@@ -1,0 +1,192 @@
+/* General Theme Colors */
+:root {
+    --main-green: #3d5a41;
+    --gold-color: #cfae6b;
+    --background-color: #f9f7f1;
+}
+
+/* Background Image */
+body {
+    background: url('/website/images/backgrounds/ian-taylor-4cGilXXLeao-unsplash.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    overflow: hidden; /* Prevent scroll during transitions */
+}
+
+/* Form Section */
+.form-container {
+    margin-top: 50px;
+    background-color: var(--background-color);
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    opacity: 1;
+    width: 30%;
+    transform: translateY(0);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+    /* Fade-out effect */
+    .form-container.fade-out {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+/* Form Input Styles */
+.form-control {
+    border: 2px solid var(--main-green);
+    transition: 0.3s;
+}
+
+    .form-control:focus {
+        border-color: var(--gold-color);
+        box-shadow: 0 0 5px var(--gold-color);
+    }
+
+/* Button Styles */
+.btn-primary {
+    background-color: var(--gold-color);
+    border-color: var(--gold-color);
+    color: white;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+    .btn-primary:hover {
+        background-color: var(--main-green);
+        border-color: var(--main-green);
+    }
+
+.form-link {
+    color: var(--gold-color);
+    text-align: center;
+    display: block;
+    margin-top: 10px;
+    transition: color 0.3s ease;
+}
+
+    .form-link:hover {
+        color: var(--main-green);
+    }
+
+.form-text {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Anchor tag */
+.form-link {
+    color: var(--gold-color);
+    text-align: center;
+    display: block;
+    margin-top: 20px;
+}
+
+    .form-link:hover {
+        color: var(--main-green);
+    }
+/* Heading */
+h2 {
+    color: var(--main-green);
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Password Icon */
+.password-container {
+    position: relative;
+}
+
+    .password-container i {
+        position: absolute;
+        right: 20px;
+        top: 70%;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+
+/* Responsive Styles */
+
+/* Tablet and smaller devices (up to 768px) */
+@media (max-width: 768px) {
+    /* Adjust form container size */
+    .form-container {
+        width: 70%;
+        margin-top: 30px;
+        padding: 30px;
+    }
+
+    /* Form Input Adjustments */
+    .form-control {
+        font-size: 14px;
+    }
+
+    /* Button Adjustments */
+    .btn-primary {
+        font-size: 14px;
+    }
+
+    /* Heading Adjustments */
+    h2 {
+        font-size: 24px;
+    }
+}
+
+/* Mobile devices (up to 480px) */
+@media (max-width: 480px) {
+    /* Adjust form container size */
+    .form-container {
+        width: 90%;
+        margin-top: 20px;
+        padding: 20px;
+    }
+
+    /* Form Input Adjustments */
+    .form-control {
+        font-size: 12px;
+    }
+
+    /* Button Adjustments */
+    .btn-primary {
+        font-size: 12px;
+    }
+
+    /* Heading Adjustments */
+    h2 {
+        font-size: 20px;
+    }
+
+    /* Password Icon Position */
+    .password-container i {
+        right: 10px;
+        top: 65%;
+    }
+
+    /* Form Link Adjustments */
+    .form-link {
+        font-size: 14px;
+    }
+}
+
+/* Extra Large Devices (larger than 1200px) */
+@media (min-width: 1200px) {
+    /* Adjust form container size to 50% for larger screens */
+    .form-container {
+        width: 50%;
+        padding: 50px;
+    }
+
+    /* Form Input Adjustments */
+    .form-control {
+        font-size: 16px;
+    }
+
+    /* Button Adjustments */
+    .btn-primary {
+        font-size: 16px;
+    }
+
+    /* Heading Adjustments */
+    h2 {
+        font-size: 28px;
+    }
+}

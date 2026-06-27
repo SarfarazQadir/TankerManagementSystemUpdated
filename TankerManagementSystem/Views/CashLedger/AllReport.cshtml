@@ -1,0 +1,350 @@
+﻿@model IEnumerable<TankerManagementSystem.Models.CashLedger>
+
+@{
+    Layout = null;
+
+    decimal totalCredit = Model?.Sum(x => x.Credit) ?? 0;
+    decimal totalDebit = Model?.Sum(x => x.Debit) ?? 0;
+    decimal balance = totalCredit - totalDebit;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-Time Cash Ledger Report</title>
+
+    <style>
+            :root {
+                --brand-color: #86608E;
+                --text-dark: #333;
+                --text-light: #fff;
+                --expense-red: #e74c3c;
+                --income-green: #27ae60;
+                --bg-soft: #f8f9fa;
+            }
+
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #e0e0e0;
+                color: var(--text-dark);
+            }
+
+            .invoice-wrapper {
+                max-width: 1100px;
+                margin: 30px auto;
+                background: #fff;
+                padding: 0;
+                box-shadow: 0 0 20px rgba(0,0,0,0.15);
+                border-radius: 4px;
+                overflow: hidden;
+            }
+
+            .header-top {
+                background-color: var(--brand-color);
+                color: var(--text-light);
+                padding: 40px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+                .header-top h1 {
+                    margin: 0;
+                    font-size: 36px;
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                    font-weight: 300;
+                }
+
+            .logo-box img {
+                max-height: 70px;
+                filter: brightness(0) invert(1);
+            }
+
+            .info-section {
+                display: grid;
+                grid-template-columns: 1.5fr 1fr;
+                padding: 30px 40px;
+                background: var(--bg-soft);
+                border-bottom: 1px solid #eee;
+            }
+
+            .bill-from h2 {
+                margin: 0 0 10px 0;
+                color: var(--brand-color);
+                font-size: 24px;
+            }
+
+            .bill-details p {
+                margin: 5px 0;
+                font-size: 14px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .content-area {
+                padding: 40px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 30px;
+            }
+
+            thead th {
+                background: #444;
+                color: #fff;
+                text-align: left;
+                padding: 14px;
+                font-size: 13px;
+                text-transform: uppercase;
+            }
+
+            tbody tr:nth-child(even) {
+                background: #fafafa;
+            }
+
+            tbody tr {
+                border-bottom: 1px solid #eee;
+            }
+
+            td {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            .text-right {
+                text-align: right;
+            }
+
+            .credit-text {
+                color: var(--income-green);
+                font-weight: bold;
+            }
+
+            .debit-text {
+                color: var(--expense-red);
+                font-weight: bold;
+            }
+
+            /* Date-wise Separator Row Styling */
+            .date-divider {
+                background-color: #f1f1f1 !important;
+                font-weight: bold;
+                color: var(--brand-color);
+                font-size: 14px;
+                border-top: 2px solid var(--brand-color);
+                border-bottom: 2px solid var(--brand-color);
+            }
+
+            .footer-grid {
+                display: grid;
+                grid-template-columns: 1fr 320px;
+                gap: 40px;
+            }
+
+            .terms {
+                font-size: 13px;
+                color: #777;
+                padding-top: 20px;
+            }
+
+            .total-table {
+                width: 100%;
+            }
+
+                .total-table td {
+                    padding: 10px 0;
+                    border: none;
+                }
+
+            .grand-total-row {
+                background-color: var(--brand-color);
+                color: white;
+            }
+
+                .grand-total-row td {
+                    padding: 15px 10px !important;
+                    font-size: 20px;
+                    font-weight: bold;
+                }
+
+            .no-print-btn {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .btn {
+                background: var(--brand-color);
+                color: white;
+                border: none;
+                padding: 10px 30px;
+                border-radius: 20px;
+                cursor: pointer;
+                font-weight: bold;
+                text-decoration: none;
+                display: inline-block;
+            }
+
+            @@media print {
+                .no-print-btn {
+                    display: none;
+                }
+
+                body {
+                    background: transparent;
+                }
+
+                .invoice-wrapper {
+                    box-shadow: none;
+                    margin: 0;
+                    max-width: 100%;
+                }
+
+                .header-top, .date-divider {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+            }
+    </style>
+</head>
+
+<body>
+
+    <div class="no-print-btn">
+        <button class="btn" onclick="window.print()">PRINT REPORT</button>
+    </div>
+
+    <div class="invoice-wrapper">
+
+        <div class="header-top">
+            <div class="logo-box">
+                <img src="~/img/flyeasy.png"
+                     alt="LOGO"
+                     onerror="this.src='https://via.placeholder.com/150x70?text=MALIK+BROS&bg=86608E&fg=fff'">
+            </div>
+            <h1>OVERALL CASH REPORT</h1>
+        </div>
+
+        <div class="info-section">
+            <div class="bill-from">
+                <h2>MALIK & BROTHERS</h2>
+                <p>Tanker Management Services</p>
+                <p>
+                    <strong>Report Type:</strong> All-Time Cash Ledger
+                </p>
+                <p>
+                    <strong>Total Entries:</strong> @Model.Count()
+                </p>
+                <p>
+                    <strong>Current Running Balance:</strong>
+                    @* Descending order hone ki wajah se FirstOrDefault() me sabse latest balance hoga *@
+                    @Math.Floor(Model.FirstOrDefault()?.Balance ?? 0)
+                </p>
+            </div>
+
+            <div class="bill-details">
+                <p>
+                    <strong>Generated Date:</strong>
+                    <span>@ViewBag.PrintDate.ToString("dd MMM yyyy hh:mm tt")</span>
+                </p>
+                <p>
+                    <strong>Total Credit (In):</strong>
+                    <span class="credit-text">@Math.Floor(totalCredit)</span>
+                </p>
+                <p>
+                    <strong>Total Debit (Out):</strong>
+                    <span class="debit-text">@Math.Floor(totalDebit)</span>
+                </p>
+                <p>
+                    <strong>Net Balance:</strong>
+                    <span style="font-weight:bold;">@Math.Floor(balance)</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%">#</th>
+                        <th style="width: 15%">Date</th>
+                        <th style="width: 40%">Description</th>
+                        <th class="text-right" style="width: 13%">Credit (+)</th>
+                        <th class="text-right" style="width: 13%">Debit (-)</th>
+                        <th class="text-right" style="width: 14%">Statement Bal.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        string lastDate = "";
+                    }
+                    @foreach (var item in Model)
+                    {
+                        string currentDate = item.EntryDate.ToString("dd MMM yyyy");
+
+                        // Agar date pichli entry se alag hai, to naya header line lagayein
+                        if (lastDate != currentDate)
+                        {
+                            <tr class="date-divider">
+                                <td colspan="6" style="padding: 8px 14px;">
+                                    📅 Entries for: @currentDate
+                                </td>
+                            </tr>
+                            lastDate = currentDate;
+                        }
+
+                        <tr>
+                            <td>@i</td>
+                            <td>@currentDate</td>
+                            <td>@item.Description</td>
+                            <td class="text-right credit-text">
+                                @(item.Credit > 0 ? "+ " + Math.Floor(item.Credit) : "-")
+                            </td>
+                            <td class="text-right debit-text">
+                                @(item.Debit > 0 ? "- " + Math.Floor(item.Debit) : "-")
+                            </td>
+                            <td class="text-right" style="font-weight: 500;">
+                                @Math.Floor(item.Balance)
+                            </td>
+                        </tr>
+                        i++;
+                    }
+                </tbody>
+            </table>
+
+            <div class="footer-grid">
+                <div class="terms">
+                    <p><strong>Note:</strong> This is an automated statement containing all historical transaction logs for Malik & Brothers Tanker Management Services.</p>
+                </div>
+
+                <div class="summary-box">
+                    <table class="total-table">
+                        <tr>
+                            <td>Total Incoming:</td>
+                            <td class="text-right credit-text">@Math.Floor(totalCredit)</td>
+                        </tr>
+                        <tr>
+                            <td>Total Outgoing:</td>
+                            <td class="text-right debit-text">@Math.Floor(totalDebit)</td>
+                        </tr>
+                        <tr class="grand-total-row">
+                            <td>NET CASH:</td>
+                            <td class="text-right">@Math.Floor(balance)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: var(--brand-color); height: 10px;"></div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+/* General Theme Colors */
+:root {
+    --main-green: #3d5a41;
+    --gold-color: #cfae6b;
+    --background-color: #f9f7f1;
+}
+
+body {
+    background-color: var(--background-color);
+}
+
+/* Flight Card Container */
+.flight-card-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 900px;
+    margin: 30px auto;
+}
+
+/* Single Flight Card */
+.flight-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Flight Details */
+.flight-info {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    color: #333;
+}
+
+.flight-time {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--main-green);
+}
+
+.flight-route {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Ticket Class Info */
+.ticket-class {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    text-align: right;
+    gap: 10px;
+    background-color: var(--background-color);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+}
+
+.price {
+    font-size: 1.4rem;
+    color: var(--gold-color);
+    font-weight: bold;
+}
+
+.availability {
+    color: var(--main-green);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Select Button */
+.btn-select {
+    background-color: var(--gold-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+    width: 100%;
+    text-align: center;
+}
+
+    .btn-select:hover {
+        background-color: var(--main-green);
+    }
+
+/* Search Box */
+/* Search Box Container */
+.search-box {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Search Box Form */
+form {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+}
+
+/* Input Fields */
+input[type="text"] {
+    border: 2px solid var(--main-green);
+    padding: 10px;
+    border-radius: 5px;
+    width: 45%;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+    input[type="text"]:focus {
+        outline: none;
+        border-color: var(--gold-color);
+    }
+
+/* Submit Button */
+input[type="submit"] {
+    background-color: var(--gold-color);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background-color 0.3s ease;
+    width: 20%;
+}
+
+    input[type="submit"]:hover {
+        background-color: var(--main-green);
+    }
+
+    input[type="submit"]:focus {
+        outline: none;
+    }
+
+/* Responsive Design */
+
+/* Mobile Devices */
+@media (max-width: 600px) {
+    .flight-card-container {
+        margin: 15px auto;
+        gap: 15px;
+    }
+
+    .flight-card {
+        padding: 15px;
+        flex-direction: column;
+    }
+
+    .flight-info {
+        gap: 20px;
+    }
+
+    .ticket-class {
+        padding: 10px;
+        min-width: 100%;
+        text-align: center;
+    }
+
+    .price {
+        font-size: 1.2rem;
+    }
+
+    .availability {
+        font-size: 0.9rem;
+    }
+
+    .btn-select {
+        font-size: 1rem;
+    }
+
+    .search-box {
+        padding: 15px;
+        flex-direction: column;
+    }
+
+    input[type="text"] {
+        width: 100%;
+    }
+
+    input[type="submit"] {
+        width: 100%;
+    }
+}
+
+/* Tablet Devices */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .flight-card-container {
+        margin: 20px auto;
+        gap: 20px;
+    }
+
+    .flight-card {
+        padding: 18px;
+    }
+
+    .ticket-class {
+        padding: 12px;
+        min-width: 200px;
+        text-align: center;
+    }
+
+    .price {
+        font-size: 1.3rem;
+    }
+
+    .availability {
+        font-size: 1rem;
+    }
+
+    .btn-select {
+        font-size: 1.1rem;
+    }
+
+    .search-box {
+        padding: 18px;
+    }
+
+    input[type="text"] {
+        width: 45%;
+    }
+
+    input[type="submit"] {
+        width: 25%;
+    }
+}
+
+/* Desktop Devices */
+@media (min-width: 1025px) {
+    .flight-card-container {
+        margin: 30px auto;
+        gap: 25px;
+    }
+
+    .flight-card {
+        padding: 20px;
+    }
+
+    .ticket-class {
+        padding: 15px;
+        min-width: 200px;
+    }
+
+    .price {
+        font-size: 1.4rem;
+    }
+
+    .availability {
+        font-size: 1rem;
+    }
+
+    .btn-select {
+        font-size: 1.2rem;
+    }
+
+    .search-box {
+        padding: 20px;
+    }
+
+    input[type="text"] {
+        width: 45%;
+    }
+
+    input[type="submit"] {
+        width: 20%;
+    }
+}

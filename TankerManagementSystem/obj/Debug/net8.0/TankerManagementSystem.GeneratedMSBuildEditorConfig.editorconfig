@@ -1,0 +1,252 @@
+is_global = true
+build_property.TargetFramework = net8.0
+build_property.TargetFramework = net8.0
+build_property.TargetPlatformMinVersion = 
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.TargetFrameworkIdentifier = .NETCoreApp
+build_property.TargetFrameworkVersion = v8.0
+build_property.EntryPointFilePath = 
+build_property.RootNamespace = TankerManagementSystem
+build_property.RootNamespace = TankerManagementSystem
+build_property.ProjectDir = D:\ASP.Net\Latest Tanker Management System\Live\TankerManagementSystem\TankerManagementSystem\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 8.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = D:\ASP.Net\Latest Tanker Management System\Live\TankerManagementSystem\TankerManagementSystem
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 8.0
+build_property.EnableCodeStyleSeverity = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Account/AccessDenied.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudFxBY2Nlc3NEZW5pZWQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Admin/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Admin/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Admin/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUHJvZmlsZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/AllReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWxsUmVwb3J0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/CashLedger/AddEntry.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FzaExlZGdlclxBZGRFbnRyeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/CashLedger/AllReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FzaExlZGdlclxBbGxSZXBvcnQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/CashLedger/DailyReport.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FzaExlZGdlclxEYWlseVJlcG9ydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/CashLedger/EditEntry.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FzaExlZGdlclxFZGl0RW50cnkuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/CashLedger/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FzaExlZGdlclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/ChangePassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2hhbmdlUGFzc3dvcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Commission/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWlzc2lvblxBZGQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Commission/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWlzc2lvblxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Commission/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ29tbWlzc2lvblxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/CreatUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ3JlYXRVc2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/FetchUsers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRmV0Y2hVc2Vycy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/MonthlyBill/Generate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTW9udGhseUJpbGxcR2VuZXJhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/MonthlyBill/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTW9udGhseUJpbGxcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/PersonalKhata/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGVyc29uYWxLaGF0YVxBZGQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/PersonalKhata/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGVyc29uYWxLaGF0YVxFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/PersonalKhata/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGVyc29uYWxLaGF0YVxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/PersonalKhata/Print.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGVyc29uYWxLaGF0YVxQcmludC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Products/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdHNcQWRkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Products/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdHNcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Products/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUHJvZHVjdHNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Shared/_Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9EYXNoYm9hcmQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Shared/_EmailConfirmationTemplate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9FbWFpbENvbmZpcm1hdGlvblRlbXBsYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Shared/_OtpConfirmationTemplate.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9PdHBDb25maXJtYXRpb25UZW1wbGF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TankerBalanceLog/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFua2VyQmFsYW5jZUxvZ1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TankerBalanceLog/TankerLogs.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFua2VyQmFsYW5jZUxvZ1xUYW5rZXJMb2dzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TankerOwner/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFua2VyT3duZXJcQWRkLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TankerOwner/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFua2VyT3duZXJcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TankerOwner/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFua2VyT3duZXJcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Tanker/Add.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFua2VyXEFkZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Tanker/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFua2VyXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Tanker/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGFua2VyXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TripEntry/AddEntry.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcEVudHJ5XEFkZEVudHJ5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TripEntry/EditEntry.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcEVudHJ5XEVkaXRFbnRyeS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TripEntry/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcEVudHJ5XEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TripLedger/AddLedger.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcExlZGdlclxBZGRMZWRnZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TripLedger/EditLedger.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcExlZGdlclxFZGl0TGVkZ2VyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TripLedger/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcExlZGdlclxJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/TripLedger/PrintBill.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVHJpcExlZGdlclxQcmludEJpbGwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/User/ChangePassword.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxDaGFuZ2VQYXNzd29yZC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/User/CreatUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxDcmVhdFVzZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/User/EditUser.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxFZGl0VXNlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/User/FetchUsers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxGZXRjaFVzZXJzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[D:/ASP.Net/Latest Tanker Management System/Live/TankerManagementSystem/TankerManagementSystem/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-88323u1lje

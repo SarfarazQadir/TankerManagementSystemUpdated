@@ -1,0 +1,309 @@
+﻿@* @{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="card">
+            <div class="card-header">
+                <h4>Add Tanker</h4>
+            </div>
+
+            <div class="card-body">
+
+                <form method="post"
+                      asp-action="Add"
+                      onsubmit="return validateTankerForm(event)">
+
+                    <div class="form-group">
+                        <label>
+                            Tanker No <span style="color:red;">*</span>
+                        </label>
+                        <input type="text"
+                               id="TankerNo"
+                               name="TankerNo"
+                               class="form-control"
+                               placeholder="Enter Tanker No" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Select Owner <span style="color:red;">*</span>
+                        </label>
+
+                        <select id="OwnerId" name="OwnerId" class="form-control">
+                            <option value="">-- Select Owner --</option>
+
+                            @foreach (var item in ViewBag.Owners)
+                            {
+                                <option value="@item.Id">
+                                    @item.Id - @item.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Model <span style="color:red;">*</span>
+                        </label>
+                        <input type="text"
+                               id="Model"
+                               name="Model"
+                               class="form-control"
+                               placeholder="Enter Model" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Capacity <span style="color:red;">*</span>
+                        </label>
+                        <input type="text"
+                               id="Capacity"
+                               name="Capacity"
+                               class="form-control"
+                               placeholder="Enter Capacity" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Previous Balance
+                        </label>
+                        <input type="number"
+                               id="PreviousBalance"
+                               name="PreviousBalance"
+                               class="form-control" />
+                    </div>
+
+                    <div class="text-center">
+                        <input type="submit"
+                               value="Add Tanker"
+                               class="btn btn-primary" />
+
+                        <a href="@Url.Action("Index")"
+                           class="btn btn-secondary">
+                            Back
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateTankerForm(event) {
+
+        let tankerNo = document.getElementById("TankerNo").value.trim();
+        let ownerId = document.getElementById("OwnerId").value.trim();
+        let model = document.getElementById("Model").value.trim();
+        let capacity = document.getElementById("Capacity").value.trim();
+        let previousBalance = document.getElementById("PreviousBalance").value.trim();
+
+        if (tankerNo === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Tanker No is required!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (ownerId === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Please select Owner!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (model === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Model is required!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (capacity === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Capacity is required!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+</script> *@
+
+@{
+    ViewData["Title"] = "Add";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="card">
+            <div class="card-header">
+                <h4>Add Tanker</h4>
+            </div>
+
+            <div class="card-body">
+
+                <form method="post"
+                      asp-action="Add"
+                      onsubmit="return validateTankerForm(event)">
+
+                    <div class="form-group">
+                        <label>
+                            Tanker No <span style="color:red;">*</span>
+                        </label>
+                        <input type="text"
+                               id="TankerNo"
+                               name="TankerNo"
+                               class="form-control"
+                               placeholder="Enter Tanker No" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Select Owner <span style="color:red;">*</span>
+                        </label>
+
+                        <select id="OwnerId" name="OwnerId" class="form-control">
+                            <option value="">-- Select Owner --</option>
+
+                            @foreach (var item in ViewBag.Owners)
+                            {
+                                <option value="@item.Id">
+                                    @item.Id - @item.Name
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Model <span style="color:red;">*</span>
+                        </label>
+                        <input type="text"
+                               id="Model"
+                               name="Model"
+                               class="form-control"
+                               placeholder="Enter Model" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Capacity <span style="color:red;">*</span>
+                        </label>
+                        <input type="text"
+                               id="Capacity"
+                               name="Capacity"
+                               class="form-control"
+                               placeholder="Enter Capacity" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Opening Balance (PKR)
+                            <small class="text-muted">(Use positive value for Profit, negative '-' for Loss/Due)</small>
+                        </label>
+                        <input type="number"
+                               step="0.01"
+                               id="CurrentBalance"
+                               name="CurrentBalance"
+                               class="form-control"
+                               placeholder="0.00" />
+                    </div>
+
+                    <div class="text-center">
+                        <input type="submit"
+                               value="Add Tanker"
+                               class="btn btn-primary" />
+
+                        <a href="@Url.Action("Index")"
+                           class="btn btn-secondary">
+                            Back
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateTankerForm(event) {
+        let tankerNo = document.getElementById("TankerNo").value.trim();
+        let ownerId = document.getElementById("OwnerId").value.trim();
+        let model = document.getElementById("Model").value.trim();
+        let capacity = document.getElementById("Capacity").value.trim();
+        let currentBalance = document.getElementById("CurrentBalance").value.trim(); // Changed ID
+
+        if (tankerNo === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Tanker No is required!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (ownerId === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Please select Owner!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (model === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Model is required!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (capacity === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Capacity is required!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (currentBalance !== "" && isNaN(currentBalance)) {
+            iziToast.error({
+                title: 'Error',
+                message: 'Opening Balance must be a valid number!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+</script>

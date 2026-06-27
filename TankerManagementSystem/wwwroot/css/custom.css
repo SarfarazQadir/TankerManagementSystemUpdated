@@ -1,0 +1,89 @@
+
+/*# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY3VzdG9tLmNzcyIsInNvdXJjZXMiOlsiY3VzdG9tLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9 */
+
+/*# sourceMappingURL=custom.css.map */
+
+Print CSS
+
+/* Basic reset for printing */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'DM Sans', sans-serif;
+    color: #333;
+    background: #fff;
+}
+
+/* Print logo and adjust layout */
+@media print {
+    header, footer, .main-menu, .mobile-nav__wrapper, .main-menu__search-cart-call-box {
+        display: none;
+    }
+
+    .page-wrapper {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .print-logo {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+        .print-logo img {
+            width: 150px;
+        }
+
+    .content {
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+        max-width: 800px;
+        background-color: #fff;
+    }
+
+        .content h1, .content p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .content p {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+    /* Remove unnecessary elements for print */
+    .footer-widget__column {
+        display: none;
+    }
+
+    .footer-widget__bottom {
+        text-align: center;
+        padding: 10px;
+    }
+
+    .footer-widget__bottom-text {
+        font-size: 12px;
+        color: #777;
+    }
+
+    .site-footer {
+        display: none;
+    }
+
+    .page-wrapper {
+        background-color: transparent;
+    }
+}
+
+/* Standard Styles */
+.content {
+    text-align: center;
+}
+
+.print-logo img {
+    max-width: 200px;
+    display: block;
+    margin: 0 auto;
+}

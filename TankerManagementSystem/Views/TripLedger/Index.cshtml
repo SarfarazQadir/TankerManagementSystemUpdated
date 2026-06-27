@@ -1,0 +1,274 @@
+﻿@* @model IEnumerable<TankerManagementSystem.Models.TripLedger>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+@if (TempData["add_ledger"] != null)
+{
+    <script>
+        Swal.fire({
+            title: '@TempData["add_ledger"]',
+            icon: 'success'
+        });
+    </script>
+}
+
+@if (TempData["edit_ledger"] != null)
+{
+    <script>
+        Swal.fire({
+            title: '@TempData["edit_ledger"]',
+            icon: 'success'
+        });
+    </script>
+}
+
+<section class="section">
+    <div class="section-body">
+
+        <br /><br />
+
+        <div class="card">
+            <div class="card-header">
+                <h4>Trip Transaction Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover" id="myTable">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Token No</th>
+                                <th>Trip From</th>
+                                <th>Trip To</th>
+                                <th>Product</th>
+                                <th>Freight</th>
+                                <th>Grand Total</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                int i = 1;
+                            }
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@item.TokenNo</td>
+                                    <td>@item.TripEntryFk?.FromLocation</td>
+                                    <td>@item.TripEntryFk?.ToLocation</td>
+                                    <td>@item.Product?.ProductName</td>
+                                    <td>@Math.Floor(item.Freight)</td>
+                                    <td>@Math.Floor(item.GrandTotal)</td>
+
+                                    <td>
+                                        <div class="dropdown">
+                                            <a href="#" data-toggle="dropdown" class="btn btn-warning dropdown-toggle">Options</a>
+                                            <div class="dropdown-menu">
+                                                <a href="@Url.Action("EditLedger", new { id = item.Id })" class="dropdown-item has-icon">
+                                                    <i class="far fa-edit"></i> Edit
+                                                </a>
+                                                <a href="@Url.Action("PrintBill", new { id = item.Id })" class="dropdown-item has-icon">
+                                                    <i class="far fa-print"></i> Print
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                i++;
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</section> *@
+@* 
+@model IEnumerable<TankerManagementSystem.Models.TripLedger>
+
+@{
+    ViewData["Title"] = "Trip Transactions";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+@if (TempData["add_ledger"] != null)
+{
+    <script>
+        Swal.fire({
+            title: '@TempData["add_ledger"]',
+            icon: 'success'
+        });
+    </script>
+}
+
+@if (TempData["edit_ledger"] != null)
+{
+    <script>
+        Swal.fire({
+            title: '@TempData["edit_ledger"]',
+            icon: 'success'
+        });
+    </script>
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>Trip Transaction Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover w-100" id="myTable">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 5%;">S.No</th>
+                                <th>Token No</th>
+                                <th>Trip From</th>
+                                <th>Trip To</th>
+                                <th>Product</th>
+                                <th>Freight</th>
+                                <th>Grand Total</th>
+                                <th class="text-center" style="width: 15%;">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                int i = 1;
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@i</td>
+                                    <td><span class="badge badge-light font-weight-bold">@item.TokenNo</span></td>
+                                    <td>@item.TripEntryFk?.FromLocation</td>
+                                    <td>@item.TripEntryFk?.ToLocation</td>
+                                    <td>@item.Product?.ProductName</td>
+                                    <! -- Null Check safely string formatting k sath -->
+                                    <td>@string.Format("{0:N0}", item.Freight)</td>
+                                    <td><span class="text-success font-weight-bold">@string.Format("{0:N0}", item.GrandTotal)</span></td>
+
+                                    <td class="text-center">
+                                        <div class="dropdown d-inline">
+                                            <button data-toggle="dropdown" class="btn btn-warning btn-sm dropdown-toggle">Options</button>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                                <a href="@Url.Action("EditLedger", new { id = item.Id })" class="dropdown-item has-icon">
+                                                    <i class="far fa-edit text-primary"></i> Edit
+                                                </a>
+                                                <a href="@Url.Action("PrintBill", new { id = item.Id })" class="dropdown-item has-icon">
+                                                    <i class="far fa-print text-success"></i> Print
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section> *@
+
+@model IEnumerable<TankerManagementSystem.Models.TripLedger>
+
+@{
+    ViewData["Title"] = "Trip Transactions";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+@if (TempData["add_ledger"] != null)
+{
+    <script>
+        Swal.fire({
+            title: '@TempData["add_ledger"]',
+            icon: 'success'
+        });
+    </script>
+}
+
+@if (TempData["edit_ledger"] != null)
+{
+    <script>
+        Swal.fire({
+            title: '@TempData["edit_ledger"]',
+            icon: 'success'
+        });
+    </script>
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="card mt-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>Trip Transaction Details</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover w-100" id="myTable">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 5%;">S.No</th>
+                                <th>Token No</th>
+                                <th>Trip From</th>
+                                <th>Trip To</th>
+                                <th>Product</th>
+                                <th>Freight</th>
+                                <th>Grand Total</th>
+                                <th class="text-center" style="width: 15%;">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                int i = 1;
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@i</td>
+                                    <td><span class="badge badge-light font-weight-bold">@item.TokenNo</span></td>
+                                    <td>@item.TripEntryFk?.FromLocation</td>
+                                    <td>@item.TripEntryFk?.ToLocation</td>
+                                    <td>@item.Product?.ProductName</td>
+                                    <td>@string.Format("{0:N0}", item.Freight)</td>
+                                    <td><span class="text-success font-weight-bold">@string.Format("{0:N0}", item.GrandTotal)</span></td>
+
+                                    <td class="text-center">
+                                        <div class="dropdown d-inline">
+                                            <button data-toggle="dropdown" class="btn btn-warning btn-sm dropdown-toggle">Options</button>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                                <a href="@Url.Action("EditLedger", new { id = item.Id })" class="dropdown-item has-icon">
+                                                    <i class="fas fa-edit text-primary"></i> Edit
+                                                </a>
+                                                <a href="@Url.Action("PrintBill", new { id = item.Id })" class="dropdown-item has-icon" target="_blank">
+                                                    <i class="fas fa-print text-success"></i> Print
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

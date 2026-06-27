@@ -1,0 +1,97 @@
+﻿@model IEnumerable<TankerManagementSystem.Models.TripEntry>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+@if (TempData["ledger_exists"] != null)
+{
+    <script>Swal.fire({ title: '@TempData["ledger_exists"]', icon: 'error' });</script>
+}
+
+@if (TempData["add_trip_message"] != null)
+{
+    <script>Swal.fire({ title: '@TempData["add_trip_message"]', icon: 'success' });</script>
+}
+
+@if (TempData["edit_trip_message"] != null)
+{
+    <script>Swal.fire({ title: '@TempData["edit_trip_message"]', icon: 'success' });</script>
+}
+
+<section class="section">
+    <div class="section-body">
+        <a href="@Url.Action("AddEntry")" class="btn btn-primary">Add Trip</a>
+        <br /><br />
+
+        <div class="card">
+            <div class="card-header"><h4>Trip List</h4></div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+
+                    <table class="table table-striped table-bordered table-hover" id="myTable">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>Id</th>
+                                <th>Load Date</th>
+                                <th>Tanker</th>
+                                <th>Advance</th>
+                                <th>From</th>
+                                <th>To</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @{
+                                int i = 1;
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@item.Id</td>
+                                    <td>@item.LoadDate.ToString("dd/MMM/yyy")</td>
+                                    <td>@item.TankerFk?.TankerNo</td>
+                                    <td>@Math.Floor(item.AdvanceCash)</td>
+                                    <td>@item.FromLocation</td>
+                                    <td>@item.ToLocation</td>
+                                    <td>
+                                        <div class="d-flex justify-content-center align-items-center gap-2">
+
+                                            <div class="dropdown">
+                                                <a href="#" data-toggle="dropdown"
+                                                   class="btn btn-warning dropdown-toggle">
+                                                    Options
+                                                </a>
+
+                                                <div class="dropdown-menu">
+                                                    <a href="@Url.Action("EditEntry", new { id = item.Id })"
+                                                       class="dropdown-item has-icon">
+                                                        <i class="far fa-edit"></i> Edit
+                                                    </a>
+
+                                                </div>
+                                            </div>
+
+                                            <a href="@Url.Action("AddLedger", "TripLedger", new { tripId = item.Id })"
+                                               class="btn btn-primary">
+                                                <i class="fas fa-file-invoice"></i> Add Ledger
+                                            </a>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                                i++;
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

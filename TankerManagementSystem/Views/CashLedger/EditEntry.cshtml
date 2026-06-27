@@ -1,0 +1,287 @@
+﻿@* @model TankerManagementSystem.Models.CashLedger
+
+@{
+    ViewData["Title"] = "EditEntry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+
+
+<section class="section">
+
+    <div class="card">
+
+        <div class="card-header">
+            <h4>Edit Cash Entry</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <input type="hidden"
+                       name="CreatedAt"
+                       value="@Model.CreatedAt" />
+
+                <input type="hidden"
+                       name="CreatedBy"
+                       value="@Model.CreatedBy" />
+
+                <div class="form-group">
+                    <label>Date</label>
+
+                    <input type="date"
+                           name="EntryDate"
+                           value="@Model.EntryDate.ToString("yyyy-MM-dd")"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+
+                    <textarea name="Description"
+                              class="form-control">@Model.Description</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Credit</label>
+
+                    <input type="number"
+                           step="0.01"
+                           name="Credit"
+                           value="@Model.Credit"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Debit</label>
+
+                    <input type="number"
+                           step="0.01"
+                           name="Debit"
+                           value="@Model.Debit"
+                           class="form-control" />
+                </div>
+
+                <button class="btn btn-primary">
+                    Update Entry
+                </button>
+
+                <a href="@Url.Action("Index")"
+                   class="btn btn-secondary">
+
+                    Back
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+<script>
+
+    @if (TempData["success"] != null)
+    {
+            <text>
+
+            iziToast.success({
+                title: 'Success',
+                message: '@TempData["success"]',
+                position: 'bottomRight'
+            });
+
+            </text>
+    }
+
+    @if (TempData["error"] != null)
+    {
+            <text>
+
+            iziToast.error({
+                title: 'Error',
+                message: '@TempData["error"]',
+                position: 'bottomRight'
+            });
+
+            </text>
+    }
+
+</script> *@
+
+@model TankerManagementSystem.Models.CashLedger
+
+@{
+    ViewData["Title"] = "EditEntry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+
+    <div class="card">
+
+        <div class="card-header">
+            <h4>Edit Cash Entry</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post" onsubmit="return validateEditCashLedgerForm(event)">
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <input type="hidden"
+                       name="CreatedAt"
+                       value="@Model.CreatedAt" />
+
+                <input type="hidden"
+                       name="CreatedBy"
+                       value="@Model.CreatedBy" />
+
+                <div class="form-group">
+                    <label>
+                        Date<span style="color:red;">*</span>
+                    </label>
+
+                    <input type="date"
+                           id="EntryDate"
+                           name="EntryDate"
+                           value="@Model.EntryDate.ToString("yyyy-MM-dd")"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Description<span style="color:red;">*</span>
+                    </label>
+
+                    <textarea id="Description"
+                              name="Description"
+                              class="form-control">@Model.Description</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label style="color:green;">
+                        Credit
+                    </label>
+
+                    <input type="number"
+                           step="0.01"
+                           id="Credit"
+                           name="Credit"
+                           value="@Model.Credit"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label style="color:red;">
+                        Debit
+                    </label>
+
+                    <input type="number"
+                           step="0.01"
+                           id="Debit"
+                           name="Debit"
+                           value="@Model.Debit"
+                           class="form-control" />
+                </div>
+
+                <button class="btn btn-primary">
+                    Update Entry
+                </button>
+
+                <a href="@Url.Action("Index")"
+                   class="btn btn-secondary">
+
+                    Back
+
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script>
+
+    function validateEditCashLedgerForm(event) {
+
+        let entryDate = document.getElementById("EntryDate").value.trim();
+        let description = document.getElementById("Description").value.trim();
+        let credit = document.getElementById("Credit").value.trim();
+        let debit = document.getElementById("Debit").value.trim();
+
+        if (entryDate === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Date is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (description === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Description is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        // Agar dono empty hon to error show karo
+        if (credit === "" && debit === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Please enter Credit or Debit amount!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+
+    @if (TempData["success"] != null)
+    {
+            <text>
+
+                iziToast.success({
+                    title: 'Success',
+                    message: '@TempData["success"]',
+                    position: 'bottomRight'
+                });
+
+            </text>
+    }
+
+    @if (TempData["error"] != null)
+    {
+            <text>
+
+                iziToast.error({
+                    title: 'Error',
+                    message: '@TempData["error"]',
+                    position: 'bottomRight'
+                });
+
+            </text>
+    }
+
+</script>

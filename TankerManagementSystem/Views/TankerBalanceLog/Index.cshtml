@@ -1,0 +1,99 @@
+﻿@model IEnumerable<TankerManagementSystem.Models.TankerBalanceLog>
+
+@{
+    ViewData["Title"] = "Balance Logs";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="card">
+
+            <div class="card-header">
+                <h4>Tanker Balance Logs</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover" id="myTable">
+
+                        <thead>
+
+                            <tr>
+                                <th>#</th>
+                                <th>Date</th>
+                                <th>Tanker</th>
+                                <th>Type</th>
+                                <th>Module</th>
+                                <th>Previous</th>
+                                <th>Amount</th>
+                                <th>New</th>
+                                <th>Description</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @{
+                                int i = 1;
+                            }
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>@i</td>
+
+                                    <td>
+                                        @item.EntryDate.ToString("dd MMM yyyy")
+                                    </td>
+
+                                    <td>
+                                        @item.Tanker?.TankerNo
+                                    </td>
+
+                                    <td>
+
+                                        @if (item.TransactionType == "ADD")
+                                        {
+                                            <span class="badge badge-success">
+                                                ADD
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">
+                                                DEDUCT
+                                            </span>
+                                        }
+
+                                    </td>
+
+                                    <td>@item.ModuleName</td>
+
+                                    <td>@item.PreviousBalance</td>
+
+                                    <td>@item.Amount</td>
+
+                                    <td>@item.NewBalance</td>
+
+                                    <td>@item.Description</td>
+
+                                </tr>
+
+                                i++;
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</section>

@@ -1,0 +1,374 @@
+﻿@* @model TankerManagementSystem.Models.TripEntry
+
+@{
+    ViewData["Title"] = "EditEntry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+
+<section class="section">
+    <div class="card">
+        <div class="card-header"><h4>Edit Trip</h4></div>
+
+        <div class="card-body">
+            <form method="post" asp-action="EditEntry">
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group">
+                    <label>Load Date</label>
+                    <input asp-for="LoadDate" type="date" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Select Tanker</label>
+                    <select asp-for="TankerId" class="form-control">
+                        @foreach (var t in ViewBag.Tankers)
+                        {
+                            <option value="@t.Id" selected="@(t.Id == Model.TankerId)">
+                                @t.TankerNo
+                            </option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Advance Cash</label>
+                    <input asp-for="AdvanceCash" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>From Location</label>
+                    <input asp-for="FromLocation" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>To Location</label>
+                    <input asp-for="ToLocation" class="form-control" />
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-primary">Update</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</section> *@
+
+@* Working Start *@
+
+
+@* @model TankerManagementSystem.Models.TripEntry
+
+@{
+    ViewData["Title"] = "EditEntry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="card">
+
+        <div class="card-header">
+            <h4>Edit Trip</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post"
+                  asp-action="EditEntry"
+                  onsubmit="return validateEditTripForm(event)">
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group">
+                    <label>
+                        Load Date<span style="color:red;">*</span>
+                    </label>
+
+                    <input asp-for="LoadDate"
+                           id="LoadDate"
+                           type="date"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Select Tanker<span style="color:red;">*</span>
+                    </label>
+
+                    <select asp-for="TankerId"
+                            id="TankerId"
+                            class="form-control">
+
+                        <option value="">-- Select Tanker --</option>
+
+                        @foreach (var t in ViewBag.Tankers)
+                        {
+                            <option value="@t.Id" selected="@(t.Id == Model.TankerId)">
+                                @t.TankerNo
+                            </option>
+                        }
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Advance Cash<span style="color:red;">*</span>
+                    </label>
+
+                    <input asp-for="AdvanceCash"
+                           id="AdvanceCash"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        From Location<span style="color:red;">*</span>
+                    </label>
+
+                    <input asp-for="FromLocation"
+                           id="FromLocation"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        To Location<span style="color:red;">*</span>
+                    </label>
+
+                    <input asp-for="ToLocation"
+                           id="ToLocation"
+                           class="form-control" />
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-primary">Update</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateEditTripForm(event) {
+
+        let loadDate = document.getElementById("LoadDate").value.trim();
+        let tankerId = document.getElementById("TankerId").value.trim();
+        let advanceCash = document.getElementById("AdvanceCash").value.trim();
+        let fromLocation = document.getElementById("FromLocation").value.trim();
+        let toLocation = document.getElementById("ToLocation").value.trim();
+
+        if (loadDate === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Load Date is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (tankerId === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Please select a tanker!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (advanceCash === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Advance Cash is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (fromLocation === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'From Location is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (toLocation === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'To Location is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+</script> *@
+
+                @* Working End *@
+@model TankerManagementSystem.Models.TripEntry
+
+@{
+    ViewData["Title"] = "Edit Entry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="card">
+        <div class="card-header">
+            <h4>Edit Trip & Expenses</h4>
+        </div>
+
+        <div class="card-body">
+            <form method="post" asp-action="EditEntry" onsubmit="return validateEditTripForm(event)">
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group">
+                    <label>Load Date<span style="color:red;">*</span></label>
+                    <input asp-for="LoadDate" id="LoadDate" type="date" class="form-control" value="@Model.LoadDate.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="form-group">
+                    <label>Select Tanker<span style="color:red;">*</span></label>
+                    <select asp-for="TankerId" id="TankerId" class="form-control">
+                        <option value="">-- Select Tanker --</option>
+                        @foreach (var t in ViewBag.Tankers)
+                        {
+                            <option value="@t.Id">@t.TankerNo</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Advance Cash<span style="color:red;">*</span></label>
+                    <input asp-for="AdvanceCash" type="number" step="any" id="AdvanceCash" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>From Location<span style="color:red;">*</span></label>
+                    <input asp-for="FromLocation" id="FromLocation" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>To Location<span style="color:red;">*</span></label>
+                    <input asp-for="ToLocation" id="ToLocation" class="form-control" />
+                </div>
+
+                <hr />
+                <h5 class="mb-3">Expenses (Ledger will auto-adjust)</h5>
+
+                @{
+                    int totalExistingExpenses = 0;
+                }
+
+                <div id="expenseContainer">
+                    @if (Model.TripExpenses != null && Model.TripExpenses.Any())
+                    {
+                        foreach (var exp in Model.TripExpenses)
+                        {
+                            <div class="row mb-2 expense-row" id="expense_row_@totalExistingExpenses">
+                                <div class="col-md-6">
+                                    <input type="text" name="expenses[@totalExistingExpenses].ExpenseName" value="@exp.ExpenseName" class="form-control" placeholder="Expense Name" required />
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="number" step="any" name="expenses[@totalExistingExpenses].Amount" value="@exp.Amount" class="form-control" placeholder="Amount" required />
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-danger" onclick="removeExpenseRow(@totalExistingExpenses)"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            totalExistingExpenses++;
+                        }
+                    }
+                </div>
+
+                <input type="hidden" id="initialExpenseCount" value="@totalExistingExpenses" />
+
+                <button type="button" onclick="addExpenseRow()" class="btn btn-info mb-4 mt-2">
+                    <i class="fas fa-plus"></i> Add Expense
+                </button>
+
+                <div class="text-center">
+                    <button class="btn btn-primary">Update</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    // DOM se loop ka count receive kiya bina context conflict ke
+    let expenseIndex = parseInt(document.getElementById("initialExpenseCount").value) || 0;
+
+    function addExpenseRow() {
+        let container = document.getElementById("expenseContainer");
+        let html = `
+            <div class="row mb-2 expense-row" id="expense_row_${expenseIndex}">
+                <div class="col-md-6">
+                    <input type="text" name="expenses[${expenseIndex}].ExpenseName" class="form-control" placeholder="Expense Name" required />
+                </div>
+                <div class="col-md-4">
+                    <input type="number" step="any" name="expenses[${expenseIndex}].Amount" class="form-control" placeholder="Amount" required />
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger" onclick="removeExpenseRow(${expenseIndex})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+        expenseIndex++;
+    }
+
+    function removeExpenseRow(index) {
+        let row = document.getElementById(`expense_row_${index}`);
+        if (row) {
+            row.remove();
+        }
+    }
+
+    function validateEditTripForm(event) {
+        let loadDate = document.getElementById("LoadDate").value.trim();
+        let tankerId = document.getElementById("TankerId").value.trim();
+        let advanceCash = document.getElementById("AdvanceCash").value.trim();
+        let fromLocation = document.getElementById("FromLocation").value.trim();
+        let toLocation = document.getElementById("ToLocation").value.trim();
+
+        if (loadDate === "" || tankerId === "" || advanceCash === "" || fromLocation === "" || toLocation === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'All fields marked with * are required!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+        return true;
+    }
+</script>

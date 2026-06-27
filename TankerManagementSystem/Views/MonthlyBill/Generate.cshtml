@@ -1,0 +1,1485 @@
+﻿
+@{
+    ViewData["Title"] = "Generate";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+@* @model IEnumerable<TankerManagementSystem.Models.TripLedger>
+
+@{
+    Layout = null;
+
+    var tanker = ViewBag.Tanker;
+
+    decimal totalFreight = Model.Sum(x => x.Freight);
+
+    decimal totalAdvance = Model.Sum(x => x.AdvanceCash);
+
+    decimal totalShortage = Model.Sum(x => x.Shortage);
+
+    decimal totalCommission = Model.Sum(x => x.Commission);
+
+    decimal totalMunshiana = Model.Sum(x => x.Munshiana);
+
+    decimal totalExpense =
+        Model.Sum(x => x.Expenses.Sum(e => e.Amount));
+
+    decimal totalDeduction =
+        totalAdvance +
+        totalShortage +
+        totalCommission +
+        totalMunshiana +
+        totalExpense;
+
+    decimal grandNet =
+        totalFreight - totalDeduction;
+}
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>Monthly Tanker Bill</title>
+
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+
+    <style>
+
+        body {
+            background: #f2f2f2;
+        }
+
+        .invoice {
+            background: white;
+            padding: 30px;
+            margin: 30px auto;
+            max-width: 1200px;
+        }
+
+        .top-title {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+            .top-title h1 {
+                font-weight: bold;
+            }
+
+        .table th {
+            background: black;
+            color: white;
+        }
+
+        .profit {
+            color: green;
+            font-weight: bold;
+        }
+
+        .loss {
+            color: red;
+            font-weight: bold;
+        }
+
+        @@media print {
+
+            .no-print {
+                display: none;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="text-center no-print mt-3">
+        <button onclick="window.print()"
+                class="btn btn-primary">
+
+            Print Monthly Bill
+
+        </button>
+    </div>
+
+    <div class="invoice">
+
+        <div class="top-title">
+
+            <h1>MALIK & BROTHERS</h1>
+
+            <h3>MONTHLY TANKER STATEMENT</h3>
+
+            <hr />
+
+        </div>
+
+        <div class="row mb-4">
+
+            <div class="col-md-6">
+
+                <h5>
+                    Tanker:
+                    @tanker.TankerNo
+                </h5>
+
+                <h5>
+                    Owner:
+                    @tanker.Owner.Name
+                </h5>
+
+            </div>
+
+            <div class="col-md-6 text-right">
+
+                <h5>
+                    Month:
+                    @(System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(ViewBag.Month))
+
+                </h5>
+
+                <h5>
+                    Year:
+                    @ViewBag.Year
+                </h5>
+
+            </div>
+
+        </div>
+
+        <table class="table table-bordered">
+
+            <thead>
+
+                <tr>
+
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Route</th>
+                    <th>Product</th>
+                    <th>Freight</th>
+                    <th>Advance</th>
+                    <th>Shortage</th>
+                    <th>Commission</th>
+                    <th>Munshiana</th>
+                    <th>Expenses</th>
+                    <th>Net</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @{
+                    int i = 1;
+                }
+
+                @foreach (var item in Model)
+                {
+                    decimal expense =
+                    item.Expenses.Sum(x => x.Amount);
+
+                    decimal net =
+                    item.Freight
+                    - item.AdvanceCash
+                    - item.Shortage
+                    - item.Commission
+                    - item.Munshiana
+                    - expense;
+
+                    <tr>
+
+                        <td>@i</td>
+
+                        <td>
+                            @item.TripDate.ToString("dd MMM yyyy")
+                        </td>
+
+                        <td>
+                            @item.TripEntryFk.FromLocation
+                            →
+                            @item.TripEntryFk.ToLocation
+                        </td>
+
+                        <td>
+                            @item.Product?.ProductName
+                        </td>
+
+                        <td>@item.Freight</td>
+
+                        <td>@item.AdvanceCash</td>
+
+                        <td>@item.Shortage</td>
+
+                        <td>@item.Commission</td>
+
+                        <td>@item.Munshiana</td>
+
+                        <td>@expense</td>
+
+                        <td class="@(net >= 0 ? "profit" : "loss")">
+
+                            @net
+
+                        </td>
+
+                    </tr>
+
+                    i++;
+                }
+
+            </tbody>
+
+        </table>
+
+        <div class="row mt-5">
+
+            <div class="col-md-6">
+
+                <h4>Summary</h4>
+
+                <table class="table table-bordered">
+
+                    <tr>
+                        <th>Total Freight</th>
+                        <td>@totalFreight</td>
+                    </tr>
+
+                    <tr>
+                        <th>Total Advance</th>
+                        <td>@totalAdvance</td>
+                    </tr>
+
+                    <tr>
+                        <th>Total Shortage</th>
+                        <td>@totalShortage</td>
+                    </tr>
+
+                    <tr>
+                        <th>Total Commission</th>
+                        <td>@totalCommission</td>
+                    </tr>
+
+                    <tr>
+                        <th>Total Munshiana</th>
+                        <td>@totalMunshiana</td>
+                    </tr>
+
+                    <tr>
+                        <th>Total Expenses</th>
+                        <td>@totalExpense</td>
+                    </tr>
+
+                    <tr>
+                        <th>Total Deductions</th>
+                        <td>@totalDeduction</td>
+                    </tr>
+
+                    <tr>
+                        <th>Final Profit / Loss</th>
+
+                        <td class="@(grandNet >= 0 ? "profit" : "loss")">
+
+                            @grandNet
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html> *@
+
+@* @model IEnumerable<TankerManagementSystem.Models.TripLedger>
+
+@{
+    Layout = null;
+
+    var tanker = ViewBag.Tanker;
+
+    decimal openingBalance = ViewBag.OpeningBalance;
+    decimal closingBalance = ViewBag.ClosingBalance;
+
+    decimal totalFreight = Model.Sum(x => x.Freight);
+
+    decimal totalAdvance = Model.Sum(x => x.AdvanceCash);
+    decimal totalShortage = Model.Sum(x => x.Shortage);
+    decimal totalCommission = Model.Sum(x => x.Commission);
+    decimal totalMunshiana = Model.Sum(x => x.Munshiana);
+    decimal totalExpense = Model.Sum(x => x.Expenses.Sum(e => e.Amount));
+    decimal totalPaid = Model.Sum(x => x.AmountPay ?? 0);
+
+    decimal totalDebit =
+        totalAdvance +
+        totalShortage +
+        totalCommission +
+        totalMunshiana +
+        totalExpense;
+
+    string monthName = System.Globalization.CultureInfo
+        .CurrentCulture
+        .DateTimeFormat
+        .GetMonthName(ViewBag.Month);
+
+    decimal runningBalance = openingBalance;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Monthly Statement
+    </title>
+
+    <style>
+
+        :root {
+            --brand: #86608E;
+            --dark: #333;
+            --light: #fff;
+            --soft: #f8f9fa;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #e5e5e5;
+            color: var(--dark);
+        }
+
+        .wrapper {
+            max-width: 1300px;
+            margin: 30px auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,.12);
+            overflow: hidden;
+        }
+
+        /* HEADER */
+
+        .header {
+            background: var(--brand);
+            color: white;
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .header h1 {
+                margin: 0;
+                font-size: 42px;
+                letter-spacing: 2px;
+                font-weight: 300;
+            }
+
+            .header h3 {
+                margin-top: 10px;
+                font-weight: 400;
+            }
+
+        /* INFO */
+
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 35px 40px;
+            background: var(--soft);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box h2 {
+            margin: 0 0 10px 0;
+            color: var(--brand);
+        }
+
+        .info-box p {
+            margin: 6px 0;
+            font-size: 15px;
+        }
+
+        /* CONTENT */
+
+        .content {
+            padding: 35px 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background: #444;
+            color: white;
+            padding: 14px;
+            text-align: left;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        tbody td {
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .expense {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .profit {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .loss {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        /* SUMMARY */
+
+        .summary-grid {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 40px;
+        }
+
+        .notes {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .summary-table td {
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .grand-row {
+            background: var(--brand);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+            .grand-row td {
+                padding: 18px 12px !important;
+            }
+
+        /* FOOTER */
+
+        .footer-line {
+            height: 12px;
+            background: var(--brand);
+            width: 100%;
+        }
+
+            .logo-box img {
+                max-height: 70px;
+                filter: brightness(0) invert(1); /* Makes logo white to match theme */
+            }
+        /* PRINT */
+
+        .print-btn {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .btn {
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            cursor: pointer;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        @@media print {
+
+            .print-btn {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .wrapper {
+                box-shadow: none;
+                margin: 0;
+            }
+
+            .header {
+                -webkit-print-color-adjust: exact;
+            }
+
+            thead th {
+                -webkit-print-color-adjust: exact;
+            }
+
+            .grand-row {
+                -webkit-print-color-adjust: exact;
+            }
+        }
+
+            .credit {
+                color: #27ae60;
+                font-weight: bold;
+            }
+
+            .debit {
+                color: #e74c3c;
+                font-weight: bold;
+            }
+
+            .balance-positive {
+                color: #27ae60;
+                font-weight: bold;
+            }
+
+            .balance-negative {
+                color: #e74c3c;
+                font-weight: bold;
+            }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="print-btn">
+
+        <button class="btn"
+                onclick="window.print()">
+
+            PRINT MONTHLY STATEMENT
+
+        </button>
+
+    </div>
+
+    <div class="wrapper">
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div>
+
+                <h1>MALIK & BROTHERS</h1>
+
+                <h3>MONTHLY TANKER STATEMENT</h3>
+
+            </div>
+            <div class="header-right-side">
+
+                <div class="logo-box">
+                    <img src="~/img/flyeasy.png" alt="LOGO" onerror="this.src='https://via.placeholder.com/150x70?text=MALIK+BROS&bg=86608E&fg=fff'">
+                </div>
+
+                <h2 style="margin: 0;">
+                    @monthName - @ViewBag.Year
+                </h2>
+
+            </div>
+
+        </div>
+
+        <!-- INFO -->
+
+        <div class="info-section">
+
+            <div class="info-box">
+
+                <h2>Tanker Information</h2>
+
+                <p>
+                    <strong>Tanker No:</strong>
+                    @tanker.TankerNo
+                </p>
+
+                <p>
+                    <strong>Owner:</strong>
+                    @tanker.Owner?.Name
+                </p>
+
+            </div>
+
+            <div class="info-box">
+
+                <h2>Balance Information</h2>
+
+                <p>
+                    <strong>Opening Balance:</strong>
+
+                    <span class="@(openingBalance >= 0 ? "credit" : "debit")">
+
+                        @Math.Floor(Math.Abs(openingBalance))
+
+                        @(openingBalance >= 0 ? " CR" : " DR")
+
+                    </span>
+
+                </p>
+
+                <p>
+                    <strong>Closing Balance:</strong>
+
+                    <span class="@(closingBalance >= 0 ? "credit" : "debit")">
+
+                        @Math.Floor(Math.Abs(closingBalance))
+
+                        @(closingBalance >= 0 ? " CR" : " DR")
+
+                    </span>
+
+                </p>
+
+            </div>
+
+        </div>
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Route</th>
+                        <th>Product</th>
+
+                        <th class="text-right">
+                            Credit - Freight
+                        </th>
+
+                        <th class="text-right">
+                            Debit - Deductions
+                        </th>
+
+                        <th class="text-right">
+                            Paid
+                        </th>
+
+                        <th class="text-right">
+                            Running Balance
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @{
+                        int i = 1;
+                    }
+
+                    @foreach (var item in Model)
+                    {
+                        decimal expense =
+                            item.Expenses.Sum(x => x.Amount);
+
+                        decimal debit =
+                            item.AdvanceCash +
+                            item.Shortage +
+                            item.Commission +
+                            item.Munshiana +
+                            expense;
+
+                        decimal paid =
+                            item.AmountPay ?? 0;
+
+                        decimal credit =
+                            item.Freight;
+
+                        runningBalance += credit;
+                        runningBalance -= debit;
+                        runningBalance -= paid;
+
+                        <tr>
+
+                            <td>@i</td>
+
+                            <td>
+                                @item.TripDate.ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @item.TripEntryFk?.FromLocation
+                                →
+                                @item.TripEntryFk?.ToLocation
+                            </td>
+
+                            <td>
+                                @item.Product?.ProductName
+                            </td>
+
+                            <td class="text-right credit">
+                                @Math.Floor(credit)
+                            </td>
+
+                            <td class="text-right debit">
+                                @Math.Floor(debit)
+                            </td>
+
+                            <td class="text-right">
+                                @Math.Floor(paid)
+                            </td>
+
+                            <td class="text-right">
+
+                                <span class="@(runningBalance >= 0 ? "credit" : "debit")">
+
+                                    @Math.Floor(Math.Abs(runningBalance))
+
+                                    @(runningBalance >= 0 ? " CR" : " DR")
+
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                        i++;
+                    }
+
+                </tbody>
+
+            </table>
+            <!-- SUMMARY -->
+
+            <div class="summary-grid">
+
+                <div class="notes">
+
+                    <h3 style="color:#86608E">
+                        Notes
+                    </h3>
+
+                    <p>
+                        This monthly statement contains all tanker
+                        trips, freight details, deductions,
+                        shortages, expenses and net balances for the
+                        selected month.
+                    </p>
+
+                    <br />
+                    <br />
+
+                    <p>
+
+                        __________________________
+
+                        <br />
+
+                        Authorised Signature
+
+                    </p>
+
+                </div>
+
+                <div>
+
+                    <table class="summary-table">
+
+                        <tr>
+                            <td>Opening Balance</td>
+
+                            <td class="text-right">
+
+                                @Math.Floor(Math.Abs(openingBalance))
+
+                                @(openingBalance >= 0 ? " CR" : " DR")
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Total Freight</td>
+
+                            <td class="text-right credit">
+
+                                @Math.Floor(totalFreight)
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Total Debit</td>
+
+                            <td class="text-right debit">
+
+                                @Math.Floor(totalDebit)
+
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Total Paid</td>
+
+                            <td class="text-right debit">
+
+                                @Math.Floor(totalPaid)
+
+                            </td>
+                        </tr>
+
+                        <tr class="grand-row">
+
+                            <td>Closing Balance</td>
+
+                            <td class="text-right">
+
+                                @Math.Floor(Math.Abs(closingBalance))
+
+                                @(closingBalance >= 0 ? " CR" : " DR")
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="footer-line"></div>
+
+    </div>
+
+</body>
+
+</html> *@
+
+@model IEnumerable<TankerManagementSystem.Models.TripLedger>
+
+@{
+    Layout = null;
+
+    var tanker = ViewBag.Tanker;
+
+    decimal totalFreight = Model.Sum(x => x.Freight);
+
+    decimal totalAdvance = Model.Sum(x => x.AdvanceCash);
+
+    decimal totalShortage = Model.Sum(x => x.Shortage);
+
+    decimal totalCommission = Model.Sum(x => x.Commission);
+
+    decimal totalMunshiana = Model.Sum(x => x.Munshiana);
+
+    decimal totalExpense =
+        Model.Sum(x => x.Expenses.Sum(e => e.Amount));
+
+    decimal totalPaid =
+        Model.Sum(x => x.AmountPay ?? 0);
+
+    decimal totalDeduction =
+        totalAdvance +
+        totalShortage +
+        totalCommission +
+        totalMunshiana +
+        totalExpense +
+        totalPaid;
+
+    decimal grandNet =
+        totalFreight - totalDeduction;
+
+    string monthName =
+        System.Globalization.CultureInfo
+        .CurrentCulture
+        .DateTimeFormat
+        .GetMonthName(ViewBag.Month);
+}
+
+    <!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        Monthly Statement
+    </title>
+
+    <style>
+
+        :root {
+            --brand: #86608E;
+            --dark: #333;
+            --light: #fff;
+            --soft: #f8f9fa;
+            --danger: #e74c3c;
+            --success: #27ae60;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #e5e5e5;
+            color: var(--dark);
+        }
+
+        .wrapper {
+            max-width: 1300px;
+            margin: 30px auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,.12);
+            overflow: hidden;
+        }
+
+        /* HEADER */
+
+        .header {
+            background: var(--brand);
+            color: white;
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+            .header h1 {
+                margin: 0;
+                font-size: 42px;
+                letter-spacing: 2px;
+                font-weight: 300;
+            }
+
+            .header h3 {
+                margin-top: 10px;
+                font-weight: 400;
+            }
+
+        /* INFO */
+
+        .info-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 35px 40px;
+            background: var(--soft);
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box h2 {
+            margin: 0 0 10px 0;
+            color: var(--brand);
+        }
+
+        .info-box p {
+            margin: 6px 0;
+            font-size: 15px;
+        }
+
+        /* CONTENT */
+
+        .content {
+            padding: 35px 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead th {
+            background: #444;
+            color: white;
+            padding: 14px;
+            text-align: left;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        tbody td {
+            padding: 14px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .expense {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .profit {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .loss {
+            color: var(--danger);
+            font-weight: bold;
+        }
+
+        /* SUMMARY */
+
+        .summary-grid {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 40px;
+        }
+
+        .notes {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .summary-table td {
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .grand-row {
+            background: var(--brand);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+            .grand-row td {
+                padding: 18px 12px !important;
+            }
+
+        /* FOOTER */
+
+        .footer-line {
+            height: 12px;
+            background: var(--brand);
+            width: 100%;
+        }
+
+            .logo-box img {
+                max-height: 70px;
+                filter: brightness(0) invert(1); /* Makes logo white to match theme */
+            }
+        /* PRINT */
+
+        .print-btn {
+            text-align: center;
+            margin: 20px;
+        }
+
+        .btn {
+            background: var(--brand);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            cursor: pointer;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        @@media print {
+
+            .print-btn {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .wrapper {
+                box-shadow: none;
+                margin: 0;
+            }
+
+            .header {
+                -webkit-print-color-adjust: exact;
+            }
+
+            thead th {
+                -webkit-print-color-adjust: exact;
+            }
+
+            .grand-row {
+                -webkit-print-color-adjust: exact;
+            }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="print-btn">
+
+        <button class="btn"
+                onclick="window.print()">
+
+            PRINT MONTHLY STATEMENT
+
+        </button>
+
+    </div>
+
+    <div class="wrapper">
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div>
+
+                <h1>MALIK & BROTHERS</h1>
+
+                <h3>MONTHLY TANKER STATEMENT</h3>
+
+            </div>
+
+            <div class="header-right-side">
+
+                <div class="logo-box">
+                    <img src="~/img/flyeasy.png" alt="LOGO" onerror="this.src='https://via.placeholder.com/150x70?text=MALIK+BROS&bg=86608E&fg=fff'">
+                </div>
+
+                <h2 style="margin: 0;">
+                    @monthName - @ViewBag.Year
+                </h2>
+
+            </div>
+
+        </div>
+
+        <!-- INFO -->
+
+        <div class="info-section">
+
+            <div class="info-box">
+
+                <h2>Tanker Information</h2>
+
+                <p>
+                    <strong>Tanker No:</strong>
+                    @tanker.TankerNo
+                </p>
+
+                <p>
+                    <strong>Owner:</strong>
+                    @tanker.Owner?.Name
+                </p>
+
+            </div>
+
+            <div class="info-box">
+
+                <h2>Statement Details</h2>
+
+                <p>
+                    <strong>Total Trips:</strong>
+                    @Model.Count()
+                </p>
+
+                <p>
+                    <strong>Statement Month:</strong>
+                    @monthName
+                </p>
+
+                <p>
+                    <strong>Statement Year:</strong>
+                    @ViewBag.Year
+                </p>
+
+            </div>
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+                        <th>Date</th>
+                        <th>Route</th>
+                        <th>Product</th>
+                        <th class="text-right">Freight</th>
+                        <th class="text-right">Deductions</th>
+                        <th class="text-right">Net Amount</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @{
+                        int i = 1;
+                    }
+
+                    @foreach (var item in Model)
+                    {
+                        decimal expense =
+                        item.Expenses.Sum(x => x.Amount);
+
+                        decimal deduction =
+                        item.AdvanceCash
+                        + item.Shortage
+                        + item.Commission
+                        + item.Munshiana
+                        + (item.AmountPay ?? 0)
+                        + expense;
+
+                        decimal net =
+                        item.Freight - deduction;
+
+                        <tr>
+
+                            <td>@i</td>
+
+                            <td>
+                                @item.TripDate.ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @item.TripEntryFk?.FromLocation
+                                →
+                                @item.TripEntryFk?.ToLocation
+                            </td>
+
+                            <td>
+                                @item.Product?.ProductName
+                            </td>
+
+                            <td class="text-right">
+                                @Math.Floor(item.Freight)
+                            </td>
+
+                            <td class="text-right expense">
+                                - @Math.Floor(deduction)
+                            </td>
+
+                            <td class="text-right @(net >= 0 ? "profit" : "loss")">
+
+                                @Math.Floor(net)
+
+                            </td>
+
+                        </tr>
+
+                        i++;
+                    }
+
+                </tbody>
+
+            </table>
+
+            <!-- SUMMARY -->
+
+            <div class="summary-grid">
+
+                <div class="notes">
+
+                    <h3 style="color:#86608E">
+                        Notes
+                    </h3>
+
+                    <p>
+                        This monthly statement contains all tanker
+                        trips, freight details, deductions,
+                        shortages, expenses and net balances for the
+                        selected month.
+                    </p>
+
+                    <br />
+                    <br />
+
+                    <p>
+
+                        __________________________
+
+                        <br />
+
+                        Authorised Signature
+
+                    </p>
+
+                </div>
+
+                <div>
+
+                    <table class="summary-table">
+
+                        <tr>
+                            <td>Total Freight</td>
+                            <td class="text-right">
+                                @Math.Floor(totalFreight)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="expense">
+                                Advance Cash
+                            </td>
+
+                            <td class="text-right expense">
+                                - @Math.Floor(totalAdvance)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="expense">
+                                Shortage
+                            </td>
+
+                            <td class="text-right expense">
+                                - @Math.Floor(totalShortage)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="expense">
+                                Commission
+                            </td>
+
+                            <td class="text-right expense">
+                                - @Math.Floor(totalCommission)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="expense">
+                                Munshiana
+                            </td>
+
+                            <td class="text-right expense">
+                                - @Math.Floor(totalMunshiana)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="expense">
+                                Expenses
+                            </td>
+
+                            <td class="text-right expense">
+                                - @Math.Floor(totalExpense)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="expense">
+                                Paid Amount
+                            </td>
+
+                            <td class="text-right expense">
+                                 @Math.Floor(totalPaid)
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                Total Deductions
+                            </td>
+
+                            <td class="text-right">
+                                @Math.Floor(totalDeduction)
+                            </td>
+                        </tr>
+
+                        <tr class="grand-row">
+
+                            <td>
+                                FINAL BALANCE
+                            </td>
+
+                            <td class="text-right">
+
+                                @Math.Floor(grandNet)
+
+                            </td>
+
+                        </tr>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="footer-line"></div>
+
+    </div>
+
+</body>
+
+</html>

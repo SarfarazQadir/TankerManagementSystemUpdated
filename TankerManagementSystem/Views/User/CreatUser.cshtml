@@ -1,0 +1,309 @@
+﻿@* @model TankerManagementSystem.Models.ViewModels.UserCreateMVCVM
+
+@{
+    ViewData["Title"] = "Create User";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="card">
+            <div class="card-header">
+                <h4>Create New User</h4>
+            </div>
+            <div class="card-body">
+
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+
+                <form method="post" asp-action="CreatUser" onsubmit="return validatePassword()">
+
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" asp-for="Username" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" asp-for="Email" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" asp-for="Password" class="form-control" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Assign Base Role</label>
+                        <select asp-for="SelectedRole" class="form-control">
+                            <option value="User">User</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mt-3">
+                        <div class="form-check">
+                            <input type="checkbox" asp-for="EnableOTP" class="form-check-input" id="otpCheck" />
+                            <label class="form-check-label" for="otpCheck"><strong>Enable 2FA OTP Email Verification</strong></label>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary">Create User & Send Activation Mail</button>
+                        <a href="@Url.Action("FetchUsers")" class="btn btn-secondary">Back</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function validatePassword() {
+        var pass = document.getElementById("password").value;
+        var regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[@@!#$%^&*]).{8,}$/;
+        if (!regex.test(pass)) {
+            alert("Password must be 8+ chars, 1 uppercase, 1 number, 1 special char");
+            return false;
+        }
+        return true;
+    }
+</script> *@
+
+@model TankerManagementSystem.Models.ViewModels.UserCreateMVCVM
+
+@{
+    ViewData["Title"] = "Create User";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<style>
+    /* Base Back Button Styling */
+    .btn-outline-back {
+        border: 1px solid #86608E;
+        color: #86608E;
+        background-color: transparent;
+    }
+
+        .btn-outline-back:hover {
+            background-color: #f5f0f6;
+            color: #6a4772;
+            border-color: #6a4772;
+        }
+
+    /* Core Submit Button Hover Action */
+    .btn-theme-submit:hover {
+        background-color: #6a4772 !important;
+        box-shadow: 0 4px 16px rgba(106, 71, 114, 0.35) !important;
+    }
+
+    /* Input Focus Theme integration */
+    .form-control:focus, .form-select:focus {
+        border-color: #86608E !important;
+        box-shadow: 0 0 0 0.25rem rgba(134, 96, 142, 0.15) !important;
+    }
+
+    /* Eye Icon Toggle Premium Core */
+    .password-toggle-btn {
+        background-color: #ffffff;
+        border-color: #e2d9e6;
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        color: #a392a8;
+        cursor: pointer;
+        transition: color 0.2s ease;
+    }
+
+        .password-toggle-btn:hover {
+            color: #86608E;
+        }
+
+    .gap-2 > * + * {
+        margin-left: 10px;
+    }
+</style>
+
+<section class="section" style="background-color: #fcfbfe; min-height: 85vh; padding: 20px 0;">
+    <div class="section-body container-fluid">
+
+        <!-- Header Section -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 style="font-weight: 700; color: #2e1f33; font-size: 1.5rem; margin-bottom: 4px;">Create New User</h2>
+                @* <p class="text-muted" style="font-size: 0.875rem; margin: 0;">Provision a new system user identity and configure authorization parameters.</p> *@
+            </div>
+            <div>
+                <a href="@Url.Action("FetchUsers")" class="btn btn-outline-back" style="border-radius: 8px; font-weight: 500; font-size: 0.875rem; padding: 8px 16px; transition: all 0.2s;">
+                    <i data-feather="arrow-left" style="width: 16px; height: 16px; margin-right: 6px; vertical-align: text-bottom;"></i> Back to List
+                </a>
+            </div>
+        </div>
+
+        <!-- Notification Alerts -->
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4" style="border-radius: 8px; font-size: 0.9rem; background-color: #fdf2f8; color: #86198f;">
+                <i data-feather="alert-circle" style="width: 20px; height: 20px; margin-right: 10px;"></i>
+                <div>@TempData["Error"]</div>
+            </div>
+        }
+
+        <!-- Custom Javascript Error Alert Container -->
+        <div id="jsValidationError" class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-4 d-none" style="border-radius: 8px; font-size: 0.9rem; background-color: #fdf2f8; color: #86198f;">
+            <i data-feather="alert-triangle" style="width: 20px; height: 20px; margin-right: 10px;"></i>
+            <div id="validationMessage"></div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-xl-6 col-lg-8 col-md-10">
+
+                <form method="post" asp-action="CreatUser" onsubmit="return validatePassword()">
+                    @Html.AntiForgeryToken()
+
+                    <!-- Main Account Config Card -->
+                    <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                        <div class="card-body p-4">
+
+                            <!-- Card Section Heading -->
+                            <div class="d-flex align-items-center mb-3">
+                                <div style="background-color: #f5f0f6; padding: 10px; border-radius: 8px; margin-right: 12px; color: #86608E;">
+                                    <i data-feather="user-plus" style="width: 20px; height: 20px;"></i>
+                                </div>
+                                <h5 style="font-weight: 600; color: #4a3552; margin: 0; font-size: 1.1rem;">Account Information</h5>
+                            </div>
+                            <hr style="border-color: #f5f0f6; margin-bottom: 24px;" />
+
+                            <!-- Username Field -->
+                            <div class="form-group mb-4">
+                                <label style="font-weight: 500; color: #6b5873; font-size: 0.85rem; margin-bottom: 6px;">Username</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" style="background-color: #ffffff; border-color: #e2d9e6; border-right: none; border-radius: 8px 0 0 8px; color: #86608E;">
+                                            <i data-feather="user" style="width: 14px;"></i>
+                                        </span>
+                                    </div>
+                                    <input type="text" asp-for="Username" class="form-control" placeholder="Enter unique username" style="border-color: #e2d9e6; border-left: none; border-radius: 0 8px 8px 0; font-size: 0.9rem; height: 42px;" required />
+                                </div>
+                            </div>
+
+                            <!-- Email Address Field -->
+                            <div class="form-group mb-4">
+                                <label style="font-weight: 500; color: #6b5873; font-size: 0.85rem; margin-bottom: 6px;">Email Address</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" style="background-color: #ffffff; border-color: #e2d9e6; border-right: none; border-radius: 8px 0 0 8px; color: #86608E;">
+                                            <i data-feather="mail" style="width: 14px;"></i>
+                                        </span>
+                                    </div>
+                                    <input type="email" asp-for="Email" class="form-control" placeholder="name@domain.com" style="border-color: #e2d9e6; border-left: none; border-radius: 0 8px 8px 0; font-size: 0.9rem; height: 42px;" required />
+                                </div>
+                            </div>
+
+                            <!-- Password Field with Eye Toggle -->
+                            <div class="form-group mb-4">
+                                <label style="font-weight: 500; color: #6b5873; font-size: 0.85rem; margin-bottom: 6px;">Authentication Password</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" style="background-color: #ffffff; border-color: #e2d9e6; border-right: none; border-radius: 8px 0 0 8px; color: #86608E;">
+                                            <i data-feather="lock" style="width: 14px;"></i>
+                                        </span>
+                                    </div>
+                                    <input type="password" id="password" asp-for="Password" class="form-control" placeholder="Minimum 8 characters with upper, digit, special symbol" style="border-color: #e2d9e6; border-left: none; border-right: none; font-size: 0.9rem; height: 42px;" required />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text password-toggle-btn" onclick="togglePassword()">
+                                            <i data-feather="eye" id="passwordEyeIcon" style="width: 16px; height: 16px;"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Role Dropdown Field -->
+                            <div class="form-group mb-4">
+                                <label style="font-weight: 500; color: #6b5873; font-size: 0.85rem; margin-bottom: 6px;">Assign Base Role</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" style="background-color: #ffffff; border-color: #e2d9e6; border-right: none; border-radius: 8px 0 0 8px; color: #86608E;">
+                                            <i data-feather="shield" style="width: 14px;"></i>
+                                        </span>
+                                    </div>
+                                    <select asp-for="SelectedRole" class="form-control" style="border-color: #e2d9e6; border-left: none; border-radius: 0 8px 8px 0; font-size: 0.9rem; height: 42px;">
+                                        <option value="User">User</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 2FA OTP Configurations Slider Switch Frame -->
+                            <div class="p-3" style="background-color: #fbf9fc; border: 1px solid #f1e9f3; border-radius: 10px; margin-top: 15px;">
+                                <div class="custom-control custom-switch d-flex align-items-center justify-content-between p-0">
+                                    <div>
+                                        <label class="form-check-label" for="otpCheck" style="font-weight: 600; color: #5c3f63; font-size: 0.9rem; cursor: pointer; display: block; margin: 0;">Enable 2FA OTP Email Verification</label>
+                                        <span class="text-muted" style="font-size: 0.75rem; display: block; color: #86608E !important; opacity: 0.8;">Enforces direct multi-factor validation via access token mail.</span>
+                                    </div>
+                                    <div style="position: relative;">
+                                        <input type="checkbox" asp-for="EnableOTP" class="custom-control-input" id="otpCheck" style="cursor: pointer;" />
+                                        <label class="custom-control-label" for="otpCheck" style="cursor: pointer; padding-left: 35px;"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Bottom Custom Actions Save Tray -->
+                    <div class="card border-0 shadow-sm mt-3" style="border-radius: 12px; background-color: #ffffff;">
+                        <div class="card-body py-3 px-4 d-flex justify-content-end align-items-center gap-2">
+                            <a href="@Url.Action("FetchUsers")" class="btn btn-light" style="font-weight: 600; font-size: 0.9rem; padding: 10px 20px; border-radius: 8px; border: 1px solid #e4e6fc;">Cancel</a>
+                            <button type="submit" class="btn btn-theme-submit" style="background-color: #86608E; color: #ffffff; font-weight: 600; font-size: 0.9rem; padding: 10px 24px; border-radius: 8px; border: none; box-shadow: 0 4px 12px rgba(134, 96, 142, 0.2); transition: all 0.2s;">
+                                <i data-feather="check" style="width: 16px; height: 16px; margin-right: 6px; vertical-align: text-bottom;"></i> Create User & Send Activation Mail
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- JavaScript Core Blocks -->
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const eyeIcon = document.getElementById("passwordEyeIcon");
+
+        if (passwordInput && eyeIcon) {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.setAttribute('data-feather', 'eye-off');
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.setAttribute('data-feather', 'eye');
+            }
+
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        }
+    }
+
+    function validatePassword() {
+        var pass = document.getElementById("password").value;
+        var regex = /^(?=.*[A-Z])(?=.*[0-9])(?=.*[@@!#$%^&*]).{8,}$/;
+
+        var errorContainer = document.getElementById("jsValidationError");
+        var msgDiv = document.getElementById("validationMessage");
+
+        if (!regex.test(pass)) {
+            msgDiv.innerText = "Password must be 8+ chars, 1 uppercase, 1 number, 1 special char.";
+            errorContainer.classList.remove("d-none");
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            return false;
+        }
+
+        errorContainer.classList.add("d-none");
+        return true;
+    }
+</script>

@@ -1,0 +1,108 @@
+﻿@model TankerManagementSystem.Models.Product
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Edit Product</h4>
+                    </div>
+
+                    <div class="card-body">
+
+                        <form method="post"
+                              asp-action="Edit"
+                              onsubmit="return validateProductEditForm(event)">
+
+                            <input type="hidden" asp-for="Id" />
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Name<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+                                    <input asp-for="ProductName"
+                                           id="ProductName"
+                                           class="form-control"
+                                           placeholder="Enter Product Name" />
+
+                                    <span asp-validation-for="ProductName"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Description<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+                                    <input asp-for="Description"
+                                           id="Description"
+                                           class="form-control"
+                                           placeholder="Enter Description" />
+
+                                    <span asp-validation-for="Description"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="card-footer text-center">
+                                <input type="submit"
+                                       value="Update Product"
+                                       class="btn btn-primary" />
+
+                                <a href="@Url.Action("Index")"
+                                   class="btn btn-secondary">
+                                    Back
+                                </a>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateProductEditForm(event) {
+
+        let productName = document.getElementById("ProductName").value.trim();
+        let description = document.getElementById("Description").value.trim();
+
+        if (productName === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Product Name is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (description === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Description is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+</script>

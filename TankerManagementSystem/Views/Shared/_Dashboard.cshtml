@@ -1,0 +1,456 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using System.Security.Claims
+@using System.Security.Claims
+@using Microsoft.EntityFrameworkCore
+@using TankerManagementSystem.Models
+@inject TankerManagementSystem.Models.ApplicationDbContext _context
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    IdentityUser user = null;
+    if (User?.Identity?.IsAuthenticated == true)
+    {
+        user = await UserManager.GetUserAsync(User);
+
+        // Fallback: if GetUserAsync didn't find the user, try by NameIdentifier claim
+        if (user == null)
+        {
+            var userId1 = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId1))
+            {
+                user = await UserManager.FindByIdAsync(userId1);
+            }
+        }
+    }
+
+    // Choose a display name with fallbacks
+    string name = user?.UserName ?? User?.Identity?.Name ?? "User";
+
+    // Default profile image
+    string profileImage = Url.Content("~/img/user.png");
+
+    // 1. User ki ID aur Admin status nikalna
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? User.FindFirst(ClaimTypes.Name)?.Value;
+    var isAdmin = User.IsInRole("Admin");
+
+    // 2. Agar user Admin NAHI hai, toh uske saare allowed modules pehle hi memory me load kar lein (Performance ke liye)
+    var allowedModules = new List<string>();
+    if (!isAdmin && !string.IsNullOrEmpty(userId))
+    {
+        allowedModules = _context.UserPermissions
+            .Include(up => up.Module)
+            .Where(up => (up.UserId == userId || up.User.UserName == userId) && up.CanView)
+            .Select(up => up.Module.Controller.ToLower())
+            .ToList();
+    }
+
+    // Helper function taake baar baar code na likhna pare
+    bool HasAccess(string controllerName)
+    {
+        if (isAdmin) return true; // Admin ko sab ka access hai
+        return allowedModules.Contains(controllerName.ToLower()); // Baqi users ke liye DB check
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+
+    <title>Tanker Management System</title>
+
+    <!-- Otika CSS -->
+    <link rel="stylesheet" href="~/css/app.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/components.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+
+    <!-- DataTables -->
+    <link rel="stylesheet"
+          href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+    <!-- iziToast -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/izitoast@1.4.0/dist/css/iziToast.min.css" />
+
+    <!-- Slim Select -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.1/slimselect.min.css" />
+
+    <!-- Sweet Alert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <!-- Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+
+    <link rel='shortcut icon' type='image/x-icon' href='~/img/flyeasy.png' />
+
+</head>
+<body>
+    <div class="loader"></div>
+    <div id="app">
+        <div class="main-wrapper main-wrapper-1">
+            <div class="navbar-bg"></div>
+            <nav class="navbar navbar-expand-lg main-navbar sticky">
+                <div class="form-inline mr-auto">
+                    <ul class="navbar-nav mr-3">
+                        <li>
+                            <a href="#" data-toggle="sidebar" class="nav-link nav-link-lg collapse-btn">
+                                <i data-feather="align-justify"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-link nav-link-lg fullscreen-btn">
+                                <i data-feather="maximize"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <ul class="navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" data-toggle="dropdown"
+                           class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+                            <img alt="image" src="~/img/flyeasy.png" style="margin-top: 34px !important;" class="user-img-radious-style" />
+                            <span style="color:black !important;display:flex !important;margin-left: -4px !important;">@name</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right pullDown">
+                            <div class="dropdown-title">@name</div>
+                            @* <a href="@Url.Action("Profile", "Admin")" class="dropdown-item has-icon">
+                                <i class="far fa-user"></i> Profile
+                            </a> *@
+                            <div class="dropdown-divider"></div>
+                       @*      <a href="@Url.Action("logout", "Authentication")" class="dropdown-item has-icon text-danger">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a> *@
+                            <a href="javascript:void(0);" id="logoutBtn" class="dropdown-item has-icon text-danger">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <div class="main-sidebar sidebar-style-2">
+                <aside id="sidebar-wrapper">
+                    <div class="sidebar-brand">
+                        <a href="@Url.Action("index", "admin")">
+                            <img style="height:100px !important;" alt="image" src="~/img/flyeasy.png" class="header-logo" />
+                        </a>
+                    </div>
+                    @* <ul class="sidebar-menu">
+
+                        <li class="dropdown active">
+                            <a href="@Url.Action("Index", "Admin")" class="nav-link">
+                                <i data-feather="home"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="nav-link" href="@Url.Action("Index", "TripEntry")">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg><span>
+                                Trip Entry
+                            </span>
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="@Url.Action("Index", "TripLedger")" class="nav-link">
+                            <i data-feather="book-open"></i>
+                            <span>Trip Ledger</span>
+                        </a>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="@Url.Action("Index", "MonthlyBill")" class="nav-link">
+                            <i data-feather="file-text"></i>
+                            <span>Monthly Bill</span>
+                        </a>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="@Url.Action("Index", "CashLedger")" class="nav-link">
+                            <i data-feather="dollar-sign"></i>
+                            <span>Daily Cash Ledger</span>
+                        </a>
+                    </li>
+
+                    <li class="dropdown">
+                        <a href="@Url.Action("Index", "PersonalKhata")" class="nav-link">
+                            <i data-feather="clipboard"></i>
+                            <span>Personal Ledger</span>
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" class="menu-toggle nav-link has-dropdown">
+                            <i data-feather="settings"></i><span>Settings</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="nav-link" href="@Url.Action("FetchUsers", "User")"> <i data-feather="users"></i>Add User</a></li>
+                            <li><a class="nav-link" href="@Url.Action("Index", "Products")"> <i data-feather="package"></i>Add Product</a></li>
+                            <li><a class="nav-link" href="@Url.Action("Index", "TankerOwner")"> <i data-feather="user-check"></i>Add Tanker Owner</a></li>
+                            <li><a class="nav-link" href="@Url.Action("Index", "Tanker")"> <i data-feather="truck"></i>Add Tanker</a></li>
+                            <li><a class="nav-link" href="@Url.Action("Index", "Commission")"> <i data-feather="percent"></i>Add Commission</a></li>
+                            <li><a class="nav-link" href="@Url.Action("Index", "TankerBalanceLog")"> <i data-feather="percent"></i>Balance Logs</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a href="@Url.Action("Logout", "Admin")" class="nav-link">
+                            <i data-feather="log-out"></i>
+                            <span>Logout</span>
+                        </a>
+                    </li>
+
+                </ul> *@
+                    <ul class="sidebar-menu">
+
+                        @* 1. DASHBOARD: Sirf Admin ko dikhega *@
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="dropdown active">
+                                <a href="@Url.Action("Index", "Admin")" class="nav-link">
+                                    <i data-feather="home"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* 2. TRIP ENTRY: Admin aur Staff dono dekh sakte hain *@
+                        @if (User.IsInRole("Admin") || HasAccess("TripEntry"))
+                        {
+                            <li>
+                                <a class="nav-link" href="@Url.Action("Index", "TripEntry")">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin">
+                                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                        <circle cx="12" cy="10" r="3"></circle>
+                                    </svg>
+                                    <span>Trip Entry</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* 3. TRIP LEDGER: Admin aur Staff dono ke liye *@
+                        @if (User.IsInRole("Admin") || HasAccess("TripLedger"))
+                        {
+                            <li class="dropdown">
+                                <a href="@Url.Action("Index", "TripLedger")" class="nav-link">
+                                    <i data-feather="book-open"></i>
+                                    <span>Trip Ledger</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* 4. MONTHLY BILL *@
+                        @if (User.IsInRole("Admin") || HasAccess("MonthlyBill"))
+                        {
+                            <li class="dropdown">
+                                <a href="@Url.Action("Index", "MonthlyBill")" class="nav-link">
+                                    <i data-feather="file-text"></i>
+                                    <span>Monthly Bill</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* 5. DAILY CASH LEDGER *@
+                        @if (User.IsInRole("Admin") || HasAccess("CashLedger"))
+                        {
+                            <li class="dropdown">
+                                <a href="@Url.Action("Index", "CashLedger")" class="nav-link">
+                                    <i data-feather="dollar-sign"></i>
+                                    <span>Daily Cash Ledger</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* 6. PERSONAL LEDGER: Yeh shayad har login user dekh sakta hai *@
+                        @if (User.IsInRole("Admin") || HasAccess("PersonalKhata"))
+                        {
+                            <li class="dropdown">
+                                <a href="@Url.Action("Index", "PersonalKhata")" class="nav-link">
+                                    <i data-feather="clipboard"></i>
+                                    <span>Personal Ledger</span>
+                                </a>
+                            </li>
+                        }
+
+                        @* 7. SETTINGS DROPDOWN: Sirf Admin ko dikhega *@
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="dropdown">
+                                <a href="#" class="menu-toggle nav-link has-dropdown">
+                                    <i data-feather="settings"></i><span>Settings</span>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="nav-link" href="@Url.Action("FetchUsers", "User")"> <i data-feather="users"></i>Add User</a></li>
+                                    <li><a class="nav-link" href="@Url.Action("Index", "Products")"> <i data-feather="package"></i>Add Product</a></li>
+                                    <li><a class="nav-link" href="@Url.Action("Index", "TankerOwner")"> <i data-feather="user-check"></i>Add Tanker Owner</a></li>
+                                    <li><a class="nav-link" href="@Url.Action("Index", "Tanker")"> <i data-feather="truck"></i>Add Tanker</a></li>
+                                    <li><a class="nav-link" href="@Url.Action("Index", "Commission")"> <i data-feather="percent"></i>Add Commission</a></li>
+                                    @* <li><a class="nav-link" href="@Url.Action("Index", "TankerBalanceLog")"> <i data-feather="percent"></i>Balance Logs</a></li> *@
+                                </ul>
+                            </li>
+                        }
+
+                        @* 8. LOGOUT: Har authenticated user ke liye *@
+                        @if (User.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="dropdown">
+                                <!-- href ko javascript:void(0) kiya aur id="apiLogoutBtn" laga di -->
+                                <a href="javascript:void(0);" id="apiLogoutBtn" class="nav-link">
+                                    <i data-feather="log-out"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+            </aside>
+        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div>
+                @RenderBody()
+            </div>
+
+        </div>
+        <!-- Main Content End -->
+ @*        <footer class="main-footer">
+            <div class="footer-left">
+                <a href="@Url.Action("Index", "admin")">Tanker Management System</a>
+            </div>
+            <div class="footer-right"></div>
+        </footer> *@
+            <footer class="main-footer" style="background-color: #ffffff; border-top: 1px solid #f4f3f6; padding: 15px 30px; font-size: 0.85rem; color: #7a6982; text-align: center;">
+                <span>&copy; @DateTime.Now.Year <a href="@Url.Action("Index", "admin")" style="color: #86608E; font-weight: 600; text-decoration: none; margin: 0 4px; transition: color 0.2s;" onmouseover="this.style.color='#6a4772'" onmouseout="this.style.color='#86608E'">Tanker Management System</a> Powered By SQ &bull; All Rights Reserved.</span>
+            </footer>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="~/js/app.min.js"></script>
+
+<script src="~/bundles/chartjs/chart.min.js"></script>
+<script src="~/bundles/jquery.sparkline.min.js"></script>
+<script src="~/bundles/apexcharts/apexcharts.min.js"></script>
+<script src="~/bundles/jqvmap/dist/jquery.vmap.min.js"></script>
+<script src="~/bundles/jqvmap/dist/maps/jquery.vmap.world.js"></script>
+
+<script src="~/js/scripts.js"></script>
+<script src="~/js/custom.js"></script>
+<script src="~/js/site.js"></script>
+
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/izitoast@1.4.0/dist/js/iziToast.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.27.1/slimselect.min.js"></script>
+
+@await RenderSectionAsync("Scripts", required: false)
+
+<script>
+    @if (TempData["success"] != null)
+    {
+        <text>
+            iziToast.success({
+            title: 'Success',
+            message: '@TempData["success"]',
+            position: 'bottomRight'
+            });
+        </text>
+    }
+
+    @if (TempData["error"] != null)
+    {
+        <text>
+            iziToast.error({
+            title: 'Error',
+            message: '@TempData["error"]',
+            position: 'bottomRight'
+            });
+        </text>
+    }
+        document.getElementById('logoutBtn').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        // API ka sahi path (api/authentication/logout)
+        fetch('/api/authentication/logout', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        }
+        })
+        .then(response => {
+        if (response.ok) {
+        return response.json();
+        }
+        throw new Error('Logout failed');
+        })
+        .then(data => {
+        // Backend se jo redirect URL aaya hai (/Admin/Login), wahan bhej dein
+        window.location.href = data.redirectTo;
+        })
+        .catch(error => {
+        console.error('Error:', error);
+        alert('Logout issue!');
+        });
+        });
+</script>
+    <!-- Yeh script aap isi file ke end me ya layout ki scripts me add kar dein -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        var logoutBtn = document.getElementById('apiLogoutBtn');
+
+        if (logoutBtn) {
+        logoutBtn.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        // Aapke ApiController ka sahi path
+        fetch('/api/Authentication/logout', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        }
+        })
+        .then(response => {
+        if (response.ok) {
+        return response.json();
+        }
+        throw new Error('Logout failed');
+        })
+        .then(data => {
+        // Backend se jo redirect URL (/Admin/Login) aayega, wahan bhej dega
+        window.location.href = data.redirectTo || '/Admin/Login';
+        })
+        .catch(error => {
+        console.error('Error:', error);
+        // Agar koi issue aaye toh backup ke tor par redirect
+        window.location.href = '/Admin/Login';
+        });
+        });
+        }
+        });
+    </script>
+<script>
+    $(document).ready(function () {
+    if ($('#myTable').length > 0) {
+    $('#myTable').DataTable();
+    }
+    });
+</script>
+
+<script>
+    if ($('#Selectslim').length > 0) {
+    new SlimSelect({
+    select: '#Selectslim'
+    });
+    }
+</script>
+</body>
+</html>

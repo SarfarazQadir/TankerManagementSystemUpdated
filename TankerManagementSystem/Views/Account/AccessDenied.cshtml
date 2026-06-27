@@ -1,0 +1,55 @@
+﻿@{
+    // Layout = "~/Views/Shared/_Dashboard.cshtml";
+    Layout = null;
+    ViewData["Title"] = "Access Denied";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="~/css/app.min.css" />
+    <!-- Otika CSS -->
+    <link rel="stylesheet" href="~/css/app.min.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/components.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="shortcut icon" href="~/img/flyeasy.png" />
+
+</head>
+<body>
+
+
+    <div class="container text-center" style="margin-top: 100px;">
+        <div class="card shadow-lg p-5 border-0" style="border-radius: 15px; max-width: 600px; margin: 0 auto;">
+            <div class="mb-4">
+                <i class="fas fa-exclamation-triangle text-danger" style="font-size: 80px;"></i>
+            </div>
+            <h2 class="text-danger font-weight-bold mb-3">Security Policy Violation (403)</h2>
+
+            <div class="alert alert-danger bg-light text-dark border-danger mb-4">
+                <strong>@ViewBag.ErrorMessage</strong>
+            </div>
+
+            <p class="text-muted">If you believe this administrative assignment is an error, please reach out to your system administrator to update your account profiles.</p>
+
+            <div class="mt-4">
+                <a href="javascript:history.back()" class="btn btn-secondary px-4" style="background:#86608E;"><i class="fas fa-arrow-left mr-2"></i> Go Back</a>
+                @* <a href="/Admin/Index" class="btn text-white px-4" style="background:#86608E;"><i class="fas fa-home mr-2"></i> System Home</a> *@
+            </div>
+        </div>
+    </div>
+
+        
+    <!-- SCRIPTS -->
+    <script src="~/js/app.min.js"></script>
+    <script src="~/js/scripts.js"></script>
+    <script src="~/js/custom.js"></script>
+</body>
+</html>

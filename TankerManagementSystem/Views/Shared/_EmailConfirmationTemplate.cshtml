@@ -1,0 +1,139 @@
+﻿@model dynamic
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verify Your Email</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fcfbfe;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #fcfbfe;
+            padding-bottom: 40px;
+            padding-top: 40px;
+        }
+
+        .main-card {
+            max-width: 600px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            margin: 0 auto;
+            box-shadow: 0 4px 12px rgba(134, 96, 142, 0.08);
+            border: 1px solid #f1e9f3;
+            overflow: hidden;
+        }
+
+        .header-band {
+            background-color: #86608E;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .logo {
+            max-height: 55px;
+            width: auto;
+            margin-bottom: 10px;
+            display: inline-block;
+            filter: brightness(0) invert(1);
+        }
+
+        .content-body {
+            padding: 40px 35px;
+            color: #3d2a42;
+            line-height: 1.6;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2e1f33;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 15px;
+            color: #6b5873;
+            margin-bottom: 25px;
+        }
+
+        .btn-container {
+            text-align: center;
+            margin: 35px 0;
+        }
+
+        .action-button {
+            background-color: #86608E;
+            color: #ffffff !important;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 12px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(134, 96, 142, 0.25);
+            transition: background-color 0.2s;
+        }
+
+            .action-button:hover {
+                background-color: #6a4772;
+            }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            background-color: #f9f6fa;
+            border-top: 1px solid #f1e9f3;
+            font-size: 12px;
+            color: #a392a8;
+        }
+
+        .trouble {
+            font-size: 13px;
+            color: #a392a8;
+            border-top: 1px solid #f5f0f6;
+            padding-top: 20px;
+            margin-top: 30px;
+            word-break: break-all;
+        }
+
+            .trouble a {
+                color: #86608E;
+                text-decoration: none;
+            }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="main-card">
+            <div style="filter: brightness(0) invert(1) !important;" class="header-band">
+                <img src="@Model.LogoUrl" alt="Tanker Management System Logo" class="logo" />
+            </div>
+
+            <div class="content-body">
+                <h1>Welcome to Tanker Management System, @Model.Username!</h1>
+                <p>Thank you for registering with us. To complete your identity profile and activate your account privileges, please verify your email address by clicking the secure button below:</p>
+
+                <div class="btn-container">
+                    <a href="@Model.ConfirmationLink" target="_blank" class="action-button">Confirm Email Address</a>
+                </div>
+
+                <p>This verification matrix is valid for a limited window. If you did not initialize this registration sequence, you can safely disregard this correspondence.</p>
+            </div>
+
+            <div class="footer">
+                &copy; 2026 Tanker Management System Tanker Management System. All rights reserved.
+            </div>
+        </div>
+    </div>
+</body>
+</html>

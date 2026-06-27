@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+
+    <div class="card">
+
+        <div class="card-header">
+            <h4>Generate Monthly Tanker Bill</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="get" action="@Url.Action("Generate")">
+
+                <div class="row">
+
+                    <div class="col-md-4">
+                        <label>Select Tanker</label>
+
+                        <select name="tankerId" class="form-control" required>
+
+                            <option value="">Select Tanker</option>
+
+                            @foreach (var item in ViewBag.Tankers)
+                            {
+                                <option value="@item.Id">
+                                    @item.TankerNo - @item.Owner.Name
+                                </option>
+                            }
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label>Month</label>
+
+                        <select name="month" class="form-control" required>
+
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i">
+                                    @(System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.GetMonthName(i))
+                                </option>
+                            }
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label>Year</label>
+
+                        <select name="year" class="form-control">
+
+                            @for (int y = DateTime.Now.Year; y >= 2024; y--)
+                            {
+                                <option value="@y">@y</option>
+                            }
+
+                        </select>
+                    </div>
+
+                    <div class="col-md-2 mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary btn-block">
+
+                            Generate
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+

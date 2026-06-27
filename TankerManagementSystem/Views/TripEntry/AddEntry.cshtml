@@ -1,0 +1,328 @@
+﻿@* 
+@{
+    ViewData["Title"] = "AddEntry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="card">
+        <div class="card-header"><h4>Add Trip</h4></div>
+
+        <div class="card-body">
+            <form method="post" asp-action="AddEntry">
+
+                <div class="form-group">
+                    <label>Load Date</label>
+                    <input type="date" name="LoadDate" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Select Tanker</label>
+                    <select name="TankerId" class="form-control">
+                        <option value="">-- Select Tanker --</option>
+                        @foreach (var t in ViewBag.Tankers)
+                        {
+                            <option value="@t.Id">@t.TankerNo</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Advance Cash</label>
+                    <input type="number" name="AdvanceCash" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>From Location</label>
+                    <input type="text" name="FromLocation" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>To Location</label>
+                    <input type="text" name="ToLocation" class="form-control" />
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-primary">Add Trip</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</section> *@
+@* Working *@
+@* @{
+    ViewData["Title"] = "AddEntry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="card">
+        <div class="card-header">
+            <h4>Add Trip</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post" asp-action="AddEntry" onsubmit="return validateTripForm(event)">
+
+                <div class="form-group">
+                    <label>
+                        Load Date<span style="color:red;">*</span>
+                    </label>
+
+                    <input type="date"
+                           id="LoadDate"
+                           name="LoadDate"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Select Tanker<span style="color:red;">*</span>
+                    </label>
+
+                    <select id="TankerId"
+                            name="TankerId"
+                            class="form-control">
+
+                        <option value="">-- Select Tanker --</option>
+
+                        @foreach (var t in ViewBag.Tankers)
+                        {
+                            <option value="@t.Id">@t.TankerNo</option>
+                        }
+
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Advance Cash<span style="color:red;">*</span>
+                    </label>
+
+                    <input type="number"
+                           id="AdvanceCash"
+                           name="AdvanceCash"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        From Location<span style="color:red;">*</span>
+                    </label>
+
+                    <input type="text"
+                           id="FromLocation"
+                           name="FromLocation"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        To Location<span style="color:red;">*</span>
+                    </label>
+
+                    <input type="text"
+                           id="ToLocation"
+                           name="ToLocation"
+                           class="form-control" />
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-primary">Add Trip</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateTripForm(event) {
+
+        let loadDate = document.getElementById("LoadDate").value.trim();
+        let tankerId = document.getElementById("TankerId").value.trim();
+        let advanceCash = document.getElementById("AdvanceCash").value.trim();
+        let fromLocation = document.getElementById("FromLocation").value.trim();
+        let toLocation = document.getElementById("ToLocation").value.trim();
+
+        if (loadDate === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Load Date is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (tankerId === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Please select a tanker!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (advanceCash === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Advance Cash is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (fromLocation === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'From Location is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (toLocation === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'To Location is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+</script> *@
+
+
+@model TankerManagementSystem.Models.TripEntry
+
+@{
+    ViewData["Title"] = "AddEntry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="card">
+        <div class="card-header">
+            <h4>Add Trip & Initial Expenses</h4>
+        </div>
+
+        <div class="card-body">
+            <form method="post" asp-action="AddEntry" onsubmit="return validateTripForm(event)">
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    <label>Load Date<span style="color:red;">*</span></label>
+                    <input type="date" id="LoadDate" name="LoadDate" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                </div>
+
+                <div class="form-group">
+                    <label>Select Tanker<span style="color:red;">*</span></label>
+                    <select id="TankerId" name="TankerId" class="form-control">
+                        <option value="">-- Select Tanker --</option>
+                        @foreach (var t in ViewBag.Tankers)
+                        {
+                            <option value="@t.Id">@t.TankerNo</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Advance Cash<span style="color:red;">*</span></label>
+                    <input type="number" step="any" id="AdvanceCash" name="AdvanceCash" class="form-control" placeholder="0.00" value="0" />
+                </div>
+
+                <div class="form-group">
+                    <label>From Location<span style="color:red;">*</span></label>
+                    <input type="text" id="FromLocation" name="FromLocation" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>To Location<span style="color:red;">*</span></label>
+                    <input type="text" id="ToLocation" name="ToLocation" class="form-control" />
+                </div>
+
+                <hr />
+                <h5 class="mb-3">Expenses (Will deduct from Cash Ledger)</h5>
+
+                <div id="expenseContainer">
+                </div>
+
+                <button type="button" onclick="addExpenseRow()" class="btn btn-info mb-4 mt-2">
+                    <i class="fas fa-plus"></i> Add Expense
+                </button>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Add Trip</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+<script>
+    let expenseIndex = 0;
+
+    function addExpenseRow() {
+        let container = document.getElementById("expenseContainer");
+        let html = `
+            <div class="row mb-2 expense-row" id="expense_row_${expenseIndex}">
+                <div class="col-md-6">
+                    <input type="text" name="expenses[${expenseIndex}].ExpenseName" class="form-control" placeholder="Expense Name (e.g., Fuel, Toll)" required />
+                </div>
+                <div class="col-md-4">
+                    <input type="number" step="any" name="expenses[${expenseIndex}].Amount" class="form-control" placeholder="Amount" required />
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger" onclick="removeExpenseRow(${expenseIndex})"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+        expenseIndex++;
+    }
+
+    function removeExpenseRow(index) {
+        document.getElementById(`expense_row_${index}`).remove();
+    }
+
+    function validateTripForm(event) {
+        let loadDate = document.getElementById("LoadDate").value.trim();
+        let tankerId = document.getElementById("TankerId").value.trim();
+        let advanceCash = document.getElementById("AdvanceCash").value.trim();
+        let fromLocation = document.getElementById("FromLocation").value.trim();
+        let toLocation = document.getElementById("ToLocation").value.trim();
+
+        if (loadDate === "" || tankerId === "" || advanceCash === "" || fromLocation === "" || toLocation === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'All core fields marked with * are required!',
+                position: 'bottomRight'
+            });
+            return false;
+        }
+        return true;
+    }
+</script>

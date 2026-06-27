@@ -1,0 +1,887 @@
+﻿@* @model dynamic
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Secure OTP Code</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fcfbfe;
+            margin: 0;
+            padding: 0;
+        }
+
+        .wrapper {
+            width: 100%;
+            table-layout: fixed;
+            background-color: #fcfbfe;
+            padding-bottom: 40px;
+            padding-top: 40px;
+        }
+
+        .main-card {
+            max-width: 500px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            margin: 0 auto;
+            box-shadow: 0 4px 12px rgba(134, 96, 142, 0.08);
+            border: 1px solid #f1e9f3;
+            overflow: hidden;
+        }
+
+        .header-band {
+            background-color: #86608E;
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        .logo {
+            max-height: 50px;
+            width: auto;
+            display: inline-block;
+        }
+
+        .content-body {
+            padding: 35px 30px;
+            color: #3d2a42;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2e1f33;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+        p {
+            font-size: 14px;
+            color: #6b5873;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .otp-box {
+            background-color: #f9f6fa;
+            border: 2px dashed #86608E;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-size: 32px;
+            font-weight: 700;
+            color: #86608E;
+            letter-spacing: 6px;
+            display: inline-block;
+            margin: 20px auto;
+            min-width: 180px;
+        }
+
+        .alert-text {
+            font-size: 12px;
+            color: #a392a8;
+            margin-top: 20px;
+            text-align: left;
+            background-color: #fdf2f8;
+            border-radius: 6px;
+            padding: 10px;
+            border-left: 3px solid #86608E;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #f9f6fa;
+            border-top: 1px solid #f1e9f3;
+            font-size: 11px;
+            color: #a392a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="main-card">
+            <div class="header-band">
+                <img src="@Model.LogoUrl" alt="FlyEasy Logo" class="logo" />
+            </div>
+
+            <div class="content-body">
+                <h1 style="text-align: left;">Two-Factor Authentication</h1>
+                <p>Hello, a request was initiated to access your account via secure login. Use the following dynamic verification token code to fulfill the process:</p>
+
+                <div class="otp-box">@Model.OtpCode</div>
+
+                <p style="margin-top: 20px; font-size: 13px; color: #7a6982;">This validation signature is dynamic, single-use, and will naturally expire shortly.</p>
+
+                <div class="alert-text">
+                    <strong>Security Warning:</strong> Never share this operational token with anyone. FlyEasy support units will never ask for your authentication key matrix over unsecured channels.
+                </div>
+            </div>
+
+            <div class="footer">
+                &copy; 2026 FlyEasy Tanker Management System. All rights reserved.
+            </div>
+        </div>
+    </div>
+</body>
+</html> *@
+@* @model dynamic
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Account Verification</title>
+    <style>
+            /* Base Reset & Keyframes */
+            @@keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @@keyframes pulseGlow {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(134, 96, 142, 0.15);
+                }
+
+                70% {
+                    box-shadow: 0 0 0 10px rgba(134, 96, 142, 0);
+                }
+
+                100% {
+                    box-shadow: 0 0 0 0 rgba(134, 96, 142, 0);
+                }
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: #faf8fb;
+                margin: 0;
+                padding: 0;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            .wrapper {
+                width: 100%;
+                background-color: #faf8fb;
+                padding: 40px 0;
+            }
+
+            .main-card {
+                max-width: 480px;
+                background-color: #ffffff;
+                border-radius: 24px;
+                margin: 0 auto;
+                box-shadow: 0 20px 40px rgba(134, 96, 142, 0.04), 0 1px 3px rgba(134, 96, 142, 0.02);
+                border: 1px solid rgba(134, 96, 142, 0.08);
+                overflow: hidden;
+                animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .header-area {
+                padding: 35px 40px 20px 40px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #f5eff6;
+            }
+
+            .logo {
+                max-height: 38px;
+                width: auto;
+            }
+
+            .security-badge {
+                background-color: #f3edf5;
+                color: #86608E;
+                font-size: 11px;
+                font-weight: 600;
+                padding: 6px 12px;
+                border-radius: 100px;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+            }
+
+            .content-body {
+                padding: 40px;
+            }
+
+            /* Icon Grid */
+            .icon-container {
+                width: 64px;
+                height: 64px;
+                background: linear-gradient(135deg, #fbf9fc 0%, #f3edf5 100%);
+                border-radius: 18px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 28px;
+                border: 1px solid rgba(134, 96, 142, 0.1);
+            }
+
+            .icon-svg {
+                width: 28px;
+                height: 28px;
+                fill: #86608E;
+            }
+
+            h1 {
+                font-size: 24px;
+                font-weight: 700;
+                color: #1a0f1f;
+                margin: 0 0 12px 0;
+                letter-spacing: -0.5px;
+            }
+
+            .subtitle {
+                font-size: 15px;
+                color: #66566c;
+                line-height: 1.6;
+                margin: 0 0 32px 0;
+            }
+
+            /* Modernized OTP Presentation */
+            .otp-container {
+                text-align: center;
+                margin: 32px 0;
+            }
+
+            .otp-box {
+                background: linear-gradient(180deg, #ffffff 0%, #fbf9fc 100%);
+                border: 1px solid rgba(134, 96, 142, 0.25);
+                border-radius: 16px;
+                padding: 18px 32px;
+                font-size: 36px;
+                font-weight: 700;
+                color: #86608E;
+                letter-spacing: 8px;
+                display: inline-block;
+                box-shadow: 0 4px 12px rgba(134, 96, 142, 0.03);
+                animation: pulseGlow 2s infinite;
+            }
+
+            .timer-text {
+                font-size: 13px;
+                color: #928099;
+                margin-top: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .timer-dot {
+                width: 6px;
+                height: 6px;
+                background-color: #86608E;
+                border-radius: 50%;
+                display: inline-block;
+            }
+
+            .divider {
+                height: 1px;
+                background-color: #f5eff6;
+                margin: 32px 0;
+            }
+
+            /* Security Footer Warning */
+            .security-note {
+                background-color: #faf7fb;
+                border-radius: 14px;
+                padding: 16px 20px;
+                border-left: 4px solid #86608E;
+            }
+
+                .security-note p {
+                    font-size: 12px;
+                    color: #726177;
+                    margin: 0;
+                    line-height: 1.5;
+                }
+
+            .footer {
+                text-align: center;
+                padding: 28px 40px;
+                background-color: #faf8fb;
+                border-top: 1px solid #f5eff6;
+                font-size: 12px;
+                color: #928099;
+            }
+
+                .footer a {
+                    color: #86608E;
+                    text-decoration: none;
+                    font-weight: 500;
+                }
+
+            /* Mobile Optimization */
+            @@media only screen and (max-width: 520px) {
+                .wrapper {
+                    padding: 16px 0;
+                }
+
+                .main-card {
+                    border-radius: 20px;
+                    margin: 0 12px;
+                }
+
+                .header-area {
+                    padding: 25px 24px 16px 24px;
+                }
+
+                .content-body {
+                    padding: 32px 24px;
+                }
+
+                h1 {
+                    font-size: 21px;
+                }
+
+                .otp-box {
+                    font-size: 32px;
+                    padding: 14px 24px;
+                }
+            }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="main-card">
+
+            <!-- Top Bar -->
+            <div class="header-area">
+                <img src="@Model.LogoUrl" alt="FlyEasy Logo" class="logo" />
+                <div class="security-badge">Secure Portal</div>
+            </div>
+
+            <!-- Content -->
+            <div class="content-body">
+                <div class="icon-container">
+                    <!-- Premium Security Lock Shield SVG -->
+                    <svg class="icon-svg" viewBox="0 0 24 24">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.5 1.1 2.5 2.5 0 .95-.53 1.78-1.3 2.2c1.12.56 1.8 1.71 1.8 3H9c0-1.29.68-2.44 1.8-3-.77-.42-1.3-1.25-1.3-2.2C9.5 8.1 10.6 7 12 7z" />
+                    </svg>
+                </div>
+
+                <h1>Secure Account Verification</h1>
+                <p class="subtitle">We have sent a 6-digit verification code to your email address. Enter this code to complete your verification setup.</p>
+
+                <!-- OTP Presentation Box -->
+                <div class="otp-container">
+                    <div class="otp-box">@Model.OtpCode</div>
+                    <div class="timer-text">
+                        <span class="timer-dot"></span>
+                        This operational token will expire in 10 minutes
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Security Alert Callout -->
+                <div class="security-note">
+                    <p><strong>Security Reminder:</strong> Never share this code with anyone. FlyEasy support personnel will never ask for your authentication parameters via unsecured channels.</p>
+                </div>
+            </div>
+
+            <!-- Modern Footer Layout -->
+            <div class="footer">
+                <div style="margin-bottom: 8px;">&copy; 2026 FlyEasy Tanker Management System.</div>
+                <div>If you did not request this, you can safely ignore this email or contact <a href="#">Support</a>.</div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html> *@
+
+@* @model dynamic
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Secure Account Verification</title>
+    <style>
+            /* Base Reset & Keyframes */
+            @@keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(12px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+            @@keyframes pulseGlow {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(134, 96, 142, 0.15);
+                }
+
+                70% {
+                    box-shadow: 0 0 0 10px rgba(134, 96, 142, 0);
+                }
+
+                100% {
+                    box-shadow: 0 0 0 0 rgba(134, 96, 142, 0);
+                }
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+                background-color: #faf8fb;
+                margin: 0;
+                padding: 0;
+                -webkit-font-smoothing: antialiased;
+            }
+
+            .wrapper {
+                width: 100%;
+                background-color: #faf8fb;
+                padding: 40px 0;
+            }
+
+            .main-card {
+                max-width: 480px;
+                background-color: #ffffff;
+                border-radius: 24px;
+                margin: 0 auto;
+                box-shadow: 0 20px 40px rgba(134, 96, 142, 0.04), 0 1px 3px rgba(134, 96, 142, 0.02);
+                border: 1px solid rgba(134, 96, 142, 0.08);
+                overflow: hidden;
+                animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+
+            .header-area {
+                padding: 35px 40px 20px 40px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #f5eff6;
+            }
+
+            .logo {
+                max-height: 38px;
+                width: auto;
+            }
+
+            .security-badge {
+                background-color: #f3edf5;
+                color: #86608E;
+                font-size: 11px;
+                font-weight: 600;
+                padding: 6px 12px;
+                border-radius: 100px;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+            }
+
+            .content-body {
+                padding: 40px;
+            }
+
+            /* Security Illustration Styling */
+            .illustration-container {
+                width: 100%;
+                text-align: left;
+                margin-bottom: 28px;
+            }
+
+            .security-image {
+                width: 72px;
+                height: auto;
+                display: block;
+            }
+
+            h1 {
+                font-size: 24px;
+                font-weight: 700;
+                color: #1a0f1f;
+                margin: 0 0 12px 0;
+                letter-spacing: -0.5px;
+            }
+
+            .subtitle {
+                font-size: 15px;
+                color: #66566c;
+                line-height: 1.6;
+                margin: 0 0 32px 0;
+            }
+
+            /* Modernized OTP Presentation */
+            .otp-container {
+                text-align: center;
+                margin: 32px 0;
+            }
+
+            .otp-box {
+                background: linear-gradient(180deg, #ffffff 0%, #fbf9fc 100%);
+                border: 1px solid rgba(134, 96, 142, 0.25);
+                border-radius: 16px;
+                padding: 18px 32px;
+                font-size: 36px;
+                font-weight: 700;
+                color: #86608E;
+                letter-spacing: 8px;
+                display: inline-block;
+                box-shadow: 0 4px 12px rgba(134, 96, 142, 0.03);
+                animation: pulseGlow 2s infinite;
+            }
+
+            .timer-text {
+                font-size: 13px;
+                color: #928099;
+                margin-top: 16px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+            }
+
+            .timer-dot {
+                width: 6px;
+                height: 6px;
+                background-color: #86608E;
+                border-radius: 50%;
+                display: inline-block;
+            }
+
+            .divider {
+                height: 1px;
+                background-color: #f5eff6;
+                margin: 32px 0;
+            }
+
+            /* Security Footer Warning */
+            .security-note {
+                background-color: #faf7fb;
+                border-radius: 14px;
+                padding: 16px 20px;
+                border-left: 4px solid #86608E;
+            }
+
+                .security-note p {
+                    font-size: 12px;
+                    color: #726177;
+                    margin: 0;
+                    line-height: 1.5;
+                }
+
+            .footer {
+                text-align: center;
+                padding: 28px 40px;
+                background-color: #faf8fb;
+                border-top: 1px solid #f5eff6;
+                font-size: 12px;
+                color: #928099;
+            }
+
+                .footer a {
+                    color: #86608E;
+                    text-decoration: none;
+                    font-weight: 500;
+                }
+
+            /* Mobile Optimization */
+            @@media only screen and (max-width: 520px) {
+                .wrapper {
+                    padding: 16px 0;
+                }
+
+                .main-card {
+                    border-radius: 20px;
+                    margin: 0 12px;
+                }
+
+                .header-area {
+                    padding: 25px 24px 16px 24px;
+                }
+
+                .content-body {
+                    padding: 32px 24px;
+                }
+
+                h1 {
+                    font-size: 21px;
+                }
+
+                .otp-box {
+                    font-size: 32px;
+                    padding: 14px 24px;
+                }
+
+                .security-image {
+                    width: 64px;
+                }
+            }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="main-card">
+
+            <!-- Top Bar -->
+            <div class="header-area">
+                <img src="@Model.LogoUrl" alt="FlyEasy Logo" class="logo" />
+                <div class="security-badge">Secure Portal</div>
+            </div>
+
+            <!-- Content -->
+            <div class="content-body">
+
+                <!-- Online Security Illustration Added Here -->
+                <div class="illustration-container">
+                    <img src="http://malikbrother.runasp.net/img/flyeasy.png" alt="Security Lock" class="security-image" />
+                </div>
+
+                <h1>Secure Account Verification</h1>
+                <p class="subtitle">We have sent a 6-digit verification code to your email address. Enter this code to complete your verification setup.</p>
+
+                <!-- OTP Presentation Box -->
+                <div class="otp-container">
+                    <div class="otp-box">@Model.OtpCode</div>
+                    <div class="timer-text">
+                        <span class="timer-dot"></span>
+                        This operational token will expire in 1 minutes
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <!-- Security Alert Callout -->
+                <div class="security-note">
+                    <p><strong>Security Reminder:</strong> Never share this code with anyone. FlyEasy support personnel will never ask for your authentication parameters via unsecured channels.</p>
+                </div>
+            </div>
+
+            <!-- Modern Footer Layout -->
+            <div class="footer">
+                <div style="margin-bottom: 8px;">&copy; 2026 FlyEasy Tanker Management System.</div>
+                <div>If you did not request this, you can safely ignore this email or contact <a href="#">Support</a>.</div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html> *@
+@model dynamic
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Tanker Management System Verification</title>
+
+    <style>
+
+            body {
+                margin: 0;
+                padding: 0;
+                background: #faf8fb;
+                font-family: 'Segoe UI', sans-serif;
+            }
+
+            .wrapper {
+                width: 100%;
+                padding: 40px 0;
+            }
+
+            .main-card {
+                max-width: 480px;
+                margin: auto;
+                background: #fff;
+                border-radius: 22px;
+                overflow: hidden;
+                border: 1px solid rgba(134,96,142,0.08);
+                box-shadow: 0 10px 30px rgba(134,96,142,0.05);
+            }
+
+            /* HEADER */
+            .header-area {
+                text-align: center;
+                padding: 30px 30px 20px;
+                background: linear-gradient( 180deg, rgba(134,96,142,0.03) 0%, rgba(255,255,255,1) 100% );
+            }
+
+            .logo {
+                width: 150px;
+                max-width: 100%;
+                margin-bottom: 10px;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .system-title {
+                color: #86608E;
+                font-size: 14px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .security-badge {
+                display: inline-block;
+                margin-top: 10px;
+                background: #f3edf5;
+                color: #86608E;
+                padding: 6px 12px;
+                border-radius: 30px;
+                font-size: 10px;
+                font-weight: 600;
+            }
+
+            /* BODY */
+            .content-body {
+                text-align: center;
+                padding: 40px 30px;
+            }
+
+            h1 {
+                margin: 0 0 10px;
+                font-size: 24px;
+                color: #1a0f1f;
+            }
+
+            .subtitle {
+                color: #666;
+                font-size: 14px;
+                line-height: 1.6;
+                margin-bottom: 30px;
+            }
+
+            /* OTP */
+            .otp-box {
+                display: inline-block;
+                background: linear-gradient(180deg,#fff 0%,#fbf9fc 100%);
+                border: 1px solid rgba(134,96,142,0.25);
+                border-radius: 16px;
+                padding: 14px 24px;
+                font-size: 30px;
+                font-weight: 700;
+                color: #86608E;
+                letter-spacing: 6px;
+                margin-bottom: 25px;
+            }
+
+            /* LOGIN BUTTON */
+            .login-btn {
+                display: inline-block;
+                margin-top: 10px;
+                background: #86608E;
+                color: #fff !important;
+                text-decoration: none;
+                padding: 12px 26px;
+                border-radius: 10px;
+                font-size: 14px;
+                font-weight: 600;
+            }
+
+                .login-btn:hover {
+                    background: #75507d;
+                }
+
+            /* FOOTER */
+            .footer {
+                text-align: center;
+                padding: 18px;
+                font-size: 12px;
+                color: #999;
+                border-top: 1px solid #f5eff6;
+                background: #faf8fb;
+            }
+
+            /* MOBILE */
+            @@media only screen and (max-width:520px) {
+
+                .main-card {
+                    margin: 0 12px;
+                }
+
+                .content-body {
+                    padding: 35px 20px;
+                }
+
+                .otp-box {
+                    font-size: 26px;
+                    padding: 12px 20px;
+                    letter-spacing: 5px;
+                }
+
+                h1 {
+                    font-size: 20px;
+                }
+            }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="wrapper">
+
+        <div class="main-card">
+
+            <!-- HEADER -->
+            <div class="header-area">
+
+                <img src="@Model.LogoUrl"
+                     alt="Tanker Management System Logo"
+                     class="logo" />
+
+                <div class="system-title">
+                    Tanker Management System
+                </div>
+
+                <div class="security-badge">
+                    Secure Verification
+                </div>
+
+            </div>
+
+            <!-- BODY -->
+            <div class="content-body">
+
+                <h1>OTP Verification</h1>
+
+                <p class="subtitle">
+                    Use the verification code below to continue.
+                </p>
+
+                <div class="otp-box">
+                    @Model.OtpCode
+                </div>
+
+                <br />
+
+                <a href="https://localhost:7104/Admin/Login"
+                   class="login-btn">
+                    Login Now
+                </a>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer">
+                © 2026 Tanker Management System
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+</html>

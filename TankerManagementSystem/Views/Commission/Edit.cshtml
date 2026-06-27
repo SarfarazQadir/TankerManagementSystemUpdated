@@ -1,0 +1,49 @@
+﻿@model TankerManagementSystem.Models.CommissionSetup
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+
+
+<section class="section">
+    <div class="section-body">
+        <div class="card">
+            <div class="card-header">
+                <h4>Edit Commission</h4>
+            </div>
+
+            <div class="card-body">
+                <form method="post" asp-action="Edit">
+
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input asp-for="Name" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Percentage (%)</label>
+                        <input asp-for="Percentage" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Is Active</label>
+                        <select asp-for="IsActive" class="form-control">
+                            <option value="true" selected="@(Model.IsActive)">Active</option>
+                            <option value="false" selected="@(!Model.IsActive)">Inactive</option>
+                        </select>
+                    </div>
+
+                    <div class="text-center">
+                        <input type="submit" value="Update Commission" class="btn btn-primary" />
+                        <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

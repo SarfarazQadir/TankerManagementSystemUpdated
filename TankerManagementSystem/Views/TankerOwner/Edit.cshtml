@@ -1,0 +1,163 @@
+﻿@model TankerManagementSystem.Models.TankerOwner
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Edit Tanker Owner</h4>
+                    </div>
+
+                    <div class="card-body">
+
+                        <form method="post"
+                              asp-action="Edit"
+                              onsubmit="return validateOwnerEditForm(event)">
+
+                            <input type="hidden" asp-for="Id" />
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Name<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+                                    <input asp-for="Name"
+                                           id="Name"
+                                           class="form-control" />
+
+                                    <span asp-validation-for="Name"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Phone<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+                                    <input asp-for="Phone"
+                                           id="Phone"
+                                           class="form-control" />
+
+                                    <span asp-validation-for="Phone"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    CNIC<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+                                    <input asp-for="CNIC"
+                                           id="CNIC"
+                                           class="form-control" />
+
+                                    <span asp-validation-for="CNIC"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Address<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+                                    <input asp-for="Address"
+                                           id="Address"
+                                           class="form-control" />
+
+                                    <span asp-validation-for="Address"
+                                          class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="card-footer text-center">
+                                <input type="submit"
+                                       value="Update Owner"
+                                       class="btn btn-primary" />
+
+                                <a href="@Url.Action("Index")"
+                                   class="btn btn-secondary">
+                                    Back
+                                </a>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateOwnerEditForm(event) {
+
+        let name = document.getElementById("Name").value.trim();
+        let phone = document.getElementById("Phone").value.trim();
+        let cnic = document.getElementById("CNIC").value.trim();
+        let address = document.getElementById("Address").value.trim();
+
+        if (name === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Name is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (phone === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Phone is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (cnic === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'CNIC is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (address === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Address is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+</script>

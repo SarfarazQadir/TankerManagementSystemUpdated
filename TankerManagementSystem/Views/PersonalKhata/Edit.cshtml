@@ -1,0 +1,207 @@
+﻿@* @model TankerManagementSystem.Models.PersonalKhata
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+
+    <div class="card">
+
+        <div class="card-header">
+            <h4>Edit Credit Entry</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post">
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="form-group">
+                    <label>Date</label>
+
+                    <input type="date"
+                           name="EntryDate"
+                           value="@Model.EntryDate.ToString("yyyy-MM-dd")"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Description</label>
+
+                    <input type="text"
+                           name="Description"
+                           value="@Model.Description"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Add Amount</label>
+
+                    <input type="number"
+                           name="AddAmount"
+                           value="@Model.AddAmount"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>Minus Amount</label>
+
+                    <input type="number"
+                           name="MinusAmount"
+                           value="@Model.MinusAmount"
+                           class="form-control" />
+                </div>
+
+                <button class="btn btn-primary">
+                    Update
+                </button>
+                <a href="@Url.Action("Index")"
+                   class="btn btn-secondary">
+                    Back
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section> *@
+
+@model TankerManagementSystem.Models.PersonalKhata
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+
+    <div class="card">
+
+        <div class="card-header">
+            <h4>Edit Credit Entry</h4>
+        </div>
+
+        <div class="card-body">
+
+            <form method="post" onsubmit="return validateEditKhataForm(event)">
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="form-group">
+                    <label>
+                        Date<span style="color:red;">*</span>
+                    </label>
+
+                    <input type="date"
+                           id="EntryDate"
+                           name="EntryDate"
+                           value="@Model.EntryDate.ToString("yyyy-MM-dd")"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        Description<span style="color:red;">*</span>
+                    </label>
+
+                    <input type="text"
+                           id="Description"
+                           name="Description"
+                           value="@Model.Description"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label class="text-success">
+                        Add Amount
+                    </label>
+
+                    <input type="number"
+                           id="AddAmount"
+                           name="AddAmount"
+                           value="@Model.AddAmount"
+                           class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label class="text-danger">
+                        Minus Amount
+                    </label>
+
+                    <input type="number"
+                           id="MinusAmount"
+                           name="MinusAmount"
+                           value="@Model.MinusAmount"
+                           class="form-control" />
+                </div>
+
+                <button class="btn btn-primary">
+                    Update
+                </button>
+
+                <a href="@Url.Action("Index")"
+                   class="btn btn-secondary">
+                    Back
+                </a>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+<script>
+    function validateEditKhataForm(event) {
+
+        let entryDate = document.getElementById("EntryDate").value.trim();
+        let description = document.getElementById("Description").value.trim();
+        let addAmount = document.getElementById("AddAmount").value.trim();
+        let minusAmount = document.getElementById("MinusAmount").value.trim();
+
+        if (entryDate === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Date is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        if (description === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Description is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        // Agar dono empty hon to error show ho
+        if (addAmount === "" && minusAmount === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Please enter Add Amount or Minus Amount!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+</script>

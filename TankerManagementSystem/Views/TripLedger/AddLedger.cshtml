@@ -1,0 +1,1275 @@
+﻿@* @{
+    ViewData["Title"] = "AddLedger";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+@{
+    var trip = ViewBag.Trip;
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+
+                    <div class="card-header">
+                        <h4>Add Trip Ledger</h4>
+                    </div>
+
+                    <div class="card-body">
+
+                        <form method="post" asp-action="AddLedger">
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Trip ID</label>
+                                <div class="col-sm-9">
+                                    <input type="text" value="@trip.Id" class="form-control" readonly />
+                                    <input type="hidden" name="TripEntryId" value="@trip.Id" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Tanker No</label>
+                                <div class="col-sm-9">
+                                    <input type="text" value="@trip.TankerFk?.TankerNo" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">From</label>
+                                <div class="col-sm-9">
+                                    <input type="text" value="@trip.FromLocation" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">To</label>
+                                <div class="col-sm-9">
+                                    <input type="text" value="@trip.ToLocation" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Invoice Date</label>
+                                <div class="col-sm-9">
+                                    <input type="date" name="TripDate" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Product</label>
+                                <div class="col-sm-9">
+                                    <select name="ProductId" class="form-control">
+                                        <option value="">Select Product</option>
+                                        @foreach (var p in ViewBag.Products)
+                                        {
+                                            <option value="@p.Id">@p.ProductName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Token No</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="TokenNo" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label style="color: green;" class="col-sm-3 col-form-label">Freight</label>
+                                <div class="col-sm-9">
+                                    <input type="number" name="Freight" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label style="color: red;" class="col-sm-3 col-form-label">Advance Cash</label>
+                                <div class="col-sm-9">
+                                    <input type="number" name="AdvanceCash" value="@trip.AdvanceCash" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label style="color: red;" class="col-sm-3 col-form-label">Shortage</label>
+                                <div class="col-sm-9">
+                                    <input type="number" name="Shortage" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label style="color: red;" class="col-sm-3 col-form-label">Munshiana</label>
+                                <div class="col-sm-9">
+                                    <input type="number" name="Munshiana" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label style="color: red;" class="col-sm-3 col-form-label">Previous Balance (Tanker)</label>
+                                <div class="col-sm-9">
+                                    <input type="number" id="tankerBalance"
+                                           value="@ViewBag.TankerPreviousBalance"
+                                           class="form-control" readonly />
+                                    <input type="hidden" name="PreviousBalance"
+                                           value="@ViewBag.TankerPreviousBalance" />
+                                </div>
+                            </div>
+                            <hr />
+                            <h5>Expenses</h5>
+
+                            <div id="expenseContainer">
+                                <input type="hidden" id="expenseIndex" value="0" />
+
+                            </div>
+
+                            <button type="button" onclick="addExpense()" class="btn btn-info mb-3">
+                                Add Expense
+                            </button>
+
+                            <div class="card-footer text-center">
+                                <input type="submit" id="submitBtn" value="Add Ledger" class="btn btn-primary" />
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    document.getElementById("submitBtn").addEventListener("click", function() {
+        this.disabled = true;
+        this.value = "Saving...";
+        this.form.submit();
+    });
+</script>
+<script>
+    let i = 0;
+
+        function addExpense() {
+        let container = document.getElementById("expenseContainer");
+        let indexInput = document.getElementById("expenseIndex");
+
+        let index = parseInt(indexInput.value);
+
+        let div = document.createElement("div");
+        div.className = "row mb-2";
+
+        div.innerHTML = `
+            <div class="col-md-6">
+                <input type="text" name="expenses[${index}].ExpenseName" class="form-control" placeholder="Expense Name" />
+            </div>
+            <div class="col-md-4">
+                <input type="number" name="expenses[${index}].Amount" class="form-control" placeholder="Amount" />
+            </div>
+        `;
+
+        container.appendChild(div);
+
+        indexInput.value = index + 1;
+    }
+
+</script> *@
+@* Working Code  *@
+@* @{
+    ViewData["Title"] = "AddLedger";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+@{
+    var trip = ViewBag.Trip;
+}
+
+<section class="section">
+    <div class="section-body">
+
+        <div class="row">
+
+            <div class="col-12">
+
+                <div class="card">
+
+                    <div class="card-header">
+                        <h4>Add Trip Ledger</h4>
+                    </div>
+
+                    <div class="card-body">
+
+                        <form method="post"
+                              asp-action="AddLedger"
+                              onsubmit="return validateLedgerForm(event)">
+
+                            <!-- Trip ID -->
+                            <div class="form-group row">
+
+                                <label class="col-sm-3 col-form-label">
+                                    Trip ID<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="text"
+                                           id="TripId"
+                                           value="@trip.Id"
+                                           class="form-control"
+                                           readonly />
+
+                                    <input type="hidden"
+                                           name="TripEntryId"
+                                           value="@trip.Id" />
+
+                                </div>
+
+                            </div>
+
+                            <!-- Tanker No -->
+                            <div class="form-group row">
+
+                                <label class="col-sm-3 col-form-label">
+                                    Tanker No<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="text"
+                                           id="TankerNo"
+                                           value="@trip.TankerFk?.TankerNo"
+                                           class="form-control"
+                                           readonly />
+
+                                </div>
+
+                            </div>
+
+                            <!-- From -->
+                            <div class="form-group row">
+
+                                <label class="col-sm-3 col-form-label">
+                                    From<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="text"
+                                           id="FromLocation"
+                                           value="@trip.FromLocation"
+                                           class="form-control"
+                                           readonly />
+
+                                </div>
+
+                            </div>
+
+                            <!-- To -->
+                            <div class="form-group row">
+
+                                <label class="col-sm-3 col-form-label">
+                                    To<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="text"
+                                           id="ToLocation"
+                                           value="@trip.ToLocation"
+                                           class="form-control"
+                                           readonly />
+
+                                </div>
+
+                            </div>
+
+                            <!-- Invoice Date -->
+                            <div class="form-group row">
+
+                                <label class="col-sm-3 col-form-label">
+                                    Invoice Date<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="date"
+                                           id="TripDate"
+                                           name="TripDate"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+                            <!-- Product -->
+                            <div class="form-group row">
+
+                                <label class="col-sm-3 col-form-label">
+                                    Product<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <select id="ProductId"
+                                            name="ProductId"
+                                            class="form-control">
+
+                                        <option value="">
+                                            Select Product
+                                        </option>
+
+                                        @foreach (var p in ViewBag.Products)
+                                        {
+                                            <option value="@p.Id">
+                                                @p.ProductName
+                                            </option>
+                                        }
+
+                                    </select>
+
+                                </div>
+
+                            </div>
+
+                            <!-- Token No -->
+                            <div class="form-group row">
+
+                                <label class="col-sm-3 col-form-label">
+                                    Token No<span style="color:red;">*</span>
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="text"
+                                           id="TokenNo"
+                                           name="TokenNo"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+                            <!-- Freight -->
+                            <div class="form-group row">
+
+                                <label style="color:green;"
+                                       class="col-sm-3 col-form-label">
+
+                                    Freight<span style="color:red;">*</span>
+
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="number"
+                                           id="Freight"
+                                           name="Freight"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+                            <!-- Advance Cash -->
+                            <div class="form-group row">
+
+                                <label style="color:red;"
+                                       class="col-sm-3 col-form-label">
+
+                                    Advance Cash<span style="color:red;">*</span>
+
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="number"
+                                           id="AdvanceCash"
+                                           name="AdvanceCash"
+                                           value="@trip.AdvanceCash"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+                            <!-- Shortage -->
+                            <div class="form-group row">
+
+                                <label style="color:red;"
+                                       class="col-sm-3 col-form-label">
+
+                                    Shortage
+
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="number"
+                                           name="Shortage"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+                            <!-- Munshiana -->
+                            <div class="form-group row">
+
+                                <label style="color:red;"
+                                       class="col-sm-3 col-form-label">
+
+                                    Munshiana<span style="color:red;">*</span>
+
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="number"
+                                           id="Munshiana"
+                                           name="Munshiana"
+                                           class="form-control" />
+
+                                </div>
+
+                            </div>
+
+                            <!-- Previous Balance -->
+                            <div class="form-group row">
+
+                                <label style="color:red;"
+                                       class="col-sm-3 col-form-label">
+
+                                    Previous Balance (Tanker)
+
+                                </label>
+
+                                <div class="col-sm-9">
+
+                                    <input type="number"
+                                           id="tankerBalance"
+                                           value="@ViewBag.TankerPreviousBalance"
+                                           class="form-control"
+                                           readonly />
+
+                                    <input type="hidden"
+                                           name="PreviousBalance"
+                                           value="@ViewBag.TankerPreviousBalance" />
+
+                                </div>
+
+                            </div>
+
+                            <hr />
+
+                            <!-- Expenses -->
+                            <h5>Expenses</h5>
+
+                            <div id="expenseContainer">
+
+                                <input type="hidden"
+                                       id="expenseIndex"
+                                       value="0" />
+
+                            </div>
+
+                            <button type="button"
+                                    onclick="addExpense()"
+                                    class="btn btn-info mb-3">
+
+                                Add Expense
+
+                            </button>
+
+                            <!-- Buttons -->
+                            <div class="card-footer text-center">
+
+                                <input type="submit"
+                                       id="submitBtn"
+                                       value="Add Ledger"
+                                       class="btn btn-primary" />
+
+                                <a href="@Url.Action("Index")"
+                                   class="btn btn-secondary">
+
+                                    Back
+
+                                </a>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<script>
+
+    function validateLedgerForm(event) {
+
+        let tripDate = document.getElementById("TripDate").value.trim();
+        let productId = document.getElementById("ProductId").value.trim();
+        let tokenNo = document.getElementById("TokenNo").value.trim();
+        let freight = document.getElementById("Freight").value.trim();
+        let advanceCash = document.getElementById("AdvanceCash").value.trim();
+        let munshiana = document.getElementById("Munshiana").value.trim();
+
+        // Invoice Date
+        if (tripDate === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Invoice Date is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        // Product
+        if (productId === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Please select Product!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        // Token No
+        if (tokenNo === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Token No is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        // Freight
+        if (freight === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Freight is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        // Advance Cash
+        if (advanceCash === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Advance Cash is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        // Munshiana
+        if (munshiana === "") {
+
+            iziToast.error({
+                title: 'Error',
+                message: 'Munshiana is required!',
+                position: 'bottomRight'
+            });
+
+            event.preventDefault();
+            return false;
+        }
+
+        // Expense Validation
+        let expenseNames = document.querySelectorAll("input[name*='ExpenseName']");
+        let expenseAmounts = document.querySelectorAll("input[name*='Amount']");
+
+        for (let i = 0; i < expenseNames.length; i++) {
+
+            let name = expenseNames[i].value.trim();
+            let amount = expenseAmounts[i].value.trim();
+
+            // Name hai amount nahi
+            if (name !== "" && amount === "") {
+
+                iziToast.error({
+                    title: 'Error',
+                    message: 'Please enter Expense Amount!',
+                    position: 'bottomRight'
+                });
+
+                event.preventDefault();
+                return false;
+            }
+
+            // Amount hai name nahi
+            if (name === "" && amount !== "") {
+
+                iziToast.error({
+                    title: 'Error',
+                    message: 'Please enter Expense Title!',
+                    position: 'bottomRight'
+                });
+
+                event.preventDefault();
+                return false;
+            }
+
+            // Dono empty => no validation
+        }
+
+        return true;
+    }
+
+</script>
+
+<script>
+
+    document.getElementById("submitBtn").addEventListener("click", function (e) {
+
+        if (validateLedgerForm(e)) {
+
+            this.disabled = true;
+            this.value = "Saving...";
+            this.form.submit();
+        }
+
+    });
+
+</script>
+
+<script>
+
+    function addExpense() {
+
+        let container = document.getElementById("expenseContainer");
+        let indexInput = document.getElementById("expenseIndex");
+
+        let index = parseInt(indexInput.value);
+
+        let div = document.createElement("div");
+        div.className = "row mb-2";
+
+        div.innerHTML = `
+
+            <div class="col-md-6">
+
+                <input type="text"
+                       name="expenses[${index}].ExpenseName"
+                       class="form-control"
+                       placeholder="Expense Name" />
+
+            </div>
+
+            <div class="col-md-4">
+
+                <input type="number"
+                       name="expenses[${index}].Amount"
+                       class="form-control"
+                       placeholder="Amount" />
+
+            </div>
+
+        `;
+
+        container.appendChild(div);
+
+        indexInput.value = index + 1;
+    }
+
+</script> *@
+
+@* 
+@{
+    ViewData["Title"] = "AddLedger";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+@{
+    var trip = ViewBag.Trip;
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add Trip Ledger</h4>
+                    </div>
+
+                    <div class="card-body">
+                        <form method="post" asp-action="AddLedger" id="ledgerForm">
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Trip ID<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="TripId" value="@trip.Id" class="form-control" readonly />
+                                    <input type="hidden" name="TripEntryId" value="@trip.Id" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Tanker No<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="TankerNo" value="@trip.TankerFk?.TankerNo" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    From<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="FromLocation" value="@trip.FromLocation" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    To<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="ToLocation" value="@trip.ToLocation" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Invoice Date<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="date" id="TripDate" name="TripDate" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Product<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <select id="ProductId" name="ProductId" class="form-control">
+                                        <option value="">Select Product</option>
+                                        @foreach (var p in ViewBag.Products)
+                                        {
+                                            <option value="@p.Id">@p.ProductName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">
+                                    Token No<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="text" id="TokenNo" name="TokenNo" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label style="color:green;" class="col-sm-3 col-form-label">
+                                    Freight<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="number" id="Freight" name="Freight" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label style="color:red;" class="col-sm-3 col-form-label">
+                                    Advance Cash<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="number" id="AdvanceCash" name="AdvanceCash" value="@trip.AdvanceCash" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label style="color:red;" class="col-sm-3 col-form-label">Shortage</label>
+                                <div class="col-sm-9">
+                                    <input type="number" name="Shortage" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label style="color:red;" class="col-sm-3 col-form-label">
+                                    Munshiana<span style="color:red;">*</span>
+                                </label>
+                                <div class="col-sm-9">
+                                    <input type="number" id="Munshiana" name="Munshiana" class="form-control" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label style="color:red;" class="col-sm-3 col-form-label">Previous Balance (Tanker)</label>
+                                <div class="col-sm-9">
+                                    <input type="number" id="tankerBalance" value="@ViewBag.TankerPreviousBalance" class="form-control" readonly />
+                                    <input type="hidden" name="PreviousBalance" value="@ViewBag.TankerPreviousBalance" />
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <h5>Expenses</h5>
+                            <div id="expenseContainer">
+                                <input type="hidden" id="expenseIndex" value="0" />
+                            </div>
+
+                            <button type="button" onclick="addExpense()" class="btn btn-info mb-3">
+                                Add Expense
+                            </button>
+
+                            <div class="card-footer text-center">
+                                <button type="submit" id="submitBtn" class="btn btn-primary">Add Ledger</button>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Form submission aur validation ko aik sath handle kiya hai taake conflict na ho
+    document.getElementById("ledgerForm").addEventListener("submit", function (event) {
+        let tripDate = document.getElementById("TripDate").value.trim();
+        let productId = document.getElementById("ProductId").value.trim();
+        let tokenNo = document.getElementById("TokenNo").value.trim();
+        let freight = document.getElementById("Freight").value.trim();
+        let advanceCash = document.getElementById("AdvanceCash").value.trim();
+        let munshiana = document.getElementById("Munshiana").value.trim();
+
+        // Invoice Date
+        if (tripDate === "") {
+            showError('Invoice Date is required!');
+            event.preventDefault();
+            return false;
+        }
+
+        // Product
+        if (productId === "") {
+            showError('Please select Product!');
+            event.preventDefault();
+            return false;
+        }
+
+        // Token No
+        if (tokenNo === "") {
+            showError('Token No is required!');
+            event.preventDefault();
+            return false;
+        }
+
+        // Freight
+        if (freight === "") {
+            showError('Freight is required!');
+            event.preventDefault();
+            return false;
+        }
+
+        // Advance Cash
+        if (advanceCash === "") {
+            showError('Advance Cash is required!');
+            event.preventDefault();
+            return false;
+        }
+
+        // Munshiana
+        if (munshiana === "") {
+            showError('Munshiana is required!');
+            event.preventDefault();
+            return false;
+        }
+
+        // Expense Validation
+        let expenseNames = document.querySelectorAll("input[name*='ExpenseName']");
+        let expenseAmounts = document.querySelectorAll("input[name*='Amount']");
+
+        for (let i = 0; i < expenseNames.length; i++) {
+            let name = expenseNames[i].value.trim();
+            let amount = expenseAmounts[i].value.trim();
+
+            if (name !== "" && amount === "") {
+                showError('Please enter Expense Amount!');
+                event.preventDefault();
+                return false;
+            }
+
+            if (name === "" && amount !== "") {
+                showError('Please enter Expense Title!');
+                event.preventDefault();
+                return false;
+            }
+        }
+
+        // Agar validation pass ho jaye to button ko disable karein taake double submit na ho
+        let submitBtn = document.getElementById("submitBtn");
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "Saving...";
+
+        return true;
+    });
+
+    // Helper function toast ke liye
+    function showError(message) {
+        iziToast.error({
+            title: 'Error',
+            message: message,
+            position: 'bottomRight'
+        });
+    }
+
+    // Expense Add karne ka function (with Delete Button)
+    function addExpense() {
+        let container = document.getElementById("expenseContainer");
+        let indexInput = document.getElementById("expenseIndex");
+        let index = parseInt(indexInput.value);
+
+        let div = document.createElement("div");
+        div.className = "row mb-2 expense-row";
+
+        div.innerHTML = `
+            <div class="col-md-5">
+                <input type="text" name="expenses[${index}].ExpenseName" class="form-control" placeholder="Expense Name" />
+            </div>
+            <div class="col-md-5">
+                <input type="number" name="expenses[${index}].Amount" class="form-control" placeholder="Amount" />
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-danger btn-block" onclick="removeExpense(this)">Remove</button>
+            </div>
+        `;
+
+        container.appendChild(div);
+        indexInput.value = index + 1;
+    }
+
+    // Expense row remove karne ka function
+    function removeExpense(button) {
+        button.closest('.expense-row').remove();
+        reIndexExpenses();
+    }
+
+    // Indexing ko theek rakhne ke liye taake .NET model binder list ko break na kare
+    function reIndexExpenses() {
+        let rows = document.querySelectorAll('.expense-row');
+        let indexInput = document.getElementById("expenseIndex");
+
+        rows.forEach((row, newIndex) => {
+            let nameInput = row.querySelector("input[name*='ExpenseName']");
+            let amountInput = row.querySelector("input[name*='Amount']");
+
+            if(nameInput) nameInput.name = `expenses[${newIndex}].ExpenseName`;
+            if(amountInput) amountInput.name = `expenses[${newIndex}].Amount`;
+        });
+
+        indexInput.value = rows.length;
+    }
+</script> *@
+
+@model TankerManagementSystem.Models.ViewModels.TripLedgerVM
+
+@{
+    ViewData["Title"] = "Add Ledger";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+@{
+    var trip = ViewBag.Trip;
+    // Previous balance fetch kar rahe hain viewbag se
+    decimal? prevBalance = ViewBag.TankerPreviousBalance as decimal?;
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add Trip Ledger</h4>
+                    </div>
+
+                    <div class="card-body">
+                        <form method="post" asp-action="AddLedger" id="addLedgerForm">
+                            @Html.AntiForgeryToken()
+
+                            <!-- Hidden Fields for IDs -->
+                            <input type="hidden" asp-for="TripEntryId" value="@trip?.Id" />
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Trip ID</label>
+                                <div class="col-sm-9">
+                                    <input type="text" value="@trip?.Id" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Tanker No</label>
+                                <div class="col-sm-9">
+                                    <input type="text" value="@trip?.TankerFk?.TankerNo" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">From</label>
+                                <div class="col-sm-9">
+                                    <input type="text" value="@trip?.FromLocation" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">To</label>
+                                <div class="col-sm-9">
+                                    <input type="text" value="@trip?.ToLocation" class="form-control" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Invoice Date<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <input asp-for="TripDate" id="TripDate" type="date" class="form-control" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Product<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <select asp-for="ProductId" id="ProductId" class="form-control">
+                                        <option value="">Select Product</option>
+                                        @foreach (var p in ViewBag.Products)
+                                        {
+                                            <option value="@p.Id">@p.ProductName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Token No<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <input asp-for="TokenNo" id="TokenNo" class="form-control" placeholder="Enter Token Number" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label text-success font-weight-bold">Freight<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Freight" id="Freight" type="number" step="any" class="form-control" placeholder="0.00" />
+                                </div>
+                            </div>
+
+                            <!-- ADVANCE CASH FIELD -->
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label text-danger font-weight-bold">Advance Cash<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <input asp-for="AdvanceCash" id="AdvanceCash" type="number" step="any" class="form-control border-danger" placeholder="0.00" oninput="checkAdvanceAlert()" />
+                                    <small id="advanceHelp" class="form-text text-muted d-none">✨ Active advance amount detected for this trip ledger transaction.</small>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label text-danger font-weight-bold">Shortage</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Shortage" type="number" step="any" class="form-control" placeholder="0.00" />
+                                </div>
+                            </div>
+
+                       @*      <div class="form-group row">
+                                <label class="col-sm-3 col-form-label text-danger font-weight-bold">Commission</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Commission" type="number" step="any" class="form-control" placeholder="0.00" />
+                                </div>
+                            </div> *@
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label text-danger font-weight-bold">Munshiana<span class="text-danger">*</span></label>
+                                <div class="col-sm-9">
+                                    <input asp-for="Munshiana" id="Munshiana" type="number" step="any" class="form-control" placeholder="0.00" />
+                                </div>
+                            </div>
+
+                            <!-- PREVIOUS BALANCE HANDLING -->
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label text-warning font-weight-bold">Previous Balance (Tanker)</label>
+                                <div class="col-sm-9">
+                                    @if (prevBalance.HasValue && prevBalance.Value != 0)
+                                    {
+                                        <div class="input-group">
+                                            <div class="input-group-prepend">
+                                                <span class="input-group-text bg-warning text-white"><i class="fas fa-wallet"></i></span>
+                                            </div>
+                                            <input type="text" value="@string.Format("{0:N2}", prevBalance.Value)" class="form-control font-weight-bold text-dark bg-light" readonly />
+                                        </div>
+                                        <small class="form-text text-warning">Outstanding dues exist for this tanker.</small>
+                                    }
+                                    else
+                                    {
+                                        <input type="text" value="Nil (No Outstanding Balance)" class="form-control text-muted bg-light italic" readonly />
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Remarks</label>
+                                <div class="col-sm-9">
+                                    <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Optional internal logs..."></textarea>
+                                </div>
+                            </div>
+
+                          @* 
+                            <hr />
+
+                              <h5 class="mb-3">Dynamic Expenses</h5>
+
+                            <div id="expenseContainer" class="font-weight-bold">
+                                <!-- Dynamic rows append here -->
+                                <input type="hidden" id="expenseIndex" value="0" />
+                            </div>
+
+                            <button type="button" onclick="addExpense()" class="btn btn-info mb-4 mt-2">
+                                <i class="fas fa-plus"></i> Add Expense
+                            </button> *@
+
+                            <div class="card-footer text-center bg-transparent border-top-0">
+                                <button type="submit" id="submitBtn" class="btn btn-primary mr-2">Save Ledger</button>
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">Cancel</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Advance cash highlight monitor
+    function checkAdvanceAlert() {
+        let advInput = document.getElementById("AdvanceCash");
+        let advHelp = document.getElementById("advanceHelp");
+        let val = parseFloat(advInput.value);
+
+        if (!isNaN(val) && val > 0) {
+            advHelp.classList.remove("d-none");
+            advInput.classList.add("is-invalid"); // Red boundary border
+        } else {
+            advHelp.classList.add("d-none");
+            advInput.classList.remove("is-invalid");
+        }
+    }
+
+    function validateAddLedgerForm() {
+        let tripDate = document.getElementById("TripDate").value.trim();
+        let productId = document.getElementById("ProductId").value.trim();
+        let tokenNo = document.getElementById("TokenNo").value.trim();
+        let freight = document.getElementById("Freight").value.trim();
+        let advanceCash = document.getElementById("AdvanceCash").value.trim();
+        let munshiana = document.getElementById("Munshiana").value.trim();
+
+        if (tripDate === "") return showValidationError('Invoice Date status tracking required!');
+        if (productId === "") return showValidationError('Please map a standard Product profile!');
+        if (tokenNo === "") return showValidationError('Token Number verification string missing!');
+        if (freight === "") return showValidationError('Freight base numerical calculation target required!');
+        if (advanceCash === "") return showValidationError('Advance Cash value field is required!');
+        if (munshiana === "") return showValidationError('Munshiana records are required!');
+
+        // let expenseNames = document.querySelectorAll(".expense-name");
+        // let expenseAmounts = document.querySelectorAll(".expense-amount");
+
+        // for (let i = 0; i < expenseNames.length; i++) {
+        //     let name = expenseNames[i].value.trim();
+        //     let amount = expenseAmounts[i].value.trim();
+
+        //     if (name !== "" && amount === "") return showValidationError('Dynamic layout requires matching Expense Amount!');
+        //     if (name === "" && amount !== "") return showValidationError('Dynamic layout requires structural Expense Title!');
+        // }
+        // return true;
+    }
+
+    function showValidationError(message) {
+        iziToast.error({
+            title: 'Form Validation Error',
+            message: message,
+            position: 'bottomRight'
+        });
+        return false;
+    }
+
+    document.getElementById("addLedgerForm").addEventListener("submit", function (e) {
+        if (!validateAddLedgerForm()) {
+            e.preventDefault();
+        } else {
+            let btn = document.getElementById("submitBtn");
+            btn.disabled = true;
+            btn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Saving Records...";
+        }
+    });
+
+    // function addExpense() {
+    //     let container = document.getElementById("expenseContainer");
+    //     let indexInput = document.getElementById("expenseIndex");
+    //     let index = parseInt(indexInput.value);
+
+    //     let div = document.createElement("div");
+    //     div.className = "row mb-2 expense-row";
+    //     div.innerHTML = `
+    //         <div class="col-md-5">
+    //             <input type="text" name="expenses[${index}].ExpenseName" class="form-control expense-name" placeholder="Expense Type Name" />
+    //         </div>
+    //         <div class="col-md-5">
+    //             <input type="number" step="any" name="expenses[${index}].Amount" class="form-control expense-amount" placeholder="Amount (PKR)" />
+    //         </div>
+    //         <div class="col-md-2">
+    //             <button type="button" class="btn btn-danger btn-block" onclick="removeExpense(this)">Remove</button>
+    //         </div>
+    //     `;
+    //     container.insertBefore(div, indexInput);
+    //     indexInput.value = index + 1;
+    // }
+
+    // function removeExpense(button) {
+    //     button.closest('.expense-row').remove();
+    //     reIndexExpenses();
+    // }
+
+    // function reIndexExpenses() {
+    //     let rows = document.querySelectorAll('.expense-row');
+    //     let indexInput = document.getElementById("expenseIndex");
+
+    //     rows.forEach((row, newIndex) => {
+    //         let nameInput = row.querySelector(".expense-name");
+    //         let amountInput = row.querySelector(".expense-amount");
+
+    //         if(nameInput) nameInput.name = `expenses[${newIndex}].ExpenseName`;
+    //         if(amountInput) amountInput.name = `expenses[${newIndex}].Amount`;
+    //     });
+
+    //     indexInput.value = rows.length;
+    // }
+    }
+</script>

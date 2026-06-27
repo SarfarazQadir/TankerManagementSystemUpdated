@@ -1,0 +1,464 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+
+    var months = Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Months));
+    var revenue = Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Revenue));
+    var years = Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Years));
+    var yearlyRevenue = Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.YearlyRevenue));
+}
+
+<style>
+    body {
+        background: #f8f9fa;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    .dashboard-wrapper {
+        padding: 20px;
+    }
+
+    /* ========================================= */
+    /* MODERN METRIC CARDS */
+    /* ========================================= */
+    .dashboard-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        background: #fff;
+    }
+
+        .dashboard-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+        }
+
+    .dashboard-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: white;
+    }
+
+    .dashboard-content h6 {
+        margin-bottom: 2px;
+        color: #6c757d;
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .dashboard-content h3 {
+        margin: 0;
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 22px;
+    }
+
+    /* Stat Block Cards */
+    .stat-card {
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+        .stat-card h5 {
+            font-size: 13px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .stat-card h2 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+    /* GRADIENTS & COLORS */
+    .bg-profit {
+        background: linear-gradient(135deg, #059669, #10b981);
+    }
+
+    .bg-trip {
+        background: linear-gradient(135deg, #2563eb, #3b82f6);
+    }
+
+    .bg-tanker {
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+    }
+
+    .bg-owner {
+        background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    }
+
+    .bg-custom-primary {
+        background: linear-gradient(135deg, #1e3a8a, #2563eb);
+    }
+
+    .bg-custom-info {
+        background: linear-gradient(135deg, #0891b2, #06b6d4);
+    }
+
+    .bg-custom-warning {
+        background: linear-gradient(135deg, #b45309, #f59e0b);
+    }
+
+    .bg-custom-success {
+        background: linear-gradient(135deg, #047857, #10b981);
+    }
+
+    .bg-expense {
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+    }
+
+    .bg-net {
+        background: linear-gradient(135deg, #0d9488, #14b8a6);
+    }
+
+    .chart-card, .extra-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        background: white;
+        height: 100%;
+    }
+
+        .chart-card .card-header, .extra-card .card-header {
+            background: transparent;
+            border-bottom: 1px solid #f1f5f9;
+            padding: 15px 20px;
+        }
+
+            .chart-card .card-header h4, .extra-card .card-header h4 {
+                font-weight: 700;
+                color: #1e293b;
+                font-size: 16px;
+                margin: 0;
+            }
+
+    .mini-card {
+        border-radius: 12px;
+        padding: 20px;
+        color: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+
+        .mini-card h4 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .mini-card p {
+            margin-bottom: 2px;
+            font-weight: 500;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .mini-card span {
+            font-size: 11px;
+            opacity: 0.75;
+        }
+
+    .summary-item {
+        padding: 12px 0;
+        border-bottom: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item h6 {
+            margin: 0;
+            font-weight: 600;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .summary-item p {
+            margin: 0;
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 14px;
+        }
+</style>
+
+<div class="dashboard-wrapper">
+    <!-- Top Row Metric Cards (IDs added for AJAX binding) -->
+    <div class="row mb-3">
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-profit dashboard-icon"><i class="fas fa-money-bill-wave"></i></div>
+                        <div class="dashboard-content ml-3">
+                            <h6>Total Profit</h6>
+                            <h3 id="txtTotalProfit">Rs @Math.Floor(Convert.ToDouble(ViewBag.TotalProfit ?? 0))</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-trip dashboard-icon"><i class="fas fa-road"></i></div>
+                        <div class="dashboard-content ml-3">
+                            <h6>Total Trips</h6>
+                            <h3 id="txtTotalTrips">@ViewBag.TotalTrips</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-tanker dashboard-icon"><i class="fas fa-truck"></i></div>
+                        <div class="dashboard-content ml-3">
+                            <h6>Total Tankers</h6>
+                            <h3 id="txtTotalTankers">@ViewBag.TotalTankers</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6 mb-3">
+            <div class="card dashboard-card">
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-owner dashboard-icon"><i class="fas fa-users"></i></div>
+                        <div class="dashboard-content ml-3">
+                            <h6>Total Owners</h6>
+                            <h3 id="txtTotalOwners">@ViewBag.TotalOwners</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stat Blocks Row (IDs added) -->
+    <div class="row mb-3">
+        <div class="col-xl-3 col-md-6 mb-3"><div class="stat-card bg-custom-primary"><h5>Today's Profit</h5><h2 id="txtTodayProfit">Rs @Math.Floor(Convert.ToDouble(ViewBag.TodayProfit ?? 0))</h2></div></div>
+        <div class="col-xl-3 col-md-6 mb-3"><div class="stat-card bg-custom-info"><h5>This Week</h5><h2 id="txtWeekProfit">Rs @Math.Floor(Convert.ToDouble(ViewBag.WeekProfit ?? 0))</h2></div></div>
+        <div class="col-xl-3 col-md-6 mb-3"><div class="stat-card bg-custom-warning"><h5>This Month</h5><h2 id="txtMonthProfit">Rs @Math.Floor(Convert.ToDouble(ViewBag.MonthProfit ?? 0))</h2></div></div>
+        <div class="col-xl-3 col-md-6 mb-3"><div class="stat-card bg-custom-success"><h5>This Year</h5><h2 id="txtYearProfit">Rs @Math.Floor(Convert.ToDouble(ViewBag.YearProfit ?? 0))</h2></div></div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-xl-8 col-lg-7 mb-3">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h4>Monthly Revenue Statistics</h4>
+                </div>
+                <div class="card-body">
+                    <ul class="list-inline text-center mb-3">
+                        <li class="list-inline-item px-2 border-right">
+                            <h6 class="m-0 font-weight-bold text" id="lblWeeklyProfit">
+                                Rs @Math.Floor(Convert.ToDouble(ViewBag.WeekProfit ?? 0))
+                            </h6>
+                            <p class="text-muted small m-0">Weekly</p>
+                        </li>
+                        <li class="list-inline-item px-2 border-right">
+                            <h6 class="m-0 font-weight-bold text-warning" id="lblMonthlyProfit">
+                                Rs @Math.Floor(Convert.ToDouble(ViewBag.MonthProfit ?? 0))
+                            </h6>
+                            <p class="text-muted small m-0">Monthly</p>
+                        </li>
+                        <li class="list-inline-item px-2">
+                            <h6 class="m-0 font-weight-bold text-success" id="lblYearlyProfit">
+                                Rs @Math.Floor(Convert.ToDouble(ViewBag.YearProfit ?? 0))
+                            </h6>
+                            <p class="text-muted small m-0">Yearly</p>
+                        </li>
+                    </ul>
+
+                    <div id="malikBrothersBarChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5 mb-3">
+            <div class="d-flex flex-column h-100 justify-content-between">
+                <div class="mini-card bg-expense mb-3 flex-grow-1 d-flex flex-column justify-content-center">
+                    <h4 id="txtTotalExpenses">Rs @Math.Floor(Convert.ToDouble(ViewBag.TotalExpenses ?? 0))</h4>
+                    <p class="m-0">Total Expenses</p>
+                    <span>Business Expense Analytics</span>
+                </div>
+
+                <div class="mini-card bg-net flex-grow-1 d-flex flex-column justify-content-center">
+                    <h4 id="txtNetProfit">Rs @Math.Floor(Convert.ToDouble(ViewBag.NetProfit ?? 0))</h4>
+                    <p class="m-0">Net Profit</p>
+                    <span>Overall Business Profit</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-8 col-lg-7 mb-3">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h4>Yearly Trend Analysis (Line View)</h4>
+                </div>
+                <div class="card-body">
+                    <div id="malikBrothersYearlyLineChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5 mb-3">
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h4>Profit vs Expense Share</h4>
+                </div>
+                <div class="card-body d-flex align-items-center justify-content-center">
+                    <div id="malikBrothersDonutChart" style="width: 100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Global variables charts ko handle karne k liye taake re-render par conflict na ho
+        var barChart, lineChart, donutChart;
+
+        function loadDashboardData() {
+            console.log("Attempting to call Admin API...");
+
+            $.ajax({
+                url: '/api/AdminApi/GetDashboardData',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    console.log("Dashboard Data Received successfully:", data);
+
+                    // 1. UI Elements update karna (Property names aapke API model k mutabiq check kar lein)
+                    if(data) {
+                        $('#txtTotalProfit').text("Rs " + Math.floor(data.totalProfit || 0));
+                        $('#txtTotalTrips').text(data.totalTrips || 0);
+                        $('#txtTotalTankers').text(data.totalTankers || 0);
+                        $('#txtTotalOwners').text(data.totalOwners || 0);
+
+                        $('#txtTodayProfit').text("Rs " + Math.floor(data.todayProfit || 0));
+                        $('#txtWeekProfit').text("Rs " + Math.floor(data.weekProfit || 0));
+                        $('#txtMonthProfit').text("Rs " + Math.floor(data.monthProfit || 0));
+                        $('#txtYearProfit').text("Rs " + Math.floor(data.yearProfit || 0));
+
+                        $('#lblWeeklyProfit').text("Rs " + Math.floor(data.weekProfit || 0));
+                        $('#lblMonthlyProfit').text("Rs " + Math.floor(data.monthProfit || 0));
+                        $('#lblYearlyProfit').text("Rs " + Math.floor(data.yearProfit || 0));
+
+                        $('#txtTotalExpenses').text("Rs " + Math.floor(data.totalExpenses || 0));
+                        $('#txtNetProfit').text("Rs " + Math.floor(data.netProfit || 0));
+
+                        // 2. Charts ko fresh API data k sath update karna (Agar API charts ka data bhi bhej rhi hai)
+                        if (data.months && data.revenue) {
+                            barChart.updateSeries([{ data: data.revenue }]);
+                            barChart.updateOptions({ xaxis: { categories: data.months } });
+                        }
+                        if (data.years && data.yearlyRevenue) {
+                            lineChart.updateSeries([{ data: data.yearlyRevenue }]);
+                            lineChart.updateOptions({ xaxis: { categories: data.years } });
+                        }
+                        if (data.netProfit !== undefined && data.totalExpenses !== undefined) {
+                            donutChart.updateSeries([Math.floor(data.netProfit), Math.floor(data.totalExpenses)]);
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error("API Error Details:", xhr.status, xhr.responseText || error);
+
+                    if (xhr.status === 401 || xhr.status === 403) {
+                        console.warn("User unauthorized or session expired. Redirecting...");
+                        window.location.href = '/Admin/Login';
+                    }
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            // Initial data from ViewBag (for instant rendering)
+            var monthsData = @months || [];
+            var revenueData = @revenue || [];
+            var yearsData = @years || [];
+            var yearlyRevenueData = @yearlyRevenue || [];
+            var netProfit = Math.floor(Number("@ViewBag.NetProfit") || 0);
+            var totalExpenses = Math.floor(Number("@ViewBag.TotalExpenses") || 0);
+
+            // =====================================
+            // 1. MONTHLY REVENUE (BAR CHART)
+            // =====================================
+            var barOptions = {
+                series: [{ name: 'Profit', data: revenueData }],
+                chart: { type: 'bar', height: 280, toolbar: { show: false } },
+                colors: ['#2563eb'],
+                plotOptions: { bar: { borderRadius: 5, columnWidth: '40%' } },
+                dataLabels: { enabled: false },
+                xaxis: { categories: monthsData, axisBorder: { show: false } },
+                tooltip: { y: { formatter: function (val) { return "Rs " + val; } } }
+            };
+            barChart = new ApexCharts(document.querySelector("#malikBrothersBarChart"), barOptions);
+            barChart.render();
+
+            // =====================================
+            // 2. YEAR-WISE TREND (LINE CHART)
+            // =====================================
+            var lineOptions = {
+                series: [{ name: 'Yearly Profit Trend', data: yearlyRevenueData }],
+                chart: { type: 'line', height: 280, toolbar: { show: false }, zoom: { enabled: false } },
+                colors: ['#7c3aed'],
+                stroke: { width: 4, curve: 'smooth' },
+                markers: { size: 4, colors: ['#7c3aed'] },
+                xaxis: { categories: yearsData },
+                dataLabels: { enabled: false },
+                tooltip: { y: { formatter: function (val) { return "Rs " + val; } } }
+            };
+            lineChart = new ApexCharts(document.querySelector("#malikBrothersYearlyLineChart"), lineOptions);
+            lineChart.render();
+
+            // =====================================
+            // 3. NET PROFIT VS EXPENSE (DONUT)
+            // =====================================
+            var donutOptions = {
+                series: [netProfit, totalExpenses],
+                labels: ['Net Profit', 'Expenses'],
+                chart: { type: 'donut', height: 260 },
+                colors: ['#10b981', '#ef4444'],
+                legend: { position: 'bottom' },
+                dataLabels: { enabled: true },
+                tooltip: { y: { formatter: function (val) { return "Rs " + val; } } }
+            };
+            donutChart = new ApexCharts(document.querySelector("#malikBrothersDonutChart"), donutOptions);
+            donutChart.render();
+
+            // =====================================
+            // TRIGGER API CALL TO REFRESH DATA
+            // =====================================
+            loadDashboardData();
+        });
+    </script>
+}

@@ -1,0 +1,99 @@
+﻿@model IEnumerable<Microsoft.AspNetCore.Identity.IdentityUser>
+
+@{
+    ViewData["Title"] = "User Details";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+
+        <a href="@Url.Action("CreatUser")" class="btn btn-primary">Add User</a>
+        <br /><br />
+
+        <div class="card">
+            <div class="card-header">
+                <h4>Registered Users List</h4>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover" id="myTable">
+                        <thead>
+                            <tr>
+                                <th>S.No</th>
+                                <th>User Id</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>2FA Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int serial = 1;
+                            }
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@serial</td>
+                                    <td>@item.Id</td>
+                                    <td>@item.UserName</td>
+                                    <td>@item.Email</td>
+                                    <td>
+                                        <span class="badge @(item.TwoFactorEnabled ? "badge-success" : "badge-secondary")">
+                                            @(item.TwoFactorEnabled ? "Enabled" : "Disabled")
+                                        </span>
+                                    </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <a href="#" data-toggle="dropdown" class="btn btn-warning dropdown-toggle">Options</a>
+                                                <div class="dropdown-menu">
+                                                    <a href="@Url.Action("EditUser", new { id = item.Id })" class="dropdown-item has-icon">
+                                                        <i class="far fa-edit"></i> Edit & Access
+                                                    </a>
+
+                                                    <a href="@Url.Action("ChangePassword", "User", new { id = item.Id })" class="dropdown-item has-icon text-dark">
+                                                        <i class="fas fa-key"></i> Change Password
+                                                    </a>
+
+                                                    <div class="dropdown-divider"></div>
+
+                                                    <form id="delete-form-@item.Id" action="@Url.Action("DeleteUser", "User", new { id = item.Id })" method="post" style="display:inline;">
+                                                        @Html.AntiForgeryToken()
+                                                        <button type="button" onclick="confirmDelete('@item.Id', '@item.UserName')" class="dropdown-item has-icon text-danger d-flex align-items-center" style="border: none; background: none; width: 100%; cursor: pointer; padding: 10px 20px;">
+                                                            <i class="fas fa-trash-alt" style="margin-right: 10px; min-width: 20px; text-align: center;"></i>
+                                                            <span>Delete User</span>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </td>
+                                </tr>
+                                serial ++;
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    function confirmDelete(userId, userName) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: `You are about to permanently delete the user "${userName}". This action cannot be undone.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, delete user',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + userId).submit();
+            }
+        });
+    }
+</script>
