@@ -16,7 +16,7 @@ builder.Services.AddDbContext<ApplicationDbContext>
 (options => options.UseSqlServer(configuration.GetConnectionString("conn")));
 
 
-// Adding Authentication old
+// Adding Authentication old new
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
