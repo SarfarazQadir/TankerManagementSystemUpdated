@@ -1,4 +1,4 @@
-﻿@{
+﻿@* @{
     Layout = null;
 }
 
@@ -582,16 +582,6 @@
         <div class="modal-dialog modal-dialog-centered otp-modal-dialog">
 
             <div class="modal-content otp-modal-content">
-
-                <!-- CLOSE -->
-           @*      <button type="button"
-                        id="otpCancelBtn"
-                        class="close"
-                        data-dismiss="modal">
-
-                    <span>&times;</span>
-
-                </button> *@
 
                 <div class="modal-body">
 
@@ -1196,6 +1186,452 @@
         });
 
         }
+
+        });
+
+    </script>
+
+</body>
+</html> *@
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Login</title>
+
+    <link rel="stylesheet" href="~/css/app.min.css" />
+
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="~/css/components.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+    <link rel="shortcut icon" href="~/img/flyeasy.png" />
+
+    <style>
+
+        body {
+        background: linear-gradient(rgba(134,96,142,0.08), rgba(134,96,142,0.08)), #f4f6f9;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI';
+        padding: 20px;
+        }
+
+        /* =========================
+        LOADER
+        ==========================*/
+
+        .loader-wrapper {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        }
+
+        .loader {
+        border: 5px solid #f3f3f3;
+        border-top: 5px solid #86608E;
+        border-radius: 50%;
+        width: 55px;
+        height: 55px;
+        animation: spin .7s linear infinite;
+        }
+
+        @@keyframes spin {
+        100% {
+        transform: rotate(360deg);
+        }
+        }
+
+        .d-none {
+        display: none !important;
+        }
+
+        /* =========================
+        LOGIN CARD
+        ==========================*/
+
+        .login-container {
+        width: 100%;
+        max-width: 430px;
+        background: rgba(255,255,255,0.92);
+        backdrop-filter: blur(10px);
+        border-radius: 24px;
+        padding: 45px 35px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08), 0 2px 10px rgba(134,96,142,0.08);
+        border: 1px solid rgba(255,255,255,0.4);
+        animation: fadeUp .5s ease;
+        }
+
+        @@keyframes fadeUp {
+        from {
+        opacity: 0;
+        transform: translateY(25px);
+        }
+
+        to {
+        opacity: 1;
+        transform: translateY(0);
+        }
+        }
+
+        .login-logo {
+        text-align: center;
+        margin-bottom: 20px;
+        }
+
+        .login-logo img {
+        width: 155px;
+        transition: .3s;
+        }
+
+        .login-logo img:hover {
+        transform: scale(1.03);
+        }
+
+        .login-subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 30px;
+        font-size: 15px;
+        }
+
+        /* =========================
+        FORM
+        ==========================*/
+
+        .form-group {
+        margin-bottom: 24px;
+        position: relative;
+        }
+
+        .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: block;
+        color: #333;
+        }
+
+        .form-control {
+        height: 52px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+        padding-left: 15px;
+        padding-right: 45px;
+        transition: .3s;
+        font-size: 15px;
+        }
+
+        .form-control:focus {
+        border-color: #86608E;
+        box-shadow: 0 0 0 4px rgba(134,96,142,0.12);
+        }
+
+        .form-group i {
+        position: absolute;
+        right: 16px;
+        top: 46px;
+        color: #999;
+        }
+
+        .toggle-password {
+        cursor: pointer;
+        }
+
+        /* =========================
+        BUTTON
+        ==========================*/
+
+        .btn-primary {
+        width: 100%;
+        height: 52px;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        background: linear-gradient(135deg,#86608E,#75507d) !important;
+        transition: .3s;
+        letter-spacing: .3px;
+        }
+
+        .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(134,96,142,0.3);
+        }
+
+        /* =========================
+        RESPONSIVE
+        ==========================*/
+
+        @@media(max-width:576px) {
+        .login-container {
+        padding: 35px 20px;
+        border-radius: 20px;
+        }
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div id="pageLoader" class="loader-wrapper d-none">
+        <div class="loader"></div>
+    </div>
+
+    @{
+        if (TempData["login_failed_message"] != null)
+        {
+            <script>
+                Swal.fire({
+                title: '@TempData["login_failed_message"]',
+                text: 'Please try again',
+                icon: 'error'
+                });
+            </script>
+        }
+
+        if (TempData["logout_message"] != null)
+        {
+            <script>
+                Swal.fire({
+                title: '@TempData["logout_message"]',
+                text: 'You have been logged out',
+                icon: 'success'
+                });
+            </script>
+        }
+    }
+
+    <div class="login-container">
+
+        <div class="login-logo">
+            <img src="~/img/flyeasy.png" alt="Logo" />
+        </div>
+
+        <div class="login-subtitle">
+            Login to manage your account & bills
+        </div>
+
+        <form id="loginForm" novalidate>
+
+            <div class="form-group">
+                <label>Username</label>
+
+                <input type="text"
+                       name="username"
+                       id="username"
+                       class="form-control"
+                       placeholder="Enter your username"
+                       required />
+
+                <i class="fas fa-user"></i>
+            </div>
+
+            <div class="form-group">
+
+                <label>Password</label>
+
+                <input type="password"
+                       id="password"
+                       name="password"
+                       class="form-control"
+                       placeholder="Enter your password"
+                       required />
+
+                <i class="fas fa-eye toggle-password"
+                   id="togglePassword"></i>
+
+            </div>
+
+            <div class="form-group d-flex justify-content-between align-items-center">
+
+                <div class="custom-control custom-checkbox">
+
+                    <input type="checkbox"
+                           class="custom-control-input"
+                           id="remember">
+
+                    <label class="custom-control-label"
+                           for="remember">
+                        Remember Me
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="form-group">
+                <button type="submit"
+                        class="btn btn-primary text-white">
+                    Login
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <script src="~/js/app.min.js"></script>
+    <script src="~/js/scripts.js"></script>
+    <script src="~/js/custom.js"></script>
+
+    <script>
+
+        const loader = document.getElementById("pageLoader");
+
+        function showLoader() {
+        loader.classList.remove("d-none");
+        }
+
+        function hideLoader() {
+        loader.classList.add("d-none");
+        }
+
+        /* =========================
+        PASSWORD TOGGLE
+        ==========================*/
+
+        document.getElementById("togglePassword")
+        .addEventListener("click", function () {
+
+        const passwordInput = document.getElementById("password");
+        const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
+
+        passwordInput.setAttribute("type", type);
+
+        this.classList.toggle("fa-eye");
+        this.classList.toggle("fa-eye-slash");
+
+        });
+
+        /* =========================
+        LOGIN FORM SUBMIT
+        ==========================*/
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+        const usernameInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const rememberCheckbox = document.getElementById("remember");
+
+        // REMEMBER ME LOAD
+        if (localStorage.getItem("rememberMe") === "true") {
+        usernameInput.value = localStorage.getItem("savedUsername") || "";
+        passwordInput.value = localStorage.getItem("savedPassword") || "";
+        rememberCheckbox.checked = true;
+        }
+
+        // LOGIN SUBMIT
+        document.getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+
+        e.preventDefault();
+
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value.trim();
+
+        if (username === "" || password === "") {
+        Swal.fire({
+        icon: 'error',
+        title: 'Validation Error',
+        text: 'Username and Password are required'
+        });
+        return;
+        }
+
+        showLoader();
+
+        try {
+
+        const response = await fetch('/api/Authentication/login', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+        username: username,
+        password: password
+        })
+        });
+
+        const data = await response.json();
+        hideLoader();
+
+        if (response.ok) {
+
+        if (rememberCheckbox.checked) {
+        localStorage.setItem("savedUsername", username);
+        localStorage.setItem("savedPassword", password);
+        localStorage.setItem("rememberMe", "true");
+        }
+        else {
+        localStorage.removeItem("savedUsername");
+        localStorage.removeItem("savedPassword");
+        localStorage.setItem("rememberMe", "false");
+        }
+
+        // Token localStorage me save karna agar API cookie ke sath sath json me return kr rhi h
+        if(data.token){
+        localStorage.setItem("jwtToken", data.token);
+        }
+
+        Swal.fire({
+        icon: 'success',
+        title: 'Login Successful',
+        text: 'Redirecting...',
+        showConfirmButton: false,
+        timer: 1500
+        });
+
+        const targetUrl = data.redirectTo ? data.redirectTo : '/Admin/Index';
+
+        setTimeout(() => {
+        window.location.href = targetUrl;
+        }, 1500);
+
+        }
+        else {
+        Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: data.message || 'Invalid credentials'
+        });
+        }
+
+        }
+        catch (error) {
+        hideLoader();
+        Swal.fire({
+        icon: 'error',
+        title: 'Server Error',
+        text: 'Something went wrong'
+        });
+        }
+
+        });
 
         });
 

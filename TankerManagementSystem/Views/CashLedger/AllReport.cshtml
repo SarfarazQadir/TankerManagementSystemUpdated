@@ -1,4 +1,4 @@
-﻿@model IEnumerable<TankerManagementSystem.Models.CashLedger>
+﻿@model IEnumerable<TankerManagementSystem.Models.ViewModels.CashLedgerVM>
 
 @{
     Layout = null;
@@ -6,6 +6,8 @@
     decimal totalCredit = Model?.Sum(x => x.Credit) ?? 0;
     decimal totalDebit = Model?.Sum(x => x.Debit) ?? 0;
     decimal balance = totalCredit - totalDebit;
+    var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
+
 }
 
 <!DOCTYPE html>
@@ -13,7 +15,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All-Time Cash Ledger Report</title>
+    <title>Cash Ledger Statement</title>
 
     <style>
             :root {
@@ -54,7 +56,7 @@
 
                 .header-top h1 {
                     margin: 0;
-                    font-size: 36px;
+                    font-size: 34px;
                     letter-spacing: 2px;
                     text-transform: uppercase;
                     font-weight: 300;
@@ -132,7 +134,6 @@
                 font-weight: bold;
             }
 
-            /* Date-wise Separator Row Styling */
             .date-divider {
                 background-color: #f1f1f1 !important;
                 font-weight: bold;
@@ -179,16 +180,16 @@
                 padding: 20px;
             }
 
-            .btn {
+            .btn-print {
                 background: var(--brand-color);
                 color: white;
                 border: none;
-                padding: 10px 30px;
-                border-radius: 20px;
+                padding: 12px 40px;
+                border-radius: 25px;
                 cursor: pointer;
                 font-weight: bold;
-                text-decoration: none;
-                display: inline-block;
+                font-size: 15px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             }
 
             @@media print {
@@ -213,22 +214,18 @@
             }
     </style>
 </head>
-
 <body>
 
     <div class="no-print-btn">
-        <button class="btn" onclick="window.print()">PRINT REPORT</button>
+        <button class="btn-print" onclick="window.print()">PRINT STATEMENT</button>
     </div>
 
     <div class="invoice-wrapper">
-
         <div class="header-top">
             <div class="logo-box">
-                <img src="~/img/flyeasy.png"
-                     alt="LOGO"
-                     onerror="this.src='https://via.placeholder.com/150x70?text=MALIK+BROS&bg=86608E&fg=fff'">
+                <img src="~/img/flyeasy.png" alt="LOGO" onerror="this.src='https://via.placeholder.com/150x70?text=MALIK+BROS&bg=86608E&fg=fff'">
             </div>
-            <h1>OVERALL CASH REPORT</h1>
+            <h1>CASH LEDGER REPORT</h1>
         </div>
 
         <div class="info-section">
@@ -236,35 +233,26 @@
                 <h2>MALIK & BROTHERS</h2>
                 <p>Tanker Management Services</p>
                 <p>
-                    <strong>Report Type:</strong> All-Time Cash Ledger
+                    <strong>Statement Status:</strong>
+                    @(Context.Request.Query["startDate"].ToString() == "" && Context.Request.Query["endDate"].ToString() == "" ? "Complete History" : "Filtered Range")
                 </p>
-                <p>
-                    <strong>Total Entries:</strong> @Model.Count()
-                </p>
-                <p>
-                    <strong>Current Running Balance:</strong>
-                    @* Descending order hone ki wajah se FirstOrDefault() me sabse latest balance hoga *@
-                    @Math.Floor(Model.FirstOrDefault()?.Balance ?? 0)
-                </p>
+                @if (Context.Request.Query["startDate"].ToString() != "" || Context.Request.Query["endDate"].ToString() != "")
+                {
+                    <p>
+                        <strong>Duration:</strong>
+                        <span>@(Context.Request.Query["startDate"].ToString() == "" ? "Initial" : Context.Request.Query["startDate"])</span>
+                        to
+                        <span>@(Context.Request.Query["endDate"].ToString() == "" ? "Latest" : Context.Request.Query["endDate"])</span>
+                    </p>
+                }
+                <p><strong>Total Transactions:</strong> @Model.Count()</p>
+                <p><strong>Running Balance:</strong> @Math.Floor(Model.FirstOrDefault()?.Balance ?? 0)</p>
             </div>
 
             <div class="bill-details">
-                <p>
-                    <strong>Generated Date:</strong>
-                    <span>@ViewBag.PrintDate.ToString("dd MMM yyyy hh:mm tt")</span>
-                </p>
-                <p>
-                    <strong>Total Credit (In):</strong>
-                    <span class="credit-text">@Math.Floor(totalCredit)</span>
-                </p>
-                <p>
-                    <strong>Total Debit (Out):</strong>
-                    <span class="debit-text">@Math.Floor(totalDebit)</span>
-                </p>
-                <p>
-                    <strong>Net Balance:</strong>
-                    <span style="font-weight:bold;">@Math.Floor(balance)</span>
-                </p>
+                <p><strong>Generated Date:</strong><span>@System.TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone).ToString("dd MMM yyyy hh:mm tt")</span></p>                <p><strong>Total Credit (In):</strong> <span class="credit-text">@Math.Floor(totalCredit)</span></p>
+                <p><strong>Total Debit (Out):</strong> <span class="debit-text">@Math.Floor(totalDebit)</span></p>
+                <p><strong>Net Position:</strong> <span style="font-weight:bold;">@Math.Floor(balance)</span></p>
             </div>
         </div>
 
@@ -274,34 +262,33 @@
                     <tr>
                         <th style="width: 5%">#</th>
                         <th style="width: 15%">Date</th>
-                        <th style="width: 40%">Description</th>
-                        <th class="text-right" style="width: 13%">Credit (+)</th>
-                        <th class="text-right" style="width: 13%">Debit (-)</th>
-                        <th class="text-right" style="width: 14%">Statement Bal.</th>
+                        <th style="width: 35%">Description</th>
+                        <th class="text-right" style="width: 15%">Credit (+)</th>
+                        <th class="text-right" style="width: 15%">Debit (-)</th>
+                        <th class="text-right" style="width: 15%">Statement Bal.</th>
                     </tr>
                 </thead>
                 <tbody>
                     @{
-                        int i = 1;
+                        int idx = 1;
                         string lastDate = "";
                     }
                     @foreach (var item in Model)
                     {
                         string currentDate = item.EntryDate.ToString("dd MMM yyyy");
 
-                        // Agar date pichli entry se alag hai, to naya header line lagayein
                         if (lastDate != currentDate)
                         {
                             <tr class="date-divider">
                                 <td colspan="6" style="padding: 8px 14px;">
-                                    📅 Entries for: @currentDate
+                                    📅 Records For: @currentDate
                                 </td>
                             </tr>
                             lastDate = currentDate;
                         }
 
                         <tr>
-                            <td>@i</td>
+                            <td>@idx</td>
                             <td>@currentDate</td>
                             <td>@item.Description</td>
                             <td class="text-right credit-text">
@@ -314,37 +301,35 @@
                                 @Math.Floor(item.Balance)
                             </td>
                         </tr>
-                        i++;
+                        idx++;
                     }
                 </tbody>
             </table>
 
             <div class="footer-grid">
                 <div class="terms">
-                    <p><strong>Note:</strong> This is an automated statement containing all historical transaction logs for Malik & Brothers Tanker Management Services.</p>
+                    <p><strong>Note:</strong> This document reflects verified transaction histories recorded securely within the corporate ledger infrastructure.</p>
                 </div>
 
                 <div class="summary-box">
                     <table class="total-table">
                         <tr>
-                            <td>Total Incoming:</td>
+                            <td>Total Receipts:</td>
                             <td class="text-right credit-text">@Math.Floor(totalCredit)</td>
                         </tr>
                         <tr>
-                            <td>Total Outgoing:</td>
+                            <td>Total Payments:</td>
                             <td class="text-right debit-text">@Math.Floor(totalDebit)</td>
                         </tr>
                         <tr class="grand-total-row">
-                            <td>NET CASH:</td>
+                            <td>NET CLOSING:</td>
                             <td class="text-right">@Math.Floor(balance)</td>
                         </tr>
                     </table>
                 </div>
             </div>
         </div>
-
         <div style="background: var(--brand-color); height: 10px;"></div>
     </div>
-
 </body>
 </html>

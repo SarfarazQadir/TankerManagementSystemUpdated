@@ -36,27 +36,9 @@ namespace TankerManagementSystem.Controllers
                 return RedirectToAction("Login", "Admin");
             }
 
-            // 2. CHECK KAREIN KYA USER ADMIN HAI?
-            // (Aap "Admin" ki jagah apna role name likh sakte hain jo apne JWT me set kiya ho)
-            bool isAdmin = User.IsInRole("Admin");
-
-            List<PersonalKhata> data;
-
-            if (isAdmin)
-            {
-                // Admin hai toh poori company/sab ka data dikhao
-                data = _db.PersonalKhatas
-                    .OrderByDescending(x => x.Id)
-                    .ToList();
-            }
-            else
-            {
-                // Normal user hai toh sirf uski apni PersonId ka data dikhao
-                data = _db.PersonalKhatas
-                    .Where(x => x.PersonId == currentUserId) // Ab dono string hain, koi error nahi aayega
-                    .OrderByDescending(x => x.Id)
-                    .ToList();
-            }
+            var data = _db.PersonalKhatas
+                .OrderByDescending(x => x.Id)
+                .ToList();
 
             return View(data);
         }
@@ -69,7 +51,7 @@ namespace TankerManagementSystem.Controllers
             var data = _db.PersonalKhatas
                 .OrderByDescending(x => x.Id)
                 .ToList();
-                
+
             return View(data);
         }
 
@@ -111,7 +93,7 @@ namespace TankerManagementSystem.Controllers
 
             DateTime pakTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
 
-            model.PersonId = userId;
+            model.KhataPerson.Name = userId;
 
             model.CreatedAt = pakTime;
 
@@ -121,7 +103,7 @@ namespace TankerManagementSystem.Controllers
             // LAST BALANCE
             // =========================
             decimal lastBalance = _db.PersonalKhatas
-                .Where(x => x.PersonId == userId)
+                .Where(x => x.KhataPerson.Name == userId)
                 .OrderByDescending(x => x.Id)
                 .Select(x => x.Balance)
                 .FirstOrDefault();
@@ -233,12 +215,12 @@ namespace TankerManagementSystem.Controllers
 
             // Data ko descending order (Latest Date) me load kiya
             var data = _db.PersonalKhatas
-                .Where(x => x.PersonId == userId)
+                .Where(x => x.KhataPerson.Name == userId)
                 .OrderByDescending(x => x.EntryDate)
                 .ToList();
 
             return View(data);
         }
-    
+
     }
 }

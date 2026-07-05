@@ -5,13 +5,163 @@
     Layout = "~/Views/Shared/_Dashboard.cshtml";
 }
 
+<style>
+    /* Premium Collapsible Filter Section Styling */
+    .filter-toggle-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .filter-wrapper-panel {
+        display: none; /* Initial status hidden */
+        background: #ffffff;
+        border: 1px solid #e3eaef;
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        position: relative;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .filter-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #f1f4f6;
+        padding-bottom: 10px;
+    }
+
+        .filter-panel-header h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #495057;
+            letter-spacing: 0.5px;
+        }
+
+    .btn-close-filter {
+        background: none;
+        border: none;
+        color: #adb5bd;
+        font-size: 18px;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        padding: 0;
+    }
+
+        .btn-close-filter:hover {
+            color: #dc3545;
+        }
+
+    .premium-filter-form {
+        display: flex;
+        align-items: flex-end;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filter-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .filter-input-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-bottom: 0;
+        }
+
+    .filter-datepicker {
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #495057;
+        outline: none;
+        background-color: #fff;
+        min-width: 180px;
+        transition: border-color 0.15s ease-in-out;
+    }
+
+        .filter-datepicker:focus {
+            border-color: #86608E;
+            box-shadow: 0 0 0 0.2rem rgba(134, 96, 142, 0.15);
+        }
+
+    .filter-action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
 <section class="section">
     <div class="section-body">
-        <a href="@Url.Action("AddEntry")" class="btn btn-primary"> Add Cash Entry</a>
-        <a href="@Url.Action("DailyReport")" class="btn btn-primary"> Today Report Print</a>
-        <a href="@Url.Action("AllReport")" class="btn btn-primary"> All Report Print</a>
-        <br />
-        <br />
+
+        <div class="filter-toggle-container">
+            <div>
+                <a href="@Url.Action("AddEntry")" class="btn btn-primary mr-1"><i class="fas fa-plus"></i> Add Cash Entry</a>
+                @* <a href="@Url.Action("DailyReport")" class="btn btn-info mr-1"><i class="fas fa-print"></i> Today Report Print</a> *@
+
+                <button type="button" class="btn btn-dark" id="toggleFilterBtn">
+                    <i class="fas fa-filter"></i> <span id="toggleText">Show Filters</span>
+                </button>
+            </div>
+
+           @*  <div>
+                <a href="@Url.Action("AllReport", new { startDate = Context.Request.Query["startDate"], endDate = Context.Request.Query["endDate"] })"
+                   class="btn btn-success">
+                    <i class="fas fa-file-pdf"></i> All Report Print
+                </a>
+            </div> *@
+        </div>
+
+        <div class="filter-wrapper-panel" id="filterPanel">
+            <div class="filter-panel-header">
+                <h5><i class="fas fa-sliders-h"></i> Filter Ledger</h5>
+                <button type="button" class="btn-close-filter" id="closeFilterForm" title="Close Filters">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form method="get" action="@Url.Action("Index")" class="premium-filter-form">
+                <div class="filter-input-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" value="@Context.Request.Query["startDate"]" class="filter-datepicker" />
+                </div>
+
+                <div class="filter-input-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" value="@Context.Request.Query["endDate"]" class="filter-datepicker" />
+                </div>
+
+                <div class="filter-action-buttons">
+                    <button type="submit" id="printReportBtn" class="btn btn-primary"><i class="fas fa-check"></i> Apply Filter</button>
+                    <a href="@Url.Action("Index")" class="btn btn-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+
         <div class="card">
             <div class="card-header">
                 <h4>Cash Ledger List</h4>
@@ -49,13 +199,11 @@
                                     <td>@item.CreatedByName</td>
                                     <td>
                                         <div class="dropdown">
-                                            <button class="btn btn-warning dropdown-toggle"
-                                                    data-toggle="dropdown">
+                                            <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
                                                 Options
                                             </button>
                                             <div class="dropdown-menu">
-                                                <a class="dropdown-item"
-                                                   href="@Url.Action("EditEntry", new { id = item.Id })">
+                                                <a class="dropdown-item" href="@Url.Action("EditEntry", new { id = item.Id })">
                                                     Edit
                                                 </a>
                                             </div>
@@ -71,3 +219,56 @@
         </div>
     </div>
 </section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+    // If active filters exist in URL parameters, ensure the panel stays open
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('startDate') || urlParams.has('endDate')) {
+    $("#filterPanel").show();
+    $("#toggleText").text("Hide Filters");
+    }
+
+    // Toggle visibility click handler
+    $("#toggleFilterBtn").click(function () {
+    $("#filterPanel").slideToggle(200, function() {
+    if ($(this).is(":visible")) {
+    $("#toggleText").text("Hide Filters");
+    } else {
+    $("#toggleText").text("Show Filters");
+    }
+    });
+    });
+
+    // Close action handler inside panel
+    $("#closeFilterForm").click(function () {
+    $("#filterPanel").slideUp(200, function() {
+    $("#toggleText").text("Show Filters");
+    });
+    });
+
+    // CRITICAL FIX: Handle the Print button click directly via JavaScript
+    $("#printReportBtn").click(function (e) {
+    e.preventDefault(); // Stop the default page layout/refresh anchor behavior
+
+    // Get the values directly from the input fields
+    var start = $("#startDate").val();
+    var end = $("#endDate").val();
+
+    // Construct the redirect URL for AllReport action manually
+    var redirectUrl = '@Url.Action("AllReport")';
+    var params = [];
+
+    if (start) params.push("startDate=" + encodeURIComponent(start));
+    if (end) params.push("endDate=" + encodeURIComponent(end));
+
+    if (params.length > 0) {
+    redirectUrl += "?" + params.join("&");
+    }
+
+    // Redirect the user to the print preview page instead of refreshing index
+    window.location.href = redirectUrl;
+    });
+    });
+</script>

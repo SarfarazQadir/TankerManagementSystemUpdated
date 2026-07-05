@@ -37,87 +37,6 @@ namespace TankerManagementSystem.Controllers
             return View();
         }
 
-        // ADD POST
-        /* [HttpPost]
-         public IActionResult AddEntry(TripEntry request)
-         {
-             var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
-             request.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone);
-
-             var sessionValue = HttpContext.Session.GetString("admin_session");
-
-             if (!string.IsNullOrEmpty(sessionValue))
-                 request.CreatedBy = int.Parse(sessionValue);
-             else
-                 return RedirectToAction("Login", "Admin");
-
-             if (request.TankerId == 0 || string.IsNullOrWhiteSpace(request.ToLocation))
-             {
-                 TempData["Error"] = "Required fields missing";
-                 return RedirectToAction("AddEntry");
-             }
-
-             _db.TripEntries.Add(request);
-             _db.SaveChanges();
-
-             TempData["add_trip_message"] = "Trip added successfully.";
-             return RedirectToAction("Index");
-         }
- */
-
-        // ADD POST
-        /* [HttpPost]
-         public IActionResult AddEntry(TripEntry request)
-         {
-             var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
-             request.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone);
-
-             var currentUserId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                            ?? User?.FindFirst(ClaimTypes.Name)?.Value
-                                            ?? User?.FindFirst("sub")?.Value
-                                            ?? User?.FindFirst(ClaimTypes.Email)?.Value
-                                            ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                            ?? User?.Identity?.Name;
-
-             if (string.IsNullOrEmpty(currentUserId) || !(User?.Identity?.IsAuthenticated ?? false))
-             {
-                 TempData["Error"] = "Session expired or invalid token. Please login again.";
-                 return RedirectToAction("Login", "Admin");
-             }
-                 request.CreatedBy = currentUserId;
-
-             if (request.TankerId == 0 || string.IsNullOrWhiteSpace(request.ToLocation))
-             {
-                 TempData["Error"] = "Required fields missing";
-                 return RedirectToAction("AddEntry");
-             }
-
-             // CHECK DUPLICATE ENTRY
-             bool alreadyExists = _db.TripEntries.Any(x =>
-                 x.TankerId == request.TankerId &&
-                 x.FromLocation == request.FromLocation &&
-                 x.ToLocation == request.ToLocation &&
-                 x.CreatedAt.Date == request.CreatedAt.Date
-             );
-
-             if (alreadyExists)
-             {
-                 TempData["Error"] = "Same tanker already has an entry for this route on the same date.";
-
-                 // TOASTER MESSAGE
-                 TempData["toast_error"] = "Duplicate entry not allowed.";
-
-                 return RedirectToAction("AddEntry");
-             }
-
-             _db.TripEntries.Add(request);
-             _db.SaveChanges();
-
-             TempData["add_trip_message"] = "Trip added successfully.";
-             return RedirectToAction("Index");
-         }
-        */
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult AddEntry(TripEntry request, List<TripExpense> expenses)
@@ -206,7 +125,7 @@ namespace TankerManagementSystem.Controllers
                     currentCashBalance -= request.AdvanceCash;
                     _db.CashLedgers.Add(new CashLedger()
                     {
-                        EntryDate = pakTime,
+                        EntryDate = request.LoadDate,
                         Description = $"Trip Entry Advance Cash Payment | Tanker ID: {request.TankerId} | Trip Entry Ref: {request.Id}",
                         Debit = request.AdvanceCash,
                         Credit = 0,
@@ -223,7 +142,7 @@ namespace TankerManagementSystem.Controllers
                         currentCashBalance -= item.Amount;
                         _db.CashLedgers.Add(new CashLedger()
                         {
-                            EntryDate = pakTime,
+                            EntryDate = request.LoadDate,
                             Description = $"Trip Entry Expense Log: {item.ExpenseName} | Trip Entry Ref: {request.Id}",
                             Debit = item.Amount,
                             Credit = 0,
@@ -247,105 +166,6 @@ namespace TankerManagementSystem.Controllers
                 return RedirectToAction("AddEntry");
             }
         }
-
-
-
-        // EDIT POST
-        /*[HttpPost]
-        public IActionResult EditEntry(TripEntry update)
-        {
-            var trip = _db.TripEntries.FirstOrDefault(x => x.Id == update.Id);
-            if (trip == null) return NotFound();
-
-            var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
-            trip.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone);
-
-            trip.LoadDate = update.LoadDate;
-            trip.TankerId = update.TankerId;
-            trip.AdvanceCash = update.AdvanceCash;
-            trip.FromLocation = update.FromLocation;
-            trip.ToLocation = update.ToLocation;
-
-            var sessionValue = HttpContext.Session.GetString("admin_session");
-            if (!string.IsNullOrEmpty(sessionValue))
-                trip.UpdatedBy = int.Parse(sessionValue);
-            else
-                return RedirectToAction("Login", "Admin");
-
-            _db.SaveChanges();
-
-            TempData["edit_trip_message"] = "Trip updated successfully.";
-            return RedirectToAction("Index");
-        }*/
-
-        //Working Start
-
-        // EDIT GET
-        /* public IActionResult EditEntry(int id)
-         {
-             var trip = _db.TripEntries.FirstOrDefault(x => x.Id == id);
-             if (trip == null) return NotFound();
-
-             ViewBag.Tankers = _db.Tankers.ToList();
-             return View(trip);
-         }
-
-         // EDIT POST
-         [HttpPost]
-         public IActionResult EditEntry(TripEntry update)
-         {
-             var trip = _db.TripEntries.FirstOrDefault(x => x.Id == update.Id);
-             if (trip == null) return NotFound();
-
-             // CHECK DUPLICATE ENTRY
-             bool alreadyExists = _db.TripEntries.Any(x =>
-                 x.Id != update.Id && // current record exclude
-                 x.TankerId == update.TankerId &&
-                 x.FromLocation == update.FromLocation &&
-                 x.ToLocation == update.ToLocation &&
-                 x.LoadDate.Date == update.LoadDate.Date
-             );
-
-             if (alreadyExists)
-             {
-                 TempData["Error"] = "Same tanker already has an entry for this route on the same date.";
-                 TempData["toast_error"] = "Duplicate entry not allowed.";
-
-                 return RedirectToAction("EditEntry", new { id = update.Id });
-             }
-
-             var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
-             trip.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone);
-
-             trip.LoadDate = update.LoadDate;
-             trip.TankerId = update.TankerId;
-             trip.AdvanceCash = update.AdvanceCash;
-             trip.FromLocation = update.FromLocation;
-             trip.ToLocation = update.ToLocation;
-
-             var currentUserId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                           ?? User?.FindFirst(ClaimTypes.Name)?.Value
-                                           ?? User?.FindFirst("sub")?.Value
-                                           ?? User?.FindFirst(ClaimTypes.Email)?.Value
-                                           ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                           ?? User?.Identity?.Name;
-
-             if (string.IsNullOrEmpty(currentUserId) || !(User?.Identity?.IsAuthenticated ?? false))
-             {
-                 TempData["Error"] = "Session expired or invalid token. Please login again.";
-                 return RedirectToAction("Login", "Admin");
-             }
-
-             trip.UpdatedBy = currentUserId;
-
-             _db.SaveChanges();
-
-             TempData["edit_trip_message"] = "Trip updated successfully.";
-             return RedirectToAction("Index");
-         }
- */
-        //Working End
-
         // EDIT GET
         public IActionResult EditEntry(int id)
         {
@@ -415,7 +235,7 @@ namespace TankerManagementSystem.Controllers
                     currentCashBalance += trip.AdvanceCash;
                     _db.CashLedgers.Add(new CashLedger()
                     {
-                        EntryDate = pakTime,
+                        EntryDate = update.LoadDate,
                         Description = $"[REVERSED FOR EDIT] Trip Entry Advance Cash | Trip Entry Ref: {trip.Id}",
                         Debit = 0,
                         Credit = trip.AdvanceCash, // Cash wapas aaya
@@ -432,7 +252,7 @@ namespace TankerManagementSystem.Controllers
                     currentCashBalance += oldExpensesTotal;
                     _db.CashLedgers.Add(new CashLedger()
                     {
-                        EntryDate = pakTime,
+                        EntryDate = update.LoadDate,
                         Description = $"[REVERSED FOR EDIT] Total Expenses Reversed | Trip Entry Ref: {trip.Id}",
                         Debit = 0,
                         Credit = oldExpensesTotal, // Cash wapas aaya
@@ -499,7 +319,7 @@ namespace TankerManagementSystem.Controllers
                     currentCashBalance -= update.AdvanceCash;
                     _db.CashLedgers.Add(new CashLedger()
                     {
-                        EntryDate = pakTime,
+                        EntryDate = update.LoadDate,
                         Description = $"[UPDATED] Trip Entry Advance Cash Payment | Tanker ID: {update.TankerId} | Trip Entry Ref: {trip.Id}",
                         Debit = update.AdvanceCash,
                         Credit = 0,
@@ -515,7 +335,7 @@ namespace TankerManagementSystem.Controllers
                     currentCashBalance -= item.Amount;
                     _db.CashLedgers.Add(new CashLedger()
                     {
-                        EntryDate = pakTime,
+                        EntryDate = update.LoadDate,
                         Description = $"[UPDATED] Trip Expense Log: {item.ExpenseName} | Trip Entry Ref: {trip.Id}",
                         Debit = item.Amount,
                         Credit = 0,

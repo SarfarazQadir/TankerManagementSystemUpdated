@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TankerManagementSystem.Models;
 
@@ -11,9 +12,11 @@ using TankerManagementSystem.Models;
 namespace TankerManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260622171346_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,15 +162,15 @@ namespace TankerManagementSystem.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "660e295f-9667-4446-b3d7-cb65760b7dff",
+                            ConcurrencyStamp = "7971aade-ffa5-44b4-b0a4-48d915804e6e",
                             Email = "sarfarazqadir594@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEP67QAcsn6/X/OuuRz7YCTRT3WptBASWs3U+w6YbqwFVOXHQMUS2b7sIp9q9M/pCiQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFgZvXazcS+3w4Pr0SgsnoDW4KJerADgL6zQ1svpfnV2lJNafu04ThI+MjOtsOHPyw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "13bc501e-d5e5-4711-9fac-a4ddb139a4a0",
+                            SecurityStamp = "fbb460ac-09ad-46a2-a8f4-3b802c77a590",
                             TwoFactorEnabled = false,
                             UserName = "sqadmin"
                         });
@@ -316,9 +319,6 @@ namespace TankerManagementSystem.Migrations
                     b.Property<DateTime>("EntryDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("KhataPersonId")
-                        .HasColumnType("int");
-
                     b.Property<int>("PersonId")
                         .HasColumnType("int");
 
@@ -332,8 +332,6 @@ namespace TankerManagementSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("KhataPersonId");
 
                     b.HasIndex("TankerId");
 
@@ -375,47 +373,6 @@ namespace TankerManagementSystem.Migrations
                     b.ToTable("CommissionSetups");
                 });
 
-            modelBuilder.Entity("TankerManagementSystem.Models.KhataPerson", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Address")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("CurrentBalance")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("KhataPersons");
-                });
-
             modelBuilder.Entity("TankerManagementSystem.Models.PersonalKhata", b =>
                 {
                     b.Property<int>("Id")
@@ -443,17 +400,12 @@ namespace TankerManagementSystem.Migrations
                     b.Property<DateTime>("EntryDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("KhataPersonId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("MinusAmount")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("ModuleName")
+                    b.Property<string>("PersonId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ReferenceId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -462,8 +414,6 @@ namespace TankerManagementSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("KhataPersonId");
 
                     b.ToTable("PersonalKhatas");
                 });
@@ -929,28 +879,11 @@ namespace TankerManagementSystem.Migrations
 
             modelBuilder.Entity("TankerManagementSystem.Models.CashLedger", b =>
                 {
-                    b.HasOne("TankerManagementSystem.Models.KhataPerson", "KhataPerson")
-                        .WithMany()
-                        .HasForeignKey("KhataPersonId");
-
                     b.HasOne("TankerManagementSystem.Models.Tanker", "Tanker")
                         .WithMany()
                         .HasForeignKey("TankerId");
 
-                    b.Navigation("KhataPerson");
-
                     b.Navigation("Tanker");
-                });
-
-            modelBuilder.Entity("TankerManagementSystem.Models.PersonalKhata", b =>
-                {
-                    b.HasOne("TankerManagementSystem.Models.KhataPerson", "KhataPerson")
-                        .WithMany()
-                        .HasForeignKey("KhataPersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("KhataPerson");
                 });
 
             modelBuilder.Entity("TankerManagementSystem.Models.Tanker", b =>

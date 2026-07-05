@@ -1,119 +1,4 @@
-﻿@* @model TankerManagementSystem.Models.CashLedger
-
-@{
-    ViewData["Title"] = "EditEntry";
-    Layout = "~/Views/Shared/_Dashboard.cshtml";
-}
-
-
-
-<section class="section">
-
-    <div class="card">
-
-        <div class="card-header">
-            <h4>Edit Cash Entry</h4>
-        </div>
-
-        <div class="card-body">
-
-            <form method="post">
-
-                <input type="hidden" name="Id" value="@Model.Id" />
-
-                <input type="hidden"
-                       name="CreatedAt"
-                       value="@Model.CreatedAt" />
-
-                <input type="hidden"
-                       name="CreatedBy"
-                       value="@Model.CreatedBy" />
-
-                <div class="form-group">
-                    <label>Date</label>
-
-                    <input type="date"
-                           name="EntryDate"
-                           value="@Model.EntryDate.ToString("yyyy-MM-dd")"
-                           class="form-control" />
-                </div>
-
-                <div class="form-group">
-                    <label>Description</label>
-
-                    <textarea name="Description"
-                              class="form-control">@Model.Description</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Credit</label>
-
-                    <input type="number"
-                           step="0.01"
-                           name="Credit"
-                           value="@Model.Credit"
-                           class="form-control" />
-                </div>
-
-                <div class="form-group">
-                    <label>Debit</label>
-
-                    <input type="number"
-                           step="0.01"
-                           name="Debit"
-                           value="@Model.Debit"
-                           class="form-control" />
-                </div>
-
-                <button class="btn btn-primary">
-                    Update Entry
-                </button>
-
-                <a href="@Url.Action("Index")"
-                   class="btn btn-secondary">
-
-                    Back
-
-                </a>
-
-            </form>
-
-        </div>
-
-    </div>
-
-</section>
-<script>
-
-    @if (TempData["success"] != null)
-    {
-            <text>
-
-            iziToast.success({
-                title: 'Success',
-                message: '@TempData["success"]',
-                position: 'bottomRight'
-            });
-
-            </text>
-    }
-
-    @if (TempData["error"] != null)
-    {
-            <text>
-
-            iziToast.error({
-                title: 'Error',
-                message: '@TempData["error"]',
-                position: 'bottomRight'
-            });
-
-            </text>
-    }
-
-</script> *@
-
-@model TankerManagementSystem.Models.CashLedger
+﻿@model TankerManagementSystem.Models.CashLedger
 
 @{
     ViewData["Title"] = "EditEntry";
@@ -121,32 +6,21 @@
 }
 
 <section class="section">
-
     <div class="card">
-
         <div class="card-header">
             <h4>Edit Cash Entry</h4>
         </div>
 
         <div class="card-body">
-
-            <form method="post" onsubmit="return validateEditCashLedgerForm(event)">
+            <form method="post" action="@Url.Action("EditEntry")" onsubmit="return validateEditCashLedgerForm(event)">
 
                 <input type="hidden" name="Id" value="@Model.Id" />
-
-                <input type="hidden"
-                       name="CreatedAt"
-                       value="@Model.CreatedAt" />
-
-                <input type="hidden"
-                       name="CreatedBy"
-                       value="@Model.CreatedBy" />
+                <input type="hidden" name="CreatedAt" value="@Model.CreatedAt.ToString("yyyy-MM-ddTHH:mm:ss")" />
+                <input type="hidden" name="CreatedBy" value="@Model.CreatedBy" />
+                <input type="hidden" name="PersonId" value="@Model.PersonId" />
 
                 <div class="form-group">
-                    <label>
-                        Date<span style="color:red;">*</span>
-                    </label>
-
+                    <label>Date<span style="color:red;">*</span></label>
                     <input type="date"
                            id="EntryDate"
                            name="EntryDate"
@@ -155,20 +29,59 @@
                 </div>
 
                 <div class="form-group">
-                    <label>
-                        Description<span style="color:red;">*</span>
-                    </label>
+                    <label>Link to Tanker (Optional)</label>
+                    <select id="TankerId" name="TankerId" class="form-control select2">
+                        <option value="">-- Select Tanker (If Applicable) --</option>
+                        @if (ViewBag.Tankers != null)
+                        {
+                            foreach (var tanker in ViewBag.Tankers)
+                            {
+                                if (Model.TankerId == tanker.Id)
+                                {
+                                    <option value="@tanker.Id" selected="selected">@tanker.TankerNo</option>
+                                }
+                                else
+                                {
+                                    <option value="@tanker.Id">@tanker.TankerNo</option>
+                                }
+                            }
+                        }
+                    </select>
+                    <small class="form-text text-muted">Modify vehicle profile mapping context dynamically if required.</small>
+                </div>
 
+                <div class="form-group">
+                    <label>Link to Khata Person (Optional)</label>
+                    <select id="KhataPersonId" name="KhataPersonId" class="form-control select2">
+                        <option value="">-- Select Khata Person (If Applicable) --</option>
+                        @if (ViewBag.Khatas != null)
+                        {
+                            foreach (var khata in ViewBag.Khatas)
+                            {
+                                if (Model.KhataPersonId == khata.Id)
+                                {
+                                    <option value="@khata.Id" selected="selected">@khata.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@khata.Id">@khata.Name</option>
+                                }
+                            }
+                        }
+                    </select>
+                    <small class="form-text text-muted">Modify khata person mapping context dynamically if required.</small>
+                </div>
+
+
+                <div class="form-group">
+                    <label>Description<span style="color:red;">*</span></label>
                     <textarea id="Description"
                               name="Description"
                               class="form-control">@Model.Description</textarea>
                 </div>
 
                 <div class="form-group">
-                    <label style="color:green;">
-                        Credit
-                    </label>
-
+                    <label style="color:green;">Credit</label>
                     <input type="number"
                            step="0.01"
                            id="Credit"
@@ -178,10 +91,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label style="color:red;">
-                        Debit
-                    </label>
-
+                    <label style="color:red;">Debit</label>
                     <input type="number"
                            step="0.01"
                            id="Debit"
@@ -190,67 +100,34 @@
                            class="form-control" />
                 </div>
 
-                <button class="btn btn-primary">
-                    Update Entry
-                </button>
-
-                <a href="@Url.Action("Index")"
-                   class="btn btn-secondary">
-
-                    Back
-
-                </a>
-
+                <button type="submit" class="btn btn-primary">Update Entry</button>
+                <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
             </form>
-
         </div>
-
     </div>
-
 </section>
 
 <script>
-
     function validateEditCashLedgerForm(event) {
-
         let entryDate = document.getElementById("EntryDate").value.trim();
         let description = document.getElementById("Description").value.trim();
         let credit = document.getElementById("Credit").value.trim();
         let debit = document.getElementById("Debit").value.trim();
 
         if (entryDate === "") {
-
-            iziToast.error({
-                title: 'Error',
-                message: 'Date is required!',
-                position: 'bottomRight'
-            });
-
+            iziToast.error({ title: 'Error', message: 'Date is required!', position: 'bottomRight' });
             event.preventDefault();
             return false;
         }
 
         if (description === "") {
-
-            iziToast.error({
-                title: 'Error',
-                message: 'Description is required!',
-                position: 'bottomRight'
-            });
-
+            iziToast.error({ title: 'Error', message: 'Description is required!', position: 'bottomRight' });
             event.preventDefault();
             return false;
         }
 
-        // Agar dono empty hon to error show karo
         if (credit === "" && debit === "") {
-
-            iziToast.error({
-                title: 'Error',
-                message: 'Please enter Credit or Debit amount!',
-                position: 'bottomRight'
-            });
-
+            iziToast.error({ title: 'Error', message: 'Please enter Credit or Debit amount!', position: 'bottomRight' });
             event.preventDefault();
             return false;
         }
@@ -261,27 +138,14 @@
     @if (TempData["success"] != null)
     {
             <text>
-
-                iziToast.success({
-                    title: 'Success',
-                    message: '@TempData["success"]',
-                    position: 'bottomRight'
-                });
-
+                iziToast.success({ title: 'Success', message: '@TempData["success"]', position: 'bottomRight' });
             </text>
     }
 
     @if (TempData["error"] != null)
     {
             <text>
-
-                iziToast.error({
-                    title: 'Error',
-                    message: '@TempData["error"]',
-                    position: 'bottomRight'
-                });
-
+                iziToast.error({ title: 'Error', message: '@TempData["error"]', position: 'bottomRight' });
             </text>
     }
-
 </script>

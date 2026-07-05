@@ -25,6 +25,7 @@ namespace TankerManagementSystem.Models
         public DbSet<AppModule> AppModules { get; set; }
         public DbSet<UserPermission> UserPermissions { get; set; }
         public DbSet<TankerLedger> TankerLedgers { get; set; }
+        public DbSet<KhataPerson> KhataPersons { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
             

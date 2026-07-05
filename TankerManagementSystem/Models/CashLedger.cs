@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TankerManagementSystem.Models
 {
@@ -16,5 +18,16 @@ namespace TankerManagementSystem.Models
         public string? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string? UpdatedBy { get; set; }
+        // TankerId can be null if it's a general expense
+        public int? TankerId { get; set; }
+
+        [ForeignKey("TankerId")]
+        [ValidateNever] // This prevents HTTP 400 Validation Errors
+        public virtual Tanker? Tanker { get; set; }
+        public int? KhataPersonId { get; set; }
+
+        [ForeignKey("KhataPersonId")]
+        [ValidateNever]
+        public virtual KhataPerson? KhataPerson { get; set; }
     }
 }

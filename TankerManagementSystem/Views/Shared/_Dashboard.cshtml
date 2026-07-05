@@ -261,7 +261,7 @@
                             <li class="dropdown">
                                 <a href="@Url.Action("Index", "CashLedger")" class="nav-link">
                                     <i data-feather="dollar-sign"></i>
-                                    <span>Daily Cash Ledger</span>
+                                    <span>Cash Ledger</span>
                                 </a>
                             </li>
                         }
@@ -270,7 +270,7 @@
                         @if (User.IsInRole("Admin") || HasAccess("PersonalKhata"))
                         {
                             <li class="dropdown">
-                                <a href="@Url.Action("Index", "PersonalKhata")" class="nav-link">
+                                <a href="@Url.Action("Index", "KhataPerson")" class="nav-link">
                                     <i data-feather="clipboard"></i>
                                     <span>Personal Ledger</span>
                                 </a>
@@ -290,6 +290,7 @@
                                     <li><a class="nav-link" href="@Url.Action("Index", "TankerOwner")"> <i data-feather="user-check"></i>Add Tanker Owner</a></li>
                                     <li><a class="nav-link" href="@Url.Action("Index", "Tanker")"> <i data-feather="truck"></i>Add Tanker</a></li>
                                     <li><a class="nav-link" href="@Url.Action("Index", "Commission")"> <i data-feather="percent"></i>Add Commission</a></li>
+                                    @* <li><a class="nav-link" href="@Url.Action("Index", "KhataPerson")"> <i data-feather="clipboard"></i>Add Khata Person</a></li> *@
                                     @* <li><a class="nav-link" href="@Url.Action("Index", "TankerBalanceLog")"> <i data-feather="percent"></i>Balance Logs</a></li> *@
                                 </ul>
                             </li>
@@ -325,7 +326,7 @@
             <div class="footer-right"></div>
         </footer> *@
             <footer class="main-footer" style="background-color: #ffffff; border-top: 1px solid #f4f3f6; padding: 15px 30px; font-size: 0.85rem; color: #7a6982; text-align: center;">
-                <span>&copy; @DateTime.Now.Year <a href="@Url.Action("Index", "admin")" style="color: #86608E; font-weight: 600; text-decoration: none; margin: 0 4px; transition: color 0.2s;" onmouseover="this.style.color='#6a4772'" onmouseout="this.style.color='#86608E'">Tanker Management System</a> Powered By SQ &bull; All Rights Reserved.</span>
+                <span>&copy; @DateTime.Now.Year <a href="@Url.Action("Index", "admin")" style="color: #86608E; font-weight: 600; text-decoration: none; margin: 0 4px; transition: color 0.2s;" onmouseover="this.style.color='#6a4772'" onmouseout="this.style.color='#86608E'">Tanker Management System</a> Develop By SQ &bull; All Rights Reserved.</span>
             </footer>
     </div>
 </div>

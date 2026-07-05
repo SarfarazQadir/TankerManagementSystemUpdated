@@ -8,7 +8,7 @@ namespace TankerManagementSystem.Controllers
 {
     public class AdminController : Controller
     {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)] // 👈 Yeh lazmi add karein
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult Index()
         {
             return View();
