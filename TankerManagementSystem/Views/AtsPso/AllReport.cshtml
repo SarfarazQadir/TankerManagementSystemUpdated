@@ -1,0 +1,309 @@
+﻿@model IEnumerable<TankerManagementSystem.Models.ViewModels.AtsPsoReportVM>
+
+@{
+    Layout = null;
+    decimal totalAmount = Model?.Sum(x => x.Amount) ?? 0;
+    var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS PSO Statement Report</title>
+
+    <style>
+            :root {
+                --brand-color: #86608E;
+                --text-dark: #333;
+                --text-light: #fff;
+                --expense-red: #e74c3c;
+                --bg-soft: #f8f9fa;
+            }
+
+            body {
+                font-family: 'Segoe UI', Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #e0e0e0;
+                color: var(--text-dark);
+            }
+
+            .invoice-wrapper {
+                max-width: 1100px;
+                margin: 30px auto;
+                background: #fff;
+                padding: 0;
+                box-shadow: 0 0 20px rgba(0,0,0,0.15);
+                border-radius: 4px;
+                overflow: hidden;
+            }
+
+            .header-top {
+                background-color: var(--brand-color);
+                color: var(--text-light);
+                padding: 40px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+                .header-top h1 {
+                    margin: 0;
+                    font-size: 30px;
+                    letter-spacing: 2px;
+                    text-transform: uppercase;
+                    font-weight: 300;
+                }
+
+            .logo-box img {
+                max-height: 70px;
+                filter: brightness(0) invert(1);
+            }
+
+            .info-section {
+                display: grid;
+                grid-template-columns: 1.5fr 1fr;
+                padding: 30px 40px;
+                background: var(--bg-soft);
+                border-bottom: 1px solid #eee;
+            }
+
+            .bill-from h2 {
+                margin: 0 0 10px 0;
+                color: var(--brand-color);
+                font-size: 24px;
+            }
+
+            .bill-details p {
+                margin: 5px 0;
+                font-size: 14px;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .content-area {
+                padding: 40px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 30px;
+            }
+
+            thead th {
+                background: #444;
+                color: #fff;
+                text-align: left;
+                padding: 14px;
+                font-size: 13px;
+                text-transform: uppercase;
+            }
+
+            tbody tr:nth-child(even) {
+                background: #fafafa;
+            }
+
+            tbody tr {
+                border-bottom: 1px solid #eee;
+            }
+
+            td {
+                padding: 14px;
+                font-size: 15px;
+            }
+
+            .text-right {
+                text-align: right;
+            }
+
+            .debit-text {
+                color: var(--expense-red);
+                font-weight: bold;
+            }
+
+            .date-divider {
+                background-color: #f1f1f1 !important;
+                font-weight: bold;
+                color: var(--brand-color);
+                font-size: 14px;
+                border-top: 2px solid var(--brand-color);
+                border-bottom: 2px solid var(--brand-color);
+            }
+
+            .footer-grid {
+                display: grid;
+                grid-template-columns: 1fr 340px;
+                gap: 40px;
+            }
+
+            .terms {
+                font-size: 13px;
+                color: #777;
+                padding-top: 20px;
+            }
+
+            .total-table {
+                width: 100%;
+            }
+
+                .total-table td {
+                    padding: 10px 0;
+                    border: none;
+                }
+
+            .grand-total-row {
+                background-color: var(--brand-color);
+                color: white;
+            }
+
+                .grand-total-row td {
+                    padding: 15px 10px !important;
+                    font-size: 18px;
+                    font-weight: bold;
+                }
+
+            .no-print-btn {
+                text-align: center;
+                padding: 20px;
+            }
+
+            .btn-print {
+                background: var(--brand-color);
+                color: white;
+                border: none;
+                padding: 12px 40px;
+                border-radius: 25px;
+                cursor: pointer;
+                font-weight: bold;
+                font-size: 15px;
+                box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            }
+
+            @@media print {
+                .no-print-btn {
+                    display: none;
+                }
+
+                body {
+                    background: transparent;
+                }
+
+                .invoice-wrapper {
+                    box-shadow: none;
+                    margin: 0;
+                    max-width: 100%;
+                }
+
+                .header-top, .date-divider {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+            }
+    </style>
+</head>
+<body>
+
+    <div class="no-print-btn">
+        <button class="btn-print" onclick="window.print()">PRINT STATEMENT</button>
+    </div>
+
+    <div class="invoice-wrapper">
+        <div class="header-top">
+            <div class="logo-box">
+                <img src="~/img/flyeasy.png" alt="LOGO" onerror="this.src='https://via.placeholder.com/150x70?text=MALIK+BROS&bg=86608E&fg=fff'">
+            </div>
+            <h1>ATS PSO REPORT</h1>
+        </div>
+
+        <div class="info-section">
+            <div class="bill-from">
+                <h2>MALIK & BROTHERS</h2>
+                <p>Tanker Management Services (ATS PSO System)</p>
+                <p>
+                    <strong>Statement Status:</strong>
+                    @(string.IsNullOrEmpty(ViewBag.StartDate) && string.IsNullOrEmpty(ViewBag.EndDate) ? "Complete History" : "Filtered Range")
+                </p>
+                @if (!string.IsNullOrEmpty(ViewBag.StartDate) || !string.IsNullOrEmpty(ViewBag.EndDate))
+                {
+                    <p>
+                        <strong>Duration:</strong>
+                        <span>@(string.IsNullOrEmpty(ViewBag.StartDate) ? "Initial" : ViewBag.StartDate)</span>
+                        to
+                        <span>@(string.IsNullOrEmpty(ViewBag.EndDate) ? "Latest" : ViewBag.EndDate)</span>
+                    </p>
+                }
+                <p><strong>Total Transactions:</strong> @Model.Count()</p>
+            </div>
+
+            <div class="bill-details">
+                <p><strong>Generated Date:</strong><span>@System.TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone).ToString("dd MMM yyyy hh:mm tt")</span></p>
+                <p><strong>Total Debited Amount:</strong> <span class="debit-text">@Math.Floor(totalAmount)</span></p>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 5%">#</th>
+                        <th style="width: 15%">Date</th>
+                        <th style="width: 20%">Tanker No</th>
+                        <th style="width: 45%">Description</th>
+                        <th class="text-right" style="width: 15%">Amount (-)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int idx = 1;
+                        string lastDate = "";
+                    }
+                    @foreach (var item in Model)
+                    {
+                        string currentDate = item.EntryDate.ToString("dd MMM yyyy");
+
+                        if (lastDate != currentDate)
+                        {
+                            <tr class="date-divider">
+                                <td colspan="5" style="padding: 8px 14px;">
+                                    📅 Records For: @currentDate
+                                </td>
+                            </tr>
+                            lastDate = currentDate;
+                        }
+
+                        <tr>
+                            <td>@idx</td>
+                            <td>@currentDate</td>
+                            <td><strong>@item.TankerNo</strong> <span style="font-size: 12px; color: #777;">(@item.Capacity)</span></td>
+                            <td>@item.Description</td>
+                            <td class="text-right debit-text">
+                                @Math.Floor(item.Amount)
+                            </td>
+                        </tr>
+                        idx++;
+                    }
+                </tbody>
+            </table>
+
+            <div class="footer-grid">
+                <div class="terms">
+                    <p><strong>Note:</strong> This document reflects automated fuel advances and card transactional adjustments managed under the FlyEasy ATS PSO gateway module.</p>
+                </div>
+
+                <div class="summary-box">
+                    <table class="total-table">
+                        <tr class="grand-total-row">
+                            <td>TOTAL ATS DEBIT:</td>
+                            <td class="text-right">@Math.Floor(totalAmount)</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div style="background: var(--brand-color); height: 10px;"></div>
+    </div>
+</body>
+</html>

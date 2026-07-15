@@ -1,16 +1,4 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
-
-namespace TankerManagementSystem.Controllers
-{
-    public class KhataPersonController : Controller
-    {
-        public IActionResult Index()
-        {
-            return View();
-        }
-    }
-}
-*/using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TankerManagementSystem.Attributes;

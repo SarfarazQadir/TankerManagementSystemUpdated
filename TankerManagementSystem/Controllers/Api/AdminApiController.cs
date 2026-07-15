@@ -20,18 +20,6 @@ namespace TankerManagementSystem.Controllers.Api
         [HttpGet("GetDashboardData")]
         public IActionResult GetDashboardData()
         {
-            /*var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return RedirectToAction("Login", "Admin");
-            }
-
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Unauthorized(new { message = "Session expired. Please login again." });
-            }*/
-
             DateTime today = DateTime.Today;
             DateTime weekStart = today.AddDays(-(int)today.DayOfWeek);
             DateTime monthStart = new DateTime(today.Year, today.Month, 1);

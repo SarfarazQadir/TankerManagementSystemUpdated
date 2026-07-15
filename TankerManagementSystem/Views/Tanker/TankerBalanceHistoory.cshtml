@@ -1,0 +1,142 @@
+﻿@model Tanker
+@{
+    ViewData["Title"] = "Tanker Balance History";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+    var history = ViewBag.LedgerHistory as List<TankerLedger>;
+}
+
+<style>
+    /* Premium Header / Badge Panels Layout consistent with standard components */
+    .filter-toggle-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .badge-premium-status {
+        font-size: 14px;
+        font-weight: 700;
+        padding: 10px 20px;
+        border-radius: 4px;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .badge-module-tag {
+        background: #f0f4f8;
+        color: #4a5568;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        border: 1px solid #e2e8f0;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-ref-tag {
+        background: #ffffff;
+        color: #6c757d;
+        border: 1px dashed #ced4da;
+        font-family: monospace;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+</style>
+
+<section class="section">
+    <div class="section-body">
+
+        <!-- HEADER CONTROLS AND SNAPSHOTS -->
+        <div class="filter-toggle-container">
+            <div>
+                <h4 class="m-0" style="font-weight: 700; color: #34395e;">
+                    Balance History — <span style="color: #86608E;">@Model.TankerNo</span>
+                </h4>
+                <small class="text-muted">Capacity: @Model.Capacity</small>
+            </div>
+            <div>
+                <span class="badge-premium-status @(Model.CurrentBalance < 0 ? "bg-danger text-white" : "bg-success text-white")">
+                    Current Balance: @Model.CurrentBalance.ToString("N0") PKR
+                </span>
+            </div>
+        </div>
+
+        <!-- MAIN RECORDS CARD LIST -->
+        <div class="card">
+            <div class="card-header">
+                <h4>Running Statement & Transaction Logs</h4>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered table-hover" id="myTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">S.No</th>
+                                <th style="width: 12%">Date</th>
+                                <th style="width: 12%">Module</th>
+                                <th style="width: 10%">Ref ID</th>
+                                <th style="width: 26%">Description / Narration</th>
+                                <th style="width: 11%" class="text-end">Credit (+)</th>
+                                <th style="width: 11%" class="text-end">Debit (-)</th>
+                                <th style="width: 13%" class="text-end">Running Balance</th>
+                                <th style="width: 10%">Handled By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (history != null && history.Any())
+                            {
+                                int i = 1;
+                                foreach (var log in history)
+                                {
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@log.TransactionDate.ToString("dd MMM yyyy")</td>
+                                        <td>
+                                            <span class="badge-module-tag">@log.ModuleName</span>
+                                        </td>
+                                        <td>
+                                            @if (log.ReferenceId != null)
+                                            {
+                                                <span class="badge-ref-tag">#@log.ReferenceId</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">—</span>
+                                            }
+                                        </td>
+                                        <td>@log.Description</td>
+                                        <td class="text-end text-success fw-bold">
+                                            @(log.Credit > 0 ? string.Format("{0:N0}", log.Credit) : "—")
+                                        </td>
+                                        <td class="text-end text-danger fw-bold">
+                                            @(log.Debit > 0 ? string.Format("{0:N0}", log.Debit) : "—")
+                                        </td>
+                                        <td class="text-end fw-bold @(log.RunningBalance < 0 ? "text-danger" : "text-dark")">
+                                            @string.Format("{0:N0}", log.RunningBalance)
+                                        </td>
+                                        <td class="text-muted" style="font-size: 13px;">@log.CreatedBy</td>
+                                    </tr>
+                                    i++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted py-4">
+                                        Is tanker ka koi transaction ledger asset records nahi mila.
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>

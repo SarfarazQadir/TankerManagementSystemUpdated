@@ -22,7 +22,6 @@
 
 <section class="section">
     <div class="section-body">
-        @* <a href="@Url.Action("Add")" class="btn btn-primary">Add Commission</a> *@
         @if (!Model.Any())
         {
             <a href="@Url.Action("Add")" class="btn btn-primary">
@@ -73,10 +72,7 @@
                                 <td>
                                     <div class="dropdown">
                                         <a href="#" data-toggle="dropdown" class="btn btn-warning dropdown-toggle">Options</a>
-                                        <div class="dropdown-menu">
-                                            @*   <a href="@Url.Action("Details", "Products", new { id = item.ProductId })" class="dropdown-item has-icon">
-                                                            <i class="fas fa-eye"></i> View Details
-                                                        </a> *@
+                                        <div class="dropdown-menu">                                        
                                             <a href="@Url.Action("Edit", new { id = item.Id })" class="dropdown-item has-icon">
                                                 <i class="far fa-edit"></i> Edit
                                             </a>

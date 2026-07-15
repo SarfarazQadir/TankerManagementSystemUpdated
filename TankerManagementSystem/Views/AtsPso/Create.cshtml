@@ -1,0 +1,79 @@
+﻿@model TankerManagementSystem.Models.AtsPsoEntry
+
+@{
+    ViewData["Title"] = "Add ATS PSO Entry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="card">
+            <div class="card-header">
+                <h4>Add ATS PSO Entry</h4>
+            </div>
+
+            <div class="card-body">
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["Error"]</div>
+                }
+
+                <form method="post" asp-action="Create" onsubmit="return validateAtsForm(event)">
+
+                    <div class="form-group">
+                        <label>Select Date <span style="color:red;">*</span></label>
+                        <input type="date" id="EntryDate" name="entryDate" value="@DateTime.Today.ToString("yyyy-MM-dd")" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Select Tanker <span style="color:red;">*</span></label>
+                        <select id="TankerId" name="tankerId" class="form-control" asp-items="@(new SelectList(ViewBag.Tankers, "Value", "Text"))">
+                            <option value="">-- Select Tanker --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Debit Amount (PKR) <span style="color:red;">*</span></label>
+                        <input type="number" step="0.01" id="Amount" name="amount" class="form-control" placeholder="0.00" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description / Details <span style="color:red;">*</span></label>
+                        <textarea id="Description" name="description" class="form-control" rows="4" placeholder="Enter transaction details..."></textarea>
+                    </div>
+
+                    <div class="text-center">
+                        <input type="submit" value="Save Record" class="btn btn-primary" />
+                        <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateAtsForm(event) {
+        let tankerId = document.getElementById("TankerId").value.trim();
+        let amount = document.getElementById("Amount").value.trim();
+        let description = document.getElementById("Description").value.trim();
+            let entryDate = document.getElementById("EntryDate").value.trim();
+    if (entryDate === "") {
+        iziToast.error({ title: 'Error', message: 'Please select a Date!', position: 'bottomRight' });
+        event.preventDefault(); return false;
+    }
+        if (tankerId === "") {
+            iziToast.error({ title: 'Error', message: 'Please select a Tanker!', position: 'bottomRight' });
+            event.preventDefault(); return false;
+        }
+        if (amount === "" || isNaN(amount) || parseFloat(amount) <= 0) {
+            iziToast.error({ title: 'Error', message: 'Please enter a valid Debit Amount!', position: 'bottomRight' });
+            event.preventDefault(); return false;
+        }
+        if (description === "") {
+            iziToast.error({ title: 'Error', message: 'Description is required!', position: 'bottomRight' });
+            event.preventDefault(); return false;
+        }
+        return true;
+    }
+</script>

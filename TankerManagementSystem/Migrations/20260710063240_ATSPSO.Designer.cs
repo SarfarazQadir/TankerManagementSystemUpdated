@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TankerManagementSystem.Models;
 
@@ -11,9 +12,11 @@ using TankerManagementSystem.Models;
 namespace TankerManagementSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260710063240_ATSPSO")]
+    partial class ATSPSO
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -159,15 +162,15 @@ namespace TankerManagementSystem.Migrations
                         {
                             Id = "100",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "b00c65c1-2305-4bc7-9cb6-70dc682c2bbb",
+                            ConcurrencyStamp = "a00d46e2-1cc4-4bbc-9bcb-c1a11edcc7ad",
                             Email = "sarfarazqadir594@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "ADMIN@GMAIL.COM",
                             NormalizedUserName = "ADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBzyaPRwNgBzggdwXMQuPIshCXcmIxIQkfb2QWQs9hsdjvpldd55xajAZXT1ZyVPXg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJmPqsvCAs25jkD7g7mLcKxhE7HKNK8spAYiSNnGAfL+W4Nfk5oUnRxQ6M/fKe2AhA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e69bdbab-f017-4376-a5dc-5d8eddcacf17",
+                            SecurityStamp = "420e790b-2371-47da-8a71-746f9bb07afe",
                             TwoFactorEnabled = false,
                             UserName = "sqadmin"
                         });
@@ -306,9 +309,6 @@ namespace TankerManagementSystem.Migrations
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("EntryDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("TankerId")
                         .HasColumnType("int");
@@ -567,9 +567,6 @@ namespace TankerManagementSystem.Migrations
                     b.Property<string>("Model")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("OpeningBalanceDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("OwnerId")
                         .HasColumnType("int");
@@ -856,9 +853,6 @@ namespace TankerManagementSystem.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Shortage")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("ShortageLiters")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TokenNo")

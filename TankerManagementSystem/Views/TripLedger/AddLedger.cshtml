@@ -99,18 +99,18 @@
                             </div>
 
                             <div class="form-group row">
+                                <label class="col-sm-3 col-form-label text-danger font-weight-bold">Shortage (Liters)</label>
+                                <div class="col-sm-9">
+                                    <input asp-for="ShortageLiters" id="ShortageLiters" type="number" step="any" class="form-control" placeholder="0.00" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
                                 <label class="col-sm-3 col-form-label text-danger font-weight-bold">Shortage</label>
                                 <div class="col-sm-9">
                                     <input asp-for="Shortage" type="number" step="any" class="form-control" placeholder="0.00" />
                                 </div>
                             </div>
-
-                       @*      <div class="form-group row">
-                                <label class="col-sm-3 col-form-label text-danger font-weight-bold">Commission</label>
-                                <div class="col-sm-9">
-                                    <input asp-for="Commission" type="number" step="any" class="form-control" placeholder="0.00" />
-                                </div>
-                            </div> *@
 
                             <div class="form-group row">
                                 <label class="col-sm-3 col-form-label text-danger font-weight-bold">Munshiana<span class="text-danger">*</span></label>
@@ -146,20 +146,6 @@
                                     <textarea asp-for="Remarks" class="form-control" rows="3" placeholder="Optional internal logs..."></textarea>
                                 </div>
                             </div>
-
-                          @* 
-                            <hr />
-
-                              <h5 class="mb-3">Dynamic Expenses</h5>
-
-                            <div id="expenseContainer" class="font-weight-bold">
-                                <!-- Dynamic rows append here -->
-                                <input type="hidden" id="expenseIndex" value="0" />
-                            </div>
-
-                            <button type="button" onclick="addExpense()" class="btn btn-info mb-4 mt-2">
-                                <i class="fas fa-plus"></i> Add Expense
-                            </button> *@
 
                             <div class="card-footer text-center bg-transparent border-top-0">
                                 <button type="submit" id="submitBtn" class="btn btn-primary mr-2">Save Ledger</button>

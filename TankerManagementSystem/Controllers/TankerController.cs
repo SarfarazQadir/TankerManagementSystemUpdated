@@ -18,6 +18,33 @@ namespace TankerManagementSystem.Controllers
             _dbcontext = dbcontext;
         }
 
+        // ==========================================
+        // 🔥 SHARED HELPER: Recalculate RunningBalance
+        // ==========================================
+        private void RecalculateTankerLedger(int tankerId)
+        {
+            var rows = _dbcontext.TankerLedgers
+                .Where(x => x.TankerId == tankerId)
+                .OrderBy(x => x.TransactionDate)
+                .ThenBy(x => x.Id)
+                .ToList();
+
+            decimal running = 0;
+            foreach (var row in rows)
+            {
+                running += (row.Credit - row.Debit);
+                row.RunningBalance = running;
+            }
+
+            var tanker = _dbcontext.Tankers.FirstOrDefault(t => t.Id == tankerId);
+            if (tanker != null)
+            {
+                tanker.CurrentBalance = running;
+            }
+
+            _dbcontext.SaveChanges();
+        }
+
         // LIST
         public IActionResult Index()
         {
@@ -61,6 +88,11 @@ namespace TankerManagementSystem.Controllers
                 return RedirectToAction("Login", "Admin");
             }
             request.CreatedBy = currentUserId;
+            // 🔥 FIX: agar user ne OpeningBalanceDate nahi diya (default DateTime), to aaj ki date fallback
+            if (request.OpeningBalanceDate == default)
+            {
+                request.OpeningBalanceDate = pakTime.Date;
+            }
 
             if (string.IsNullOrWhiteSpace(request.TankerNo))
             {
@@ -68,39 +100,31 @@ namespace TankerManagementSystem.Controllers
                 return RedirectToAction("Add");
             }
 
-            // =========================================================
-            // CHANGE 1: Column name changed to CurrentBalance
-            // =========================================================
-            // Yahan hum assume kar rahe hain ke opening balance agar user ne dala hai to wo 'Payable' (Profit) hai, isliye sign (+) hai.
-            request.CurrentBalance = request.CurrentBalance;
-
             _dbcontext.Tankers.Add(request);
             _dbcontext.SaveChanges();
 
-            // =========================================================
-            // CHANGE 2: Naye Professional Ledger ke mutabiq log save hoga
-            // =========================================================
+            // Tanker Creation ke waqt TransactionDate = "abhi" hi sahi hai (kyunke ye pehli row hai, backdating ka sawal nahi)
             if (request.CurrentBalance != 0)
             {
                 TankerLedger ledgerLog = new TankerLedger()
                 {
                     TankerId = request.Id,
-                    TransactionDate = pakTime,
+                    TransactionDate = request.OpeningBalanceDate, // 🔥 FIX: pakTime ki jagah user-specified date
                     ModuleName = "Tanker Creation",
                     ReferenceId = request.Id,
-
-                    // Agar balance positive hai toh Credit (Company ne dena hai), agar negative hai toh Debit (Owner ne dena hai)
                     Credit = request.CurrentBalance > 0 ? request.CurrentBalance : 0,
                     Debit = request.CurrentBalance < 0 ? Math.Abs(request.CurrentBalance) : 0,
-
                     RunningBalance = request.CurrentBalance,
                     Description = $"Opening balance set during tanker creation. Tanker No: {request.TankerNo}",
                     CreatedAt = pakTime,
                     CreatedBy = request.CreatedBy
                 };
 
-                _dbcontext.TankerLedgers.Add(ledgerLog); // Naya table name
+                _dbcontext.TankerLedgers.Add(ledgerLog);
                 _dbcontext.SaveChanges();
+
+                // 🔥 Safety net: agar kabhi Creation se pehle bhi koi backdated row ho, chain sahi rahegi
+                RecalculateTankerLedger(request.Id);
             }
 
             TempData["add_tanker_message"] = "Tanker added successfully.";
@@ -116,29 +140,19 @@ namespace TankerManagementSystem.Controllers
             ViewBag.Owners = _dbcontext.TankerOwners.ToList();
             return View(tanker);
         }
+
         // EDIT POST        
         [HttpPost]
         public IActionResult Edit(Tanker updateTanker)
         {
-            // =========================
-            // FETCH TANKER
-            // =========================
-            var tanker = _dbcontext.Tankers
-                .FirstOrDefault(x => x.Id == updateTanker.Id);
-
+            var tanker = _dbcontext.Tankers.FirstOrDefault(x => x.Id == updateTanker.Id);
             if (tanker == null)
                 return NotFound();
 
-            // =========================
-            // PAKISTAN TIME
-            // =========================
             var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
             DateTime pakTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone);
             tanker.UpdatedAt = pakTime;
 
-            // =========================
-            // SESSION
-            // =========================
             var currentUserId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                                 ?? User?.FindFirst(ClaimTypes.Name)?.Value
                                 ?? User?.FindFirst("sub")?.Value
@@ -152,48 +166,28 @@ namespace TankerManagementSystem.Controllers
             }
             tanker.UpdatedBy = currentUserId;
 
-            // =========================
-            // VALIDATION
-            // =========================
             if (string.IsNullOrWhiteSpace(updateTanker.TankerNo))
             {
                 TempData["Error"] = "Tanker Number is required";
                 return RedirectToAction("Edit", new { id = updateTanker.Id });
             }
 
-            // =========================================================
-            // CHANGE 1: Column name changed from PreviousBalance to CurrentBalance
-            // =========================================================
             decimal oldBalance = tanker.CurrentBalance;
 
-            // =========================
-            // UPDATE DATA
-            // =========================
             tanker.TankerNo = updateTanker.TankerNo;
             tanker.OwnerId = updateTanker.OwnerId;
             tanker.Model = updateTanker.Model;
             tanker.Capacity = updateTanker.Capacity;
-
-            // Assigning the new balance to the updated column name
             tanker.CurrentBalance = updateTanker.CurrentBalance;
 
             decimal newBalance = updateTanker.CurrentBalance;
 
-            // =========================
-            // SAVE TANKER
-            // =========================
             _dbcontext.SaveChanges();
 
-            // =========================================================
-            // CHANGE 2: Professional Accounting Ledger Entry
-            // =========================================================
             decimal difference = newBalance - oldBalance;
 
             if (difference != 0)
             {
-                // Sign mapping for Accounting:
-                // Difference > 0: Balance barh gaya (Credit - Company owes more money to Owner)
-                // Difference < 0: Balance kam ho gaya (Debit - Company deducted money or Owner owes company)
                 decimal creditAmount = difference > 0 ? difference : 0;
                 decimal debitAmount = difference < 0 ? Math.Abs(difference) : 0;
 
@@ -201,18 +195,16 @@ namespace TankerManagementSystem.Controllers
                     ? $"Balance manually increased via Tanker Edit. Tanker No: {tanker.TankerNo}"
                     : $"Balance manually decreased via Tanker Edit. Tanker No: {tanker.TankerNo}";
 
-                // Using the new TankerLedger model instead of the old TankerBalanceLog
+                // Manual edit hamesha "abhi" ke waqt ka correction hota hai, isliye TransactionDate = pakTime theek hai
                 TankerLedger ledgerLog = new TankerLedger()
                 {
                     TankerId = tanker.Id,
                     TransactionDate = pakTime,
                     ModuleName = "Tanker Edit",
                     ReferenceId = tanker.Id,
-
                     Credit = creditAmount,
                     Debit = debitAmount,
-                    RunningBalance = newBalance, // Net financial position after adjustment
-
+                    RunningBalance = 0, // temp — recalculation se set hoga
                     Description = description,
                     CreatedAt = pakTime,
                     CreatedBy = tanker.UpdatedBy
@@ -220,13 +212,29 @@ namespace TankerManagementSystem.Controllers
 
                 _dbcontext.TankerLedgers.Add(ledgerLog);
                 _dbcontext.SaveChanges();
+
+                // 🔥 FIX: Manual edit ke baad bhi pura chain recalc, taake koi mismatch na reh jaye
+                RecalculateTankerLedger(tanker.Id);
             }
 
-            // =========================
-            // SUCCESS
-            // =========================
             TempData["edit_tanker_message"] = "Tanker updated successfully.";
             return RedirectToAction("Index");
+        }
+
+        public IActionResult TankerBalanceHistoory(int id)
+        {
+            var tanker = _dbcontext.Tankers.FirstOrDefault(x => x.Id == id);
+            if (tanker == null) return NotFound();
+
+            ViewBag.Owners = _dbcontext.TankerOwners.ToList();
+
+            ViewBag.LedgerHistory = _dbcontext.TankerLedgers
+                .Where(x => x.TankerId == id)
+                .OrderBy(x => x.TransactionDate)
+                .ThenBy(x => x.Id)
+                .ToList();
+
+            return View(tanker);
         }
     }
 }

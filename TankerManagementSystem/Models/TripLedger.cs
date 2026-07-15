@@ -13,6 +13,7 @@ namespace TankerManagementSystem.Models
         public Product Product { get; set; }
         public decimal Freight { get; set; }
         public decimal AdvanceCash { get; set; }
+        public decimal ShortageLiters { get; set; }
         public decimal Shortage { get; set; }
         public decimal Commission { get; set; }
         public decimal Munshiana { get; set; }

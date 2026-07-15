@@ -6,12 +6,7 @@ using System.Data;
 namespace TankerManagementSystem.Models
 {
     public class ApplicationDbContext : IdentityDbContext<IdentityUser>
-    {
-        //public DbSet<Admin> tbl_admin { get; set; }
-        //public DbSet<User> Users { get; set; }
-        //public DbSet<Role> Roles { get; set; }
-        //public DbSet<AppModule> AppModules { get; set; }
-        //public DbSet<UserPermission> UserPermissions { get; set; }
+    {        
         public DbSet<Tanker> Tankers { get; set; }
         public DbSet<TankerOwner> TankerOwners { get; set; }
         public DbSet<TripLedger> TripLedgers { get; set; }
@@ -26,6 +21,7 @@ namespace TankerManagementSystem.Models
         public DbSet<UserPermission> UserPermissions { get; set; }
         public DbSet<TankerLedger> TankerLedgers { get; set; }
         public DbSet<KhataPerson> KhataPersons { get; set; }
+        public DbSet<AtsPsoEntry> AtsPsoEntries { get; set; }
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
             
@@ -34,19 +30,7 @@ namespace TankerManagementSystem.Models
         {
             base.OnModelCreating(builder);
             SeedRoles(builder);
-        }
-        /* private static void SeedRoles(ModelBuilder builder)
-        {
-            builder.Entity<IdentityRole>().HasData
-                (
-                new IdentityRole() { Name = "Admin", ConcurrencyStamp = "1", NormalizedName = "Admin" },
-                new IdentityRole() { Name = "User", ConcurrencyStamp = "2", NormalizedName = "User" }
-                );
-            builder.Entity<IdentityUser>().HasData
-                (
-                new IdentityUser() { Id = "1", UserName = "admin", Email = "admin@gmail.com", PasswordHash = "Admin@123" }
-                );
-        }*/
+        }       
         private static void SeedRoles(ModelBuilder builder)
         {
             // ROLE IDs
