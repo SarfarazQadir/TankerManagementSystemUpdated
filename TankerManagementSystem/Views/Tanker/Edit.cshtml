@@ -1,4 +1,4 @@
-﻿@model TankerManagementSystem.Models.Tanker
+@model TankerManagementSystem.Models.Tanker
 @{
     ViewData["Title"] = "Edit";
     Layout = "~/Views/Shared/_Dashboard.cshtml";
@@ -65,13 +65,15 @@
                     <div class="form-group">
                         <label>
                             Current Balance (PKR)
-                            <small class="text-muted">(Use positive value for Profit, negative '-' for Loss/Due)</small>
+                            <!-- FIX Issue 10: CurrentBalance field made read-only - Done by AntiGravity on 2026-07-18 08:15 PST -->
+                            <small class="text-muted">(Read-only — managed via ledger entries)</small>
                         </label>
-                        <input asp-for="CurrentBalance"
-                               id="CurrentBalance"
-                               type="number"
-                               step="0.01"
-                               class="form-control" />
+                        <input type="text"
+                               value="@Model.CurrentBalance.ToString("N2")"
+                               class="form-control"
+                               readonly
+                               disabled
+                               style="background-color: #f0f0f0; font-weight: bold;" />
                     </div>
 
                     <div class="text-center">
@@ -95,7 +97,6 @@
         let ownerId = document.getElementById("OwnerId").value.trim();
         let model = document.getElementById("Model").value.trim();
         let capacity = document.getElementById("Capacity").value.trim();
-        let currentBalance = document.getElementById("CurrentBalance").value.trim(); // Changed ID
 
         if (tankerNo === "") {
             iziToast.error({
@@ -131,16 +132,6 @@
             iziToast.error({
                 title: 'Error',
                 message: 'Capacity is required!',
-                position: 'bottomRight'
-            });
-            event.preventDefault();
-            return false;
-        }
-
-        if (currentBalance !== "" && isNaN(currentBalance)) {
-            iziToast.error({
-                title: 'Error',
-                message: 'Current Balance must be a valid number!',
                 position: 'bottomRight'
             });
             event.preventDefault();

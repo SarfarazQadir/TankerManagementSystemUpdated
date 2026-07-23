@@ -52,27 +52,6 @@
   },
   {
     "ContainingType": "TankerManagementSystem.Controllers.AuthenticationController",
-    "Method": "ConfirmEmail",
-    "RelativePath": "api/Authentication/ConfirmEmail",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "token",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "email",
-        "Type": "System.String",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "TankerManagementSystem.Controllers.AuthenticationController",
     "Method": "Login",
     "RelativePath": "api/Authentication/login",
     "HttpMethod": "POST",
@@ -83,27 +62,6 @@
         "Name": "loginModel",
         "Type": "TankerManagementSystem.Models.Authentication.Login.LoginModel",
         "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "TankerManagementSystem.Controllers.AuthenticationController",
-    "Method": "LoginWithOTP",
-    "RelativePath": "api/Authentication/login-2FA",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "code",
-        "Type": "System.String",
-        "IsRequired": false
-      },
-      {
-        "Name": "username",
-        "Type": "System.String",
-        "IsRequired": false
       }
     ],
     "ReturnTypes": []

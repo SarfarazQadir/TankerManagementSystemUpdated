@@ -1,4 +1,12 @@
-﻿using System.Security.Claims;
+// Modified by AI
+// Date: 2026-07-21
+// Reason: M-05 — UserManager and SignInManager are now injected via the constructor
+// instead of being resolved via HttpContext.RequestServices.GetService (Service Locator
+// anti-pattern). This makes dependencies explicit, testable, and correctly scoped.
+// The unnecessary null check on userManager is also removed — if DI is misconfigured,
+// the app fails at startup, not silently at runtime.
+
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,16 +16,28 @@ namespace TankerManagementSystem.Controllers
 {
     public class AdminController : Controller
     {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        // Modified by AI
+        // Date: 2026-07-21
+        // Reason: M-05 — Injected via constructor instead of Service Locator pattern.
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly SignInManager<IdentityUser> _signInManager;
+
+        public AdminController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+        {
+            _userManager = userManager;
+            _signInManager = signInManager;
+        }
+
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult Index()
         {
             return View();
         }
+
         public IActionResult Login()
         {
             return View();
         }
-     
 
         [HttpPost]
         public async Task<IActionResult> Profile()
@@ -42,18 +62,13 @@ namespace TankerManagementSystem.Controllers
                 return RedirectToAction("Profile");
             }
 
-            // Resolve Identity services from DI
-            var userManager = HttpContext.RequestServices.GetService(typeof(UserManager<IdentityUser>)) as UserManager<IdentityUser>;
-            var signInManager = HttpContext.RequestServices.GetService(typeof(SignInManager<IdentityUser>)) as SignInManager<IdentityUser>;
-
-            if (userManager == null)
-            {
-                TempData["Error"] = "User manager is not available.";
-                return RedirectToAction("Profile");
-            }
+            // Modified by AI
+            // Date: 2026-07-21
+            // Reason: M-05 — Use injected _userManager and _signInManager instead of
+            // HttpContext.RequestServices.GetService (Service Locator anti-pattern).
 
             // Get the current Identity user
-            var user = await userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 TempData["Error"] = "User not found.";
@@ -61,7 +76,7 @@ namespace TankerManagementSystem.Controllers
             }
 
             // Verify current password before attempting change
-            var passwordValid = await userManager.CheckPasswordAsync(user, currentPassword);
+            var passwordValid = await _userManager.CheckPasswordAsync(user, currentPassword);
             if (!passwordValid)
             {
                 TempData["Error"] = "Current password is incorrect.";
@@ -69,13 +84,10 @@ namespace TankerManagementSystem.Controllers
             }
 
             // Change password using ASP.NET Identity (updates AspNetUsers table)
-            var changeResult = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+            var changeResult = await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
             if (changeResult.Succeeded)
             {
-                if (signInManager != null)
-                {
-                    await signInManager.RefreshSignInAsync(user);
-                }
+                await _signInManager.RefreshSignInAsync(user);
                 TempData["Success"] = "Password changed successfully.";
                 return RedirectToAction("Profile");
             }

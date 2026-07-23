@@ -1,4 +1,14 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+// Modified by AI
+// Date: 2026-07-21
+// Reason: H-05 — Replaced duplicated private RecalculateTankerLedger() with
+//         injected ILedgerRecalculationService.
+//         C-03 — Fixed balanceExcludingThisTrip calculation in EditLedger which was
+//         subtracting existingLedger.GrandTotal from tanker.CurrentBalance — this was
+//         mathematically wrong when GrandTotal was negative (a loss trip) because the
+//         formula produced the wrong sign. Now correctly reads the actual Credit/Debit
+//         from the existing TankerLedger row to compute the true prior balance.
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,6 +16,7 @@ using System.Security.Claims;
 using TankerManagementSystem.Attributes;
 using TankerManagementSystem.Models;
 using TankerManagementSystem.Models.ViewModels;
+using TankerManagementSystem.Services;
 
 namespace TankerManagementSystem.Controllers
 {
@@ -15,40 +26,16 @@ namespace TankerManagementSystem.Controllers
     {
         private readonly ApplicationDbContext _db;
 
-        public TripLedgerController(ApplicationDbContext db)
+        // Modified by AI
+        // Date: 2026-07-21
+        // Reason: H-05 — Injecting ILedgerRecalculationService replaces the private
+        // RecalculateTankerLedger() method that was duplicated in 4 controllers.
+        private readonly ILedgerRecalculationService _recalcService;
+
+        public TripLedgerController(ApplicationDbContext db, ILedgerRecalculationService recalcService)
         {
             _db = db;
-        }
-
-        // ==========================================
-        // 🔥 SHARED HELPER: Recalculate RunningBalance
-        // Har add/edit/delete ke baad ye method us tanker ki
-        // saari TankerLedgers rows ko TransactionDate order mein
-        // dobara chain kar deta hai, taake RunningBalance hamesha
-        // sahi sequence mein rahe (chahe entry backdated ho).
-        // ==========================================
-        private void RecalculateTankerLedger(int tankerId)
-        {
-            var rows = _db.TankerLedgers
-                .Where(x => x.TankerId == tankerId)
-                .OrderBy(x => x.TransactionDate)
-                .ThenBy(x => x.Id)
-                .ToList();
-
-            decimal running = 0;
-            foreach (var row in rows)
-            {
-                running += (row.Credit - row.Debit);
-                row.RunningBalance = running;
-            }
-
-            var tanker = _db.Tankers.FirstOrDefault(t => t.Id == tankerId);
-            if (tanker != null)
-            {
-                tanker.CurrentBalance = running; // final balance sequence ke hisab se
-            }
-
-            _db.SaveChanges();
+            _recalcService = recalcService;
         }
 
         public IActionResult Index()
@@ -89,7 +76,7 @@ namespace TankerManagementSystem.Controllers
             var model = new TripLedgerVM
             {
                 TripEntryId = trip.Id,
-                TripDate = trip.LoadDate, // 🔥 FIX: pehle DateTime.Now tha, ab trip ki asal LoadDate
+                TripDate = trip.LoadDate,
                 AdvanceCash = trip.AdvanceCash,
                 Freight = 0,
                 Shortage = 0,
@@ -142,7 +129,6 @@ namespace TankerManagementSystem.Controllers
                 if (trip == null) return NotFound();
                 var tanker = trip.TankerFk;
 
-                // Ye "server insertion time" ke liye chahiye (CreatedAt audit field), TransactionDate ke liye nahi
                 var tz = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
                 DateTime pakTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
 
@@ -206,12 +192,12 @@ namespace TankerManagementSystem.Controllers
                     _db.TankerLedgers.Add(new TankerLedger()
                     {
                         TankerId = tanker.Id,
-                        TransactionDate = trip.LoadDate, // 🔥 FIX: pakTime ki jagah asal trip ki date
+                        TransactionDate = trip.LoadDate,
                         ModuleName = "Trip Ledger Add",
                         ReferenceId = model.Id,
                         Credit = creditAmount,
                         Debit = debitAmount,
-                        RunningBalance = 0, // temporary — recalculation se overwrite ho jayega
+                        RunningBalance = 0, // temporary — recalculation will overwrite
                         Description = logDescription,
                         CreatedAt = pakTime,
                         CreatedBy = currentUserId
@@ -219,8 +205,7 @@ namespace TankerManagementSystem.Controllers
 
                     _db.SaveChanges();
 
-                    // 🔥 FIX: Insert ke baad turant is tanker ki poori chain date-order mein recalc karo
-                    RecalculateTankerLedger(tanker.Id);
+                    _recalcService.RecalculateTankerLedger(tanker.Id);
                 }
 
                 _db.SaveChanges();
@@ -345,9 +330,6 @@ namespace TankerManagementSystem.Controllers
                 var tz = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
                 DateTime pakTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
 
-                // NOTE: Ab hum tanker.CurrentBalance ko manually +/- nahi karenge —
-                // RecalculateTankerLedger() sab kuch date-order se khud theek kar dega.
-
                 var commissionSetup = _db.CommissionSetups.FirstOrDefault(x => x.IsActive);
                 decimal commissionPercent = commissionSetup?.Percentage ?? 0;
                 decimal calculatedCommission = (vm.Freight * commissionPercent) / 100;
@@ -358,8 +340,23 @@ namespace TankerManagementSystem.Controllers
                 decimal totalDeductions = advanceCashFromEntry + vm.Shortage + calculatedCommission + vm.Munshiana + totalExpenseFromEntry;
                 decimal grandTotal = vm.Freight - totalDeductions;
 
-                // Purani row ko chhod ke, is tanker ka balance kya tha (reference ke liye — dues-adjustment logic)
-                decimal balanceExcludingThisTrip = (tanker?.CurrentBalance ?? 0) - existingLedger.GrandTotal;
+                // Modified by AI
+                // Date: 2026-07-21
+                // Reason: C-03 — The old formula `(tanker.CurrentBalance) - existingLedger.GrandTotal`
+                // was mathematically wrong. GrandTotal can be negative (a loss trip), and subtracting
+                // a negative number would ADD to the balance instead of removing the trip's contribution.
+                // The correct approach is to read the actual Credit and Debit that were posted to
+                // TankerLedger for this trip, compute their net (Credit - Debit), and subtract that
+                // from the current balance to get the balance as if this trip never existed.
+                // This gives the correct basis for determining whether amountPay should be applied.
+                var existingTankerLogForBalance = _db.TankerLedgers
+                    .FirstOrDefault(x => x.ModuleName == "Trip Ledger Add" && x.ReferenceId == existingLedger.Id);
+
+                decimal oldTripNetContribution = existingTankerLogForBalance != null
+                    ? (existingTankerLogForBalance.Credit - existingTankerLogForBalance.Debit)
+                    : existingLedger.GrandTotal; // fallback if no log row (e.g., grandTotal was 0)
+
+                decimal balanceExcludingThisTrip = (tanker?.CurrentBalance ?? 0) - oldTripNetContribution;
 
                 decimal amountPay = 0;
                 if (balanceExcludingThisTrip < 0 && grandTotal > 0)
@@ -386,7 +383,6 @@ namespace TankerManagementSystem.Controllers
 
                 if (tanker != null)
                 {
-                    // Purani TankerLedger row dhoondo aur usko UPDATE karo (delete+re-add ki jagah)
                     var oldTankerLog = _db.TankerLedgers
                         .FirstOrDefault(x => x.ModuleName == "Trip Ledger Add" && x.ReferenceId == existingLedger.Id);
 
@@ -407,12 +403,12 @@ namespace TankerManagementSystem.Controllers
                         }
                         else
                         {
-                            oldTankerLog.TransactionDate = trip.LoadDate; // 🔥 FIX: asal trip date
+                            oldTankerLog.TransactionDate = trip.LoadDate;
                             oldTankerLog.Credit = creditAmount;
                             oldTankerLog.Debit = debitAmount;
                             oldTankerLog.Description = logDescription;
                             oldTankerLog.CreatedBy = currentUserId;
-                            // RunningBalance yahan set nahi karna — RecalculateTankerLedger() karega
+                            // RunningBalance set by RecalculateTankerLedger below
                         }
                     }
                     else if (grandTotal != 0)
@@ -420,7 +416,7 @@ namespace TankerManagementSystem.Controllers
                         _db.TankerLedgers.Add(new TankerLedger()
                         {
                             TankerId = tanker.Id,
-                            TransactionDate = trip.LoadDate, // 🔥 FIX
+                            TransactionDate = trip.LoadDate,
                             ModuleName = "Trip Ledger Add",
                             ReferenceId = existingLedger.Id,
                             Credit = creditAmount,
@@ -434,8 +430,7 @@ namespace TankerManagementSystem.Controllers
 
                     _db.SaveChanges();
 
-                    // 🔥 FIX: Edit ke baad pura chain date-order mein recalc — Bug #3 aur #4 dono fix
-                    RecalculateTankerLedger(tanker.Id);
+                    _recalcService.RecalculateTankerLedger(tanker.Id);
                 }
 
                 _db.SaveChanges();

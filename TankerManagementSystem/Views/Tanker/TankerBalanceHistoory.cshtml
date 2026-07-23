@@ -3,6 +3,9 @@
     ViewData["Title"] = "Tanker Balance History";
     Layout = "~/Views/Shared/_Dashboard.cshtml";
     var history = ViewBag.LedgerHistory as List<TankerLedger>;
+    decimal openingBalance = ViewBag.OpeningBalance ?? 0;
+    bool hasStartFilter = ViewBag.HasStartFilter ?? false;
+    bool hasAnyFilter = !string.IsNullOrEmpty(ViewBag.StartDate) || !string.IsNullOrEmpty(ViewBag.EndDate);
 }
 
 <style>
@@ -46,6 +49,147 @@
         border-radius: 4px;
         font-weight: bold;
     }
+
+    .btn-toggle-filter {
+        background: #ffffff;
+        border: 1px solid #86608E;
+        color: #86608E;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+        transition: all 0.15s ease-in-out;
+    }
+
+        .btn-toggle-filter:hover {
+            background: #86608E;
+            color: #fff;
+        }
+
+    .filter-active-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #28a745;
+        border-radius: 50%;
+        margin-left: 6px;
+    }
+
+    .opening-balance-banner {
+        background: #f8f5f9;
+        border: 1px solid #e3d9e6;
+        border-radius: 4px;
+        padding: 10px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-style: italic;
+        font-size: 14px;
+    }
+
+    /* Premium Collapsible Filter Section Styling */
+    .filter-wrapper-panel {
+        display: none; /* Initial status hidden */
+        background: #ffffff;
+        border: 1px solid #e3eaef;
+        border-radius: 6px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        position: relative;
+        animation: slideDown 0.3s ease-out;
+    }
+
+        .filter-wrapper-panel.show {
+            display: block;
+        }
+
+    .filter-panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #f1f4f6;
+        padding-bottom: 10px;
+    }
+
+        .filter-panel-header h5 {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #495057;
+            letter-spacing: 0.5px;
+        }
+
+    .btn-close-filter {
+        background: none;
+        border: none;
+        color: #adb5bd;
+        font-size: 18px;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        padding: 0;
+    }
+
+        .btn-close-filter:hover {
+            color: #dc3545;
+        }
+
+    .premium-filter-form {
+        display: flex;
+        align-items: flex-end;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .filter-input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+        .filter-input-group label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-bottom: 0;
+        }
+
+    .filter-datepicker {
+        padding: 8px 12px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+        color: #495057;
+        outline: none;
+        background-color: #fff;
+        min-width: 180px;
+        transition: border-color 0.15s ease-in-out;
+    }
+
+        .filter-datepicker:focus {
+            border-color: #86608E;
+            box-shadow: 0 0 0 0.2rem rgba(134, 96, 142, 0.15);
+        }
+
+    .filter-action-buttons {
+        display: flex;
+        gap: 8px;
+    }
+
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 
 <section class="section">
@@ -55,25 +199,84 @@
         <div class="filter-toggle-container">
             <div>
                 <h4 class="m-0" style="font-weight: 700; color: #34395e;">
+                    <i class="far fa-history" style="color:#86608E;"></i>
                     Balance History — <span style="color: #86608E;">@Model.TankerNo</span>
                 </h4>
                 <small class="text-muted">Capacity: @Model.Capacity</small>
             </div>
-            <div>
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button type="button" class="btn-toggle-filter" id="toggleFilterBtn">
+                    <i class="fas fa-sliders-h"></i> Filter by Date
+                    @if (hasAnyFilter)
+                    {
+                        <span class="filter-active-dot"></span>
+                    }
+                </button>
                 <span class="badge-premium-status @(Model.CurrentBalance < 0 ? "bg-danger text-white" : "bg-success text-white")">
                     Current Balance: @Model.CurrentBalance.ToString("N0") PKR
                 </span>
             </div>
         </div>
 
+        <!-- FILTER PANEL -->
+        <div class="filter-wrapper-panel @(hasAnyFilter ? "show" : "")" id="filterPanel">
+            <div class="filter-panel-header">
+                <h5><i class="fas fa-sliders-h"></i> Filter Ledger</h5>
+                <button type="button" class="btn-close-filter" id="closeFilterForm" title="Close Filters">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form method="get" action="@Url.Action("TankerBalanceHistoory", new { id = Model.Id })" class="premium-filter-form">
+                <div class="filter-input-group">
+                    <label for="startDate">Start Date</label>
+                    <input type="date" id="startDate" name="startDate" value="@ViewBag.StartDate" class="filter-datepicker" />
+                </div>
+
+                <div class="filter-input-group">
+                    <label for="endDate">End Date</label>
+                    <input type="date" id="endDate" name="endDate" value="@ViewBag.EndDate" class="filter-datepicker" />
+                </div>
+
+                <div class="filter-action-buttons">
+                    <button type="submit" id="printReportBtn" class="btn btn-primary"><i class="fas fa-check"></i> Apply Filter</button>
+                    <a href="@Url.Action("TankerBalanceHistoory", new { id = Model.Id })" class="btn btn-secondary">Clear</a>
+                </div>
+            </form>
+        </div>
+
         <!-- MAIN RECORDS CARD LIST -->
         <div class="card">
             <div class="card-header">
-                <h4>Running Statement & Transaction Logs</h4>
+                <h4><i class="far fa-history"></i> Running Statement & Transaction Logs</h4>
+                @if (hasAnyFilter)
+                {
+                    <small class="text-muted">
+                        Showing: @(string.IsNullOrEmpty(ViewBag.StartDate) ? "start" : ViewBag.StartDate)
+                        to @(string.IsNullOrEmpty(ViewBag.EndDate) ? "today" : ViewBag.EndDate)
+                    </small>
+                }
             </div>
+
+            @if (hasStartFilter)
+            {
+                <div class="px-3 pt-3">
+                    <div class="opening-balance-banner">
+                        <span>Opening Balance (before <strong>@ViewBag.StartDate</strong>)</span>
+                        <span class="fw-bold @(openingBalance < 0 ? "text-danger" : "text-dark")">
+                            @string.Format("{0:N0}", openingBalance) PKR
+                        </span>
+                    </div>
+                </div>
+            }
+
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped table-bordered table-hover" id="myTable">
+                    <!-- id changed from "myTable" to "ledgerHistoryTable" on purpose:
+                         the global layout script auto-initializes DataTables on any
+                         #myTable element. Renaming it here keeps this a plain table
+                         without touching that shared script. -->
+                    <table class="table table-striped table-bordered table-hover" id="ledgerHistoryTable">
                         <thead>
                             <tr>
                                 <th style="width: 5%">S.No</th>
@@ -140,3 +343,21 @@
 
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var panel = document.getElementById('filterPanel');
+            var toggleBtn = document.getElementById('toggleFilterBtn');
+            var closeBtn = document.getElementById('closeFilterForm');
+
+            toggleBtn.addEventListener('click', function() {
+                panel.classList.toggle('show');
+            });
+
+            closeBtn.addEventListener('click', function() {
+                panel.classList.remove('show');
+            });
+        });
+    </script>
+}

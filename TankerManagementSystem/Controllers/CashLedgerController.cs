@@ -1,11 +1,20 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+// Modified by AI
+// Date: 2026-07-21
+// Reason: H-05 — Replaced 4 duplicated private RecalculateTankerLedger and 1 duplicated
+//         private RecalculateCashLedger methods with injected ILedgerRecalculationService.
+//         H-07 — Added validation in AddEntry POST to ensure at least one of Credit
+//         or Debit is provided and positive (was missing from Add, only existed on Edit).
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TankerManagementSystem.Attributes;
+using TankerManagementSystem.Helpers;
 using TankerManagementSystem.Models;
 using TankerManagementSystem.Models.ViewModels;
+using TankerManagementSystem.Services;
 
 namespace TankerManagementSystem.Controllers
 {
@@ -15,43 +24,24 @@ namespace TankerManagementSystem.Controllers
     {
         private readonly ApplicationDbContext _db;
 
-        public CashLedgerController(ApplicationDbContext db)
+        // Modified by AI
+        // Date: 2026-07-21
+        // Reason: H-05 — Injecting ILedgerRecalculationService replaces the private
+        // RecalculateTankerLedger() and RecalculateCashLedger() methods that were
+        // copy-pasted into this controller and 3 others.
+        private readonly ILedgerRecalculationService _recalcService;
+
+        public CashLedgerController(ApplicationDbContext db, ILedgerRecalculationService recalcService)
         {
             _db = db;
-        }
-
-        // ==========================================
-        // 🔥 SHARED HELPER: Recalculate RunningBalance
-        // ==========================================
-        private void RecalculateTankerLedger(int tankerId)
-        {
-            var rows = _db.TankerLedgers
-                .Where(x => x.TankerId == tankerId)
-                .OrderBy(x => x.TransactionDate)
-                .ThenBy(x => x.Id)
-                .ToList();
-
-            decimal running = 0;
-            foreach (var row in rows)
-            {
-                running += (row.Credit - row.Debit);
-                row.RunningBalance = running;
-            }
-
-            var tanker = _db.Tankers.FirstOrDefault(t => t.Id == tankerId);
-            if (tanker != null)
-            {
-                tanker.CurrentBalance = running;
-            }
-
-            _db.SaveChanges();
+            _recalcService = recalcService;
         }
 
         public IActionResult Index()
         {
             var data = (
                 from c in _db.CashLedgers
-                orderby c.Id descending
+                orderby c.EntryDate descending
                 select new CashLedgerVM
                 {
                     Id = c.Id,
@@ -81,16 +71,40 @@ namespace TankerManagementSystem.Controllers
         {
             try
             {
-                model.CreatedAt = DateTime.Now;
+                var pakTime = DateTimeHelper.GetPakistanTime();
+
+                model.CreatedAt = pakTime;
                 model.PersonId = 1;
 
                 ModelState.Remove("Tanker");
                 ModelState.Remove("KhataPerson");
 
-                decimal lastCashBalance = _db.CashLedgers
-                                             .OrderByDescending(x => x.Id)
-                                             .Select(x => x.Balance)
-                                             .FirstOrDefault();
+                // Modified by AI
+                // Date: 2026-07-21
+                // Reason: H-07 — AddEntry was missing the credit/debit validation that
+                // EditEntry already had. Without this, a zero-credit/zero-debit entry
+                // could be saved, creating a phantom row that corrupts balance reporting.
+                if (model.Credit > 0 && model.Debit > 0)
+                {
+                    TempData["error"] = "Only Credit OR Debit allowed, not both at the same time.";
+                    ViewBag.Tankers = _db.Tankers.OrderBy(t => t.TankerNo).ToList();
+                    ViewBag.Khatas = _db.KhataPersons.OrderBy(k => k.Name).ToList();
+                    return View(model);
+                }
+
+                if (model.Credit <= 0 && model.Debit <= 0)
+                {
+                    TempData["error"] = "Enter either a Credit amount or a Debit amount.";
+                    ViewBag.Tankers = _db.Tankers.OrderBy(t => t.TankerNo).ToList();
+                    ViewBag.Khatas = _db.KhataPersons.OrderBy(k => k.Name).ToList();
+                    return View(model);
+                }
+
+                // Modified by AI
+                // Date: 2026-07-21
+                // Reason: Calculate total available cash balance across the entire CashLedger (Sum of Credit - Debit).
+                // Avoids retrieving a backdated row's intermediate running balance when backdated entries exist.
+                decimal lastCashBalance = _db.CashLedgers.Sum(x => (decimal?)x.Credit - (decimal?)x.Debit) ?? 0;
 
                 model.Balance = lastCashBalance + (model.Credit - model.Debit);
                 model.CreatedBy = User.Identity?.Name ?? "System Admin";
@@ -98,34 +112,33 @@ namespace TankerManagementSystem.Controllers
                 _db.CashLedgers.Add(model);
                 _db.SaveChanges();
 
+                // FIX Issue 03: Recalculate full cash ledger chain after adding
+                _recalcService.RecalculateCashLedger();
+
                 // 2. Double-Entry Logic & Tanker Balance Sync
                 if (model.TankerId.HasValue)
                 {
-                    decimal currentTransactionNet = model.Credit - model.Debit;
-
                     var tankerLedgerEntry = new TankerLedger
                     {
                         TankerId = model.TankerId.Value,
-                        TransactionDate = model.EntryDate, // ✅ Ye pehle se hi sahi tha
+                        TransactionDate = model.EntryDate,
                         ModuleName = "Cash Ledger",
                         ReferenceId = model.Id,
                         Description = model.Description,
-                        CreatedAt = DateTime.Now,
+                        CreatedAt = pakTime,
                         CreatedBy = model.CreatedBy,
                         Credit = model.Credit,
                         Debit = model.Debit,
-                        RunningBalance = 0 // temp — RecalculateTankerLedger() se set hoga
+                        RunningBalance = 0 // temp — RecalculateTankerLedger() will set this
                     };
 
                     _db.TankerLedgers.Add(tankerLedgerEntry);
                     _db.SaveChanges();
 
-                    // 🔥 FIX: Bug #2 — ab "last Id" ke bajaye pura chain date-order mein recalc hota hai,
-                    // isliye backdated entries bhi sahi jagah par sahi RunningBalance ke saath fit hoti hain
-                    RecalculateTankerLedger(model.TankerId.Value);
+                    _recalcService.RecalculateTankerLedger(model.TankerId.Value);
                 }
 
-                // 3. Khata Person Sync (ye already sahi tha, isme koi Tanker-related bug nahi tha)
+                // 3. Khata Person Sync
                 if (model.KhataPersonId.HasValue)
                 {
                     decimal lastPersonBalance = _db.PersonalKhatas
@@ -145,7 +158,7 @@ namespace TankerManagementSystem.Controllers
                         AddAmount = addAmt,
                         MinusAmount = minusAmt,
                         Balance = lastPersonBalance + addAmt - minusAmt,
-                        CreatedAt = DateTime.Now,
+                        CreatedAt = pakTime,
                         CreatedBy = model.CreatedBy,
                         ModuleName = "Cash Ledger",
                         ReferenceId = model.Id
@@ -156,12 +169,15 @@ namespace TankerManagementSystem.Controllers
                     if (khataPerson != null)
                     {
                         khataPerson.CurrentBalance += addAmt - minusAmt;
-                        khataPerson.UpdatedAt = DateTime.Now;
+                        khataPerson.UpdatedAt = pakTime;
                         khataPerson.UpdatedBy = model.CreatedBy;
                         _db.KhataPersons.Update(khataPerson);
                     }
 
                     _db.SaveChanges();
+
+                    // Recalculate PersonalKhata to ensure date-ordered chain is correct
+                    _recalcService.RecalculatePersonalKhata(model.KhataPersonId.Value);
                 }
 
                 TempData["success"] = "Ledger entry updated and balances synchronized successfully.";
@@ -216,8 +232,8 @@ namespace TankerManagementSystem.Controllers
                     return RedirectToAction("Login", "Admin");
                 }
 
-                var tz = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
-                model.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
+                var pakTime = DateTimeHelper.GetPakistanTime();
+                model.UpdatedAt = pakTime;
                 model.UpdatedBy = currentUserId;
 
                 if (model.Credit > 0 && model.Debit > 0)
@@ -236,33 +252,15 @@ namespace TankerManagementSystem.Controllers
                     return View(model);
                 }
 
-                decimal previousBalance = 0;
-                var previousEntry = _db.CashLedgers
-                    .Where(x => x.Id < model.Id)
-                    .OrderByDescending(x => x.Id)
-                    .FirstOrDefault();
-
-                if (previousEntry != null)
-                {
-                    previousBalance = previousEntry.Balance;
-                }
-
-                decimal newBalance = previousBalance + model.Credit - model.Debit;
-
-                if (newBalance < 0)
-                {
-                    TempData["error"] = $"Insufficient Balance! Current Balance is {previousBalance}";
-                    ViewBag.Tankers = _db.Tankers.OrderBy(t => t.TankerNo).ToList();
-                    ViewBag.Khatas = _db.KhataPersons.OrderBy(k => k.Name).ToList();
-                    return View(model);
-                }
-
-                model.Balance = newBalance;
+                // Set balance temporarily — RecalculateCashLedger will fix it
+                model.Balance = 0;
                 model.CreatedAt = old.CreatedAt;
                 model.CreatedBy = old.CreatedBy;
 
                 _db.CashLedgers.Update(model);
                 _db.SaveChanges();
+
+                _recalcService.RecalculateCashLedger();
 
                 // ==========================================
                 // TANKER MASTER TABLE + LEDGER SYNC (Edit)
@@ -283,7 +281,6 @@ namespace TankerManagementSystem.Controllers
                         oldTankerLedger.Credit = model.Credit;
                         oldTankerLedger.Debit = model.Debit;
                         oldTankerLedger.CreatedBy = old.CreatedBy;
-                        // RunningBalance yahan set nahi karna — recalculation karega
                         _db.TankerLedgers.Update(oldTankerLedger);
                     }
                     else
@@ -295,7 +292,7 @@ namespace TankerManagementSystem.Controllers
                             ModuleName = "Cash Ledger",
                             ReferenceId = model.Id,
                             Description = model.Description,
-                            CreatedAt = DateTime.Now,
+                            CreatedAt = pakTime,
                             CreatedBy = old.CreatedBy,
                             Credit = model.Credit,
                             Debit = model.Debit,
@@ -314,15 +311,14 @@ namespace TankerManagementSystem.Controllers
 
                 _db.SaveChanges();
 
-                // 🔥 FIX: Bug #4 — Tanker badal bhi jaye ya same rahe, dono affected tankers ki
-                // chain ko poori tarah recalc karo (agar old aur new tanker alag hain to dono)
+                // Recalculate both affected tanker chains
                 if (affectedOldTankerId.HasValue)
                 {
-                    RecalculateTankerLedger(affectedOldTankerId.Value);
+                    _recalcService.RecalculateTankerLedger(affectedOldTankerId.Value);
                 }
                 if (affectedNewTankerId.HasValue && affectedNewTankerId != affectedOldTankerId)
                 {
-                    RecalculateTankerLedger(affectedNewTankerId.Value);
+                    _recalcService.RecalculateTankerLedger(affectedNewTankerId.Value);
                 }
 
                 // ==========================================
@@ -339,8 +335,10 @@ namespace TankerManagementSystem.Controllers
                         oldPerson.CurrentBalance -= (oldKhataEntry.AddAmount - oldKhataEntry.MinusAmount);
                         _db.KhataPersons.Update(oldPerson);
                     }
+                    int oldKhataPersonId = oldKhataEntry.KhataPersonId;
                     _db.PersonalKhatas.Remove(oldKhataEntry);
                     _db.SaveChanges();
+                    _recalcService.RecalculatePersonalKhata(oldKhataPersonId);
                 }
 
                 if (model.KhataPersonId.HasValue)
@@ -362,7 +360,7 @@ namespace TankerManagementSystem.Controllers
                         AddAmount = addAmt,
                         MinusAmount = minusAmt,
                         Balance = lastPersonBalance + addAmt - minusAmt,
-                        CreatedAt = DateTime.Now,
+                        CreatedAt = pakTime,
                         CreatedBy = old.CreatedBy,
                         ModuleName = "Cash Ledger",
                         ReferenceId = model.Id
@@ -373,12 +371,13 @@ namespace TankerManagementSystem.Controllers
                     if (person != null)
                     {
                         person.CurrentBalance += addAmt - minusAmt;
-                        person.UpdatedAt = DateTime.Now;
+                        person.UpdatedAt = pakTime;
                         person.UpdatedBy = currentUserId;
                         _db.KhataPersons.Update(person);
                     }
 
                     _db.SaveChanges();
+                    _recalcService.RecalculatePersonalKhata(model.KhataPersonId.Value);
                 }
 
                 TempData["success"] = "Cash Ledger, Tanker and Khata balances updated successfully.";
@@ -416,12 +415,14 @@ namespace TankerManagementSystem.Controllers
                 }
             }
 
+            int? affectedKhataPersonId = null;
             if (data.KhataPersonId.HasValue)
             {
                 var khataEntry = _db.PersonalKhatas
                     .FirstOrDefault(x => x.ModuleName == "Cash Ledger" && x.ReferenceId == data.Id);
                 if (khataEntry != null)
                 {
+                    affectedKhataPersonId = khataEntry.KhataPersonId;
                     var person = _db.KhataPersons.FirstOrDefault(k => k.Id == khataEntry.KhataPersonId);
                     if (person != null)
                     {
@@ -435,11 +436,16 @@ namespace TankerManagementSystem.Controllers
             _db.CashLedgers.Remove(data);
             _db.SaveChanges();
 
-            // 🔥 FIX: Delete ke baad bhi is tanker ki poori chain recalc karo
-            // (pehle Tanker.CurrentBalance turant -= ho jata tha, baaki rows stale reh jati thi)
+            _recalcService.RecalculateCashLedger();
+
             if (affectedTankerId.HasValue)
             {
-                RecalculateTankerLedger(affectedTankerId.Value);
+                _recalcService.RecalculateTankerLedger(affectedTankerId.Value);
+            }
+
+            if (affectedKhataPersonId.HasValue)
+            {
+                _recalcService.RecalculatePersonalKhata(affectedKhataPersonId.Value);
             }
 
             TempData["success"] = "Cash Ledger Deleted Successfully";
@@ -451,7 +457,7 @@ namespace TankerManagementSystem.Controllers
         // =====================================
         public IActionResult DailyReport(DateTime? date)
         {
-            DateTime reportDate = date ?? DateTime.Today;
+            DateTime reportDate = date ?? DateTimeHelper.GetPakistanToday();
 
             var data = _db.CashLedgers
                 .Where(x => x.EntryDate.Date == reportDate.Date)
@@ -464,7 +470,7 @@ namespace TankerManagementSystem.Controllers
 
         // =====================================
         // ALL CASH REPORT
-        // =====================================        
+        // =====================================
         public IActionResult AllReport(DateTime? startDate, DateTime? endDate)
         {
             var query = _db.CashLedgers.AsQueryable();
@@ -494,7 +500,7 @@ namespace TankerManagementSystem.Controllers
 
             ViewBag.StartDate = startDate?.ToString("yyyy-MM-dd");
             ViewBag.EndDate = endDate?.ToString("yyyy-MM-dd");
-            ViewBag.PrintDate = DateTime.Now;
+            ViewBag.PrintDate = DateTimeHelper.GetPakistanTime();
 
             return View(data);
         }
@@ -504,8 +510,9 @@ namespace TankerManagementSystem.Controllers
         // =====================================
         public IActionResult MonthlyReport(int? month, int? year)
         {
-            int currentMonth = month ?? DateTime.Now.Month;
-            int currentYear = year ?? DateTime.Now.Year;
+            var pakTime = DateTimeHelper.GetPakistanTime();
+            int currentMonth = month ?? pakTime.Month;
+            int currentYear = year ?? pakTime.Year;
 
             var data = _db.CashLedgers
                 .Where(x => x.EntryDate.Month == currentMonth && x.EntryDate.Year == currentYear)
@@ -523,8 +530,9 @@ namespace TankerManagementSystem.Controllers
         // =====================================
         public IActionResult ProfitLoss(int? month, int? year)
         {
-            int currentMonth = month ?? DateTime.Now.Month;
-            int currentYear = year ?? DateTime.Now.Year;
+            var pakTime = DateTimeHelper.GetPakistanTime();
+            int currentMonth = month ?? pakTime.Month;
+            int currentYear = year ?? pakTime.Year;
 
             var data = _db.CashLedgers
                 .Where(x => x.EntryDate.Month == currentMonth && x.EntryDate.Year == currentYear)

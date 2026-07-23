@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -48,11 +48,15 @@ namespace TankerManagementSystem.Controllers
             var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
             request.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone);
 
+            // Modified by AI
+            // Date: 2026-07-21
+            // Reason: L-05 — Removed duplicate ClaimTypes.NameIdentifier fallback.
+            // It appeared as both the first AND fifth options in the chain (lines 51 and 55),
+            // making the fifth occurrence unreachable dead code.
             var currentUserId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                               ?? User?.FindFirst(ClaimTypes.Name)?.Value
                               ?? User?.FindFirst("sub")?.Value
                               ?? User?.FindFirst(ClaimTypes.Email)?.Value
-                              ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                               ?? User?.Identity?.Name;
 
             if (string.IsNullOrEmpty(currentUserId) || !(User?.Identity?.IsAuthenticated ?? false))

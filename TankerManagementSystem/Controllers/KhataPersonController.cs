@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TankerManagementSystem.Attributes;
+using TankerManagementSystem.Helpers;
 using TankerManagementSystem.Models;
 
 namespace TankerManagementSystem.Controllers
@@ -26,7 +27,8 @@ namespace TankerManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Add(KhataPerson model)
         {
-            model.CreatedAt = DateTime.Now;
+            // FIX Issue 13: Standardize to Pakistan Standard Time (PST) - Done by AntiGravity on 2026-07-18 08:15 PST
+            model.CreatedAt = DateTimeHelper.GetPakistanTime();
             model.CreatedBy = User?.Identity?.Name ?? "Admin";
             model.CurrentBalance = 0;
 
@@ -56,7 +58,8 @@ namespace TankerManagementSystem.Controllers
             data.ContactNumber = model.ContactNumber;
             data.Address = model.Address;
             data.Description = model.Description;
-            data.UpdatedAt = DateTime.Now;
+            // FIX Issue 13: Standardize to Pakistan Standard Time (PST) - Done by AntiGravity on 2026-07-18 08:15 PST
+            data.UpdatedAt = DateTimeHelper.GetPakistanTime();
             data.UpdatedBy = User?.Identity?.Name ?? "Admin";
 
             _db.SaveChanges();

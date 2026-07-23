@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TankerManagementSystem.Attributes;
+using TankerManagementSystem.Helpers;
 using TankerManagementSystem.Models;
 
 namespace TankerManagementSystem.Controllers
@@ -38,14 +39,13 @@ namespace TankerManagementSystem.Controllers
         [HttpPost]
         public IActionResult Add(CommissionSetup request)
         {
-            var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
-            request.CreatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone);
+            var pakTime = DateTimeHelper.GetPakistanTime();
+            request.CreatedAt = pakTime;
 
             var currentUserId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                                         ?? User?.FindFirst(ClaimTypes.Name)?.Value
                                         ?? User?.FindFirst("sub")?.Value
                                         ?? User?.FindFirst(ClaimTypes.Email)?.Value
-                                        ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                                         ?? User?.Identity?.Name;
 
             if (string.IsNullOrEmpty(currentUserId) || !(User?.Identity?.IsAuthenticated ?? false))
@@ -60,6 +60,18 @@ namespace TankerManagementSystem.Controllers
             {
                 TempData["Error"] = "Commission Name is required";
                 return RedirectToAction("Add");
+            }
+
+            // FIX Issue 14: Deactivate all other commissions when adding an active one - Done by AntiGravity on 2026-07-18 08:15 PST
+            if (request.IsActive)
+            {
+                var otherActive = _dbcontext.CommissionSetups
+                    .Where(x => x.IsActive)
+                    .ToList();
+                foreach (var item in otherActive)
+                {
+                    item.IsActive = false;
+                }
             }
 
             _dbcontext.CommissionSetups.Add(request);
@@ -85,18 +97,29 @@ namespace TankerManagementSystem.Controllers
             var data = _dbcontext.CommissionSetups.FirstOrDefault(x => x.Id == update.Id);
             if (data == null) return NotFound();
 
-            var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
-            data.UpdatedAt = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone);
+            var pakTime = DateTimeHelper.GetPakistanTime();
+            data.UpdatedAt = pakTime;
 
             data.Name = update.Name;
             data.Percentage = update.Percentage;
             data.IsActive = update.IsActive;
 
+            // FIX Issue 14: Deactivate all other commissions when setting this one active - Done by AntiGravity on 2026-07-18 08:15 PST
+            if (update.IsActive)
+            {
+                var otherActive = _dbcontext.CommissionSetups
+                    .Where(x => x.IsActive && x.Id != update.Id)
+                    .ToList();
+                foreach (var item in otherActive)
+                {
+                    item.IsActive = false;
+                }
+            }
+
             var currentUserId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                                             ?? User?.FindFirst(ClaimTypes.Name)?.Value
                                             ?? User?.FindFirst("sub")?.Value
                                             ?? User?.FindFirst(ClaimTypes.Email)?.Value
-                                            ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
                                             ?? User?.Identity?.Name;
 
             if (string.IsNullOrEmpty(currentUserId) || !(User?.Identity?.IsAuthenticated ?? false))

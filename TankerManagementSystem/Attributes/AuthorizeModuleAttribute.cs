@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -58,27 +58,68 @@ namespace TankerManagementSystem.Attributes
 
             bool isAllowed = false;
 
-            // Sakht Action Checking Logic
-            if (currentAction == "index" || currentAction == "details" || currentAction == "fetchusers" || currentAction == "getall")
+            // Modified by AI
+            // Date: 2026-07-21
+            // Reason: H-08 — All action name string literals must be lowercase to match
+            // currentAction which is already lowercased via .ToLower() on line 37.
+            // Previously "EditLedger" (PascalCase) never matched "editledger" (lowercase),
+            // causing TripLedger's EditLedger action to fall into the else branch and
+            // check CanView instead of CanEdit — effectively bypassing edit authorization.
+            // Also added "addoldentry", "allreport", "generate", "printbill",
+            // "statement", "allkhatas", "print", "monthlyreport", "dailyreport",
+            // "allreport", "profitloss", "expenseanalysis" to correct permission mapping.
+
+            // VIEW actions
+            if (currentAction == "index"
+                || currentAction == "details"
+                || currentAction == "fetchusers"
+                || currentAction == "getall"
+                || currentAction == "allreport"
+                || currentAction == "dailyreport"
+                || currentAction == "monthlyreport"
+                || currentAction == "profitloss"
+                || currentAction == "expenseanalysis"
+                || currentAction == "generate"
+                || currentAction == "printbill"
+                || currentAction == "statement"
+                || currentAction == "allkhatas"
+                || currentAction == "print"
+                || currentAction == "tankerbalancehistory")
             {
                 isAllowed = permission.CanView;
             }
-            // Agar action name 'create' ho ya 'add' ho (Dono cases handle)
-            else if (currentAction == "create" || currentAction == "add" || currentAction == "save" || currentAction == "insert" || currentAction == "addentry" || currentAction == "addLedger")
+            // CREATE actions
+            else if (currentAction == "create"
+                     || currentAction == "add"
+                     || currentAction == "save"
+                     || currentAction == "insert"
+                     || currentAction == "addentry"
+                     || currentAction == "addledger"
+                     || currentAction == "addoldentry")
             {
                 isAllowed = permission.CanCreate;
             }
-            else if (currentAction == "edit" || currentAction == "update" || currentAction == "modify" || currentAction == "editentry" || currentAction == "EditLedger")
+            // EDIT actions
+            else if (currentAction == "edit"
+                     || currentAction == "update"
+                     || currentAction == "modify"
+                     || currentAction == "editentry"
+                     || currentAction == "editledger")  // was "EditLedger" (wrong case) — fixed
             {
                 isAllowed = permission.CanEdit;
             }
-            else if (currentAction == "delete" || currentAction == "remove" || currentAction == "destroy")
+            // DELETE actions
+            else if (currentAction == "delete"
+                     || currentAction == "remove"
+                     || currentAction == "destroy"
+                     || currentAction == "deleteentry"
+                     || currentAction == "deleteuser")
             {
                 isAllowed = permission.CanDelete;
             }
             else
             {
-                // Agar koi aisa action ho jo samajh na aaye, toh hamesha strict check (False) rakhein ya CanView par choren
+                // Unknown action — default to CanView as safe fallback.
                 isAllowed = permission.CanView;
             }
 

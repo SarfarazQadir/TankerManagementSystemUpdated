@@ -1,0 +1,127 @@
+﻿@using TankerManagementSystem.Models
+@model PersonalKhata
+@{
+    ViewData["Title"] = "Add Old Entry";
+    Layout = "~/Views/Shared/_Dashboard.cshtml";
+    var khatas = ViewBag.Khatas as List<KhataPerson>;
+}
+
+<section class="section">
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12 col-md-6 col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Add Old / Manual Entry</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="addOldEntryForm" method="post" asp-action="AddOldEntry" onsubmit="return validateOldEntryForm(event)">
+                            @Html.AntiForgeryToken()
+
+                            <div class="form-group row">
+                                <label for="KhataPersonId" class="col-sm-3 col-form-label">Customer<span style="color:red;">*</span></label>
+                                <div class="col-sm-9">
+                                    <select name="KhataPersonId" id="KhataPersonId" class="form-control">
+                                        <option value="">-- Select Person --</option>
+                                        @if (khatas != null)
+                                        { 
+                                            foreach (var k in khatas)
+                                            {
+                                                <option value="@k.Id">@k.Name</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="EntryDate" class="col-sm-3 col-form-label">Entry Date<span style="color:red;">*</span></label>
+                                <div class="col-sm-9">
+                                    <input type="date" name="EntryDate" class="form-control" id="EntryDate">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="Description" class="col-sm-3 col-form-label">Description</label>
+                                <div class="col-sm-9">
+                                    <input type="text" name="Description" class="form-control" id="Description" placeholder="Enter Description">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="AddAmount" class="col-sm-3 col-form-label">Add Amount (Credit)</label>
+                                <div class="col-sm-9">
+                                    <input type="number" step="0.01" name="AddAmount" class="form-control" id="AddAmount" placeholder="0" value="0">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label for="MinusAmount" class="col-sm-3 col-form-label">Minus Amount (Debit)</label>
+                                <div class="col-sm-9">
+                                    <input type="number" step="0.01" name="MinusAmount" class="form-control" id="MinusAmount" placeholder="0" value="0">
+                                </div>
+                            </div>
+
+                            <div class="card-footer text-center">
+                                <input type="submit" value="Save Old Entry" class="btn btn-primary" />
+                                <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    function validateOldEntryForm(event) {
+
+        let khataPersonId = document.getElementById("KhataPersonId").value.trim();
+        let entryDate = document.getElementById("EntryDate").value.trim();
+        let addAmount = parseFloat(document.getElementById("AddAmount").value) || 0;
+        let minusAmount = parseFloat(document.getElementById("MinusAmount").value) || 0;
+
+        if (khataPersonId === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Customer selection is required!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (entryDate === "") {
+            iziToast.error({
+                title: 'Error',
+                message: 'Entry Date is required!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (addAmount === 0 && minusAmount === 0) {
+            iziToast.error({
+                title: 'Error',
+                message: 'Enter either Add Amount or Minus Amount!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        if (addAmount > 0 && minusAmount > 0) {
+            iziToast.error({
+                title: 'Error',
+                message: 'Only Add Amount OR Minus Amount allowed, not both!',
+                position: 'bottomRight'
+            });
+            event.preventDefault();
+            return false;
+        }
+
+        return true;
+    }
+</script>

@@ -1,12 +1,19 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using TankerManagementSystem.Helpers;
 using TankerManagementSystem.Models;
 
 namespace TankerManagementSystem.Controllers.Api
 {
-    //[Authorize(Roles = "Admin")]
+    // Modified by AI
+    // Date: 2026-07-21
+    // Reason: Enabled [Authorize] attribute so dashboard API data is protected.
+    // Also replaced DateTime.Today with DateTimeHelper.GetPakistanToday() to avoid
+    // server timezone drift issues.
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [Route("api/[controller]")]
     [ApiController]
     public class AdminApiController : ControllerBase
@@ -16,11 +23,11 @@ namespace TankerManagementSystem.Controllers.Api
         {
             _mycon = mycon;
         }
-        //[Authorize]
+
         [HttpGet("GetDashboardData")]
         public IActionResult GetDashboardData()
         {
-            DateTime today = DateTime.Today;
+            DateTime today = DateTimeHelper.GetPakistanToday();
             DateTime weekStart = today.AddDays(-(int)today.DayOfWeek);
             DateTime monthStart = new DateTime(today.Year, today.Month, 1);
             DateTime yearStart = new DateTime(today.Year, 1, 1);

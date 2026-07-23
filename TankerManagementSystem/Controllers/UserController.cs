@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -111,7 +111,13 @@ namespace TankerManagementSystem.Controllers
             }
             catch (Exception ex)
             {
-                throw ex;
+                // Modified by AI
+                // Date: 2026-07-21
+                // Reason: M-06 — 'throw ex' was resetting the stack trace, making
+                // debugging impossible. Bare 'throw' re-throws the original exception
+                // with the full stack trace preserved.
+                _ = ex; // suppress "variable unused" warning
+                throw;
             }
             // ==========================================
             // BY DEFAULT PERMISSION LOGIC END

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ASP.Net\\Latest Tanker Management System\\Live\\TankerManagementSystem\\TankerManagementSystem\\TankerManagementSystem.csproj": {}
+    "D:\\ASP.Net\\Latest Tanker Management System\\Without Email Work\\TankerManagementSystem\\TankerManagementSystem\\TankerManagementSystem.csproj": {}
   },
   "projects": {
-    "D:\\ASP.Net\\Latest Tanker Management System\\Live\\TankerManagementSystem\\TankerManagementSystem\\TankerManagementSystem.csproj": {
+    "D:\\ASP.Net\\Latest Tanker Management System\\Without Email Work\\TankerManagementSystem\\TankerManagementSystem\\TankerManagementSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ASP.Net\\Latest Tanker Management System\\Live\\TankerManagementSystem\\TankerManagementSystem\\TankerManagementSystem.csproj",
+        "projectUniqueName": "D:\\ASP.Net\\Latest Tanker Management System\\Without Email Work\\TankerManagementSystem\\TankerManagementSystem\\TankerManagementSystem.csproj",
         "projectName": "TankerManagementSystem",
-        "projectPath": "D:\\ASP.Net\\Latest Tanker Management System\\Live\\TankerManagementSystem\\TankerManagementSystem\\TankerManagementSystem.csproj",
+        "projectPath": "D:\\ASP.Net\\Latest Tanker Management System\\Without Email Work\\TankerManagementSystem\\TankerManagementSystem\\TankerManagementSystem.csproj",
         "packagesPath": "C:\\Users\\sarfa\\.nuget\\packages\\",
-        "outputPath": "D:\\ASP.Net\\Latest Tanker Management System\\Live\\TankerManagementSystem\\TankerManagementSystem\\obj\\",
+        "outputPath": "D:\\ASP.Net\\Latest Tanker Management System\\Without Email Work\\TankerManagementSystem\\TankerManagementSystem\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -103,7 +103,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

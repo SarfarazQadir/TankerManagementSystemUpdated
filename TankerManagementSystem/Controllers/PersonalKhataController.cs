@@ -1,9 +1,16 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+// Modified by AI
+// Date: 2026-07-21
+// Reason: H-05 — Replaced private RecalculatePersonalKhata() with ILedgerRecalculationService injection.
+//         C-05 — Removed redundant manual Balance pre-computation before RecalculatePersonalKhata().
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using TankerManagementSystem.Attributes;
+using TankerManagementSystem.Helpers;
 using TankerManagementSystem.Models;
+using TankerManagementSystem.Services;
 
 namespace TankerManagementSystem.Controllers
 {
@@ -13,9 +20,38 @@ namespace TankerManagementSystem.Controllers
     {
         private readonly ApplicationDbContext _db;
 
-        public PersonalKhataController(ApplicationDbContext db)
+        // Modified by AI
+        // Date: 2026-07-21
+        // Reason: H-05 — Injecting ILedgerRecalculationService replaces the private
+        // RecalculatePersonalKhata() method that was duplicated in multiple places.
+        // C-05 — The shared service call in Add() is now the single authoritative
+        // balance setter, removing the intermediate redundant saves.
+        private readonly ILedgerRecalculationService _recalcService;
+
+        public PersonalKhataController(ApplicationDbContext db, ILedgerRecalculationService recalcService)
         {
             _db = db;
+            _recalcService = recalcService;
+        }
+
+        /// <summary>
+        /// Retrieves the current user ID from JWT claims.
+        /// Returns null if user is not authenticated.
+        /// </summary>
+        private string? GetCurrentUserId()
+        {
+            var userId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                         ?? User?.FindFirst(ClaimTypes.Name)?.Value
+                         ?? User?.FindFirst("sub")?.Value
+                         ?? User?.FindFirst(ClaimTypes.Email)?.Value
+                         ?? User?.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userId) || !(User?.Identity?.IsAuthenticated ?? false))
+            {
+                return null;
+            }
+
+            return userId;
         }
 
         // =========================
@@ -23,14 +59,9 @@ namespace TankerManagementSystem.Controllers
         // =========================
         public IActionResult Index()
         {
-            // 1. JWT COOKIE SE USER ID NIKALNA
-            string currentUserId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                               ?? User?.FindFirst(ClaimTypes.Name)?.Value
-                               ?? User?.FindFirst("sub")?.Value
-                               ?? User?.FindFirst(ClaimTypes.Email)?.Value
-                               ?? User?.Identity?.Name;
+            string? currentUserId = GetCurrentUserId();
 
-            if (string.IsNullOrEmpty(currentUserId) || !(User?.Identity?.IsAuthenticated ?? false))
+            if (currentUserId == null)
             {
                 TempData["Error"] = "Session expired or invalid token. Please login again.";
                 return RedirectToAction("Login", "Admin");
@@ -71,57 +102,54 @@ namespace TankerManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Add(PersonalKhata model)
         {
-            // 1. JWT COOKIE SE USER ID NIKALNA
-            // =========================================
-            // Agar user logged in nahi hai, toh User.FindFirst null dega
-            var currentUserId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                ?? User?.FindFirst(ClaimTypes.Name)?.Value
-                                ?? User?.FindFirst("sub")?.Value
-                                ?? User?.FindFirst(ClaimTypes.Email)?.Value
-                                ?? User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                                ?? User?.Identity?.Name;
+            var currentUserId = GetCurrentUserId();
 
-            if (string.IsNullOrEmpty(currentUserId))
+            if (currentUserId == null)
             {
                 TempData["Error"] = "Session expired or invalid token. Please login again.";
                 return RedirectToAction("Login", "Admin");
             }
 
-            string userId = currentUserId;
+            var pakTime = DateTimeHelper.GetPakistanTime();
 
-            var tz = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
+            // FIX Issue 02: Find or create the KhataPerson record for the current user
+            var person = _db.KhataPersons.FirstOrDefault(x => x.Name == currentUserId);
+            if (person == null)
+            {
+                person = new KhataPerson
+                {
+                    Name = currentUserId,
+                    CurrentBalance = 0,
+                    CreatedAt = pakTime,
+                    CreatedBy = currentUserId
+                };
+                _db.KhataPersons.Add(person);
+                _db.SaveChanges();
+            }
 
-            DateTime pakTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, tz);
-
-            model.KhataPerson.Name = userId;
-
+            model.KhataPersonId = person.Id;
             model.CreatedAt = pakTime;
-
             model.CreatedBy = currentUserId;
 
-            // =========================
-            // LAST BALANCE
-            // =========================
-            decimal lastBalance = _db.PersonalKhatas
-                .Where(x => x.KhataPerson.Name == userId)
-                .OrderByDescending(x => x.Id)
-                .Select(x => x.Balance)
-                .FirstOrDefault();
-
-            // =========================
-            // BALANCE CALCULATION
-            // =========================
-            model.Balance =
-                lastBalance
-                + model.AddAmount
-                - model.MinusAmount;
+            // Modified by AI
+            // Date: 2026-07-21
+            // Reason: C-05 — Previously, Balance was computed manually here AND
+            // person.CurrentBalance was set before RecalculatePersonalKhata(), creating
+            // two redundant intermediate saves with potentially wrong values.
+            // Since RecalculatePersonalKhata() always overwrites Balance and
+            // person.CurrentBalance with the correct date-ordered values, the pre-computation
+            // is unnecessary. Saving with Balance=0 avoids any risk of stale data
+            // surviving an exception between the first and final save.
+            model.Balance = 0; // Will be correctly set by RecalculatePersonalKhata below
 
             _db.PersonalKhatas.Add(model);
-
             _db.SaveChanges();
 
-            TempData["success"] = "Customer Credit Entry Added";
+            // RecalculatePersonalKhata sets the correct date-ordered Balance on every row
+            // and sets person.CurrentBalance to the final running total.
+            _recalcService.RecalculatePersonalKhata(person.Id);
 
+            TempData["success"] = "Customer Credit Entry Added";
             return RedirectToAction("Index");
         }
 
@@ -132,12 +160,7 @@ namespace TankerManagementSystem.Controllers
         public IActionResult Edit(int id)
         {
             var data = _db.PersonalKhatas.Find(id);
-
-            if (data == null)
-            {
-                return NotFound();
-            }
-
+            if (data == null) return NotFound();
             return View(data);
         }
 
@@ -155,20 +178,24 @@ namespace TankerManagementSystem.Controllers
                 return NotFound();
             }
 
+            var pakTime = DateTimeHelper.GetPakistanTime();
+
             data.EntryDate = model.EntryDate;
             data.Description = model.Description;
             data.AddAmount = model.AddAmount;
             data.MinusAmount = model.MinusAmount;
 
-            data.Balance =
-                model.AddAmount - model.MinusAmount;
-
-            data.UpdatedAt = DateTime.Now;
+            // FIX Issue 11: Don't set balance manually — let RecalculatePersonalKhata fix the chain.
+            data.UpdatedAt = pakTime;
 
             _db.SaveChanges();
 
-            TempData["success"] = "Record Updated";
+            // Modified by AI
+            // Date: 2026-07-21
+            // Reason: H-05 — Using service instead of private method.
+            _recalcService.RecalculatePersonalKhata(data.KhataPersonId);
 
+            TempData["success"] = "Record Updated";
             return RedirectToAction("Index");
         }
 
@@ -184,43 +211,95 @@ namespace TankerManagementSystem.Controllers
                 return NotFound();
             }
 
-            _db.PersonalKhatas.Remove(data);
+            int khataPersonId = data.KhataPersonId;
 
+            _db.PersonalKhatas.Remove(data);
             _db.SaveChanges();
 
-            TempData["success"] = "Record Deleted";
+            // Modified by AI
+            // Date: 2026-07-21
+            // Reason: H-05 — Using service instead of private method.
+            // FIX Issue 12: Recalculate running balances and update KhataPerson.CurrentBalance
+            _recalcService.RecalculatePersonalKhata(khataPersonId);
 
+            TempData["success"] = "Record Deleted";
             return RedirectToAction("Index");
         }
 
         // =========================
-        // PRINT
+        // MY LEDGER VIEW (Current user's entries)
         // =========================
-        public IActionResult Print()
+        public IActionResult MyLedger()
         {
-            // 1. JWT COOKIE SE USER ID NIKALNA
-            string currentUserId = User?.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                               ?? User?.FindFirst(ClaimTypes.Name)?.Value
-                               ?? User?.FindFirst("sub")?.Value
-                               ?? User?.FindFirst(ClaimTypes.Email)?.Value
-                               ?? User?.Identity?.Name;
+            var currentUserId = GetCurrentUserId();
 
-            if (string.IsNullOrEmpty(currentUserId) || !(User?.Identity?.IsAuthenticated ?? false))
+            if (currentUserId == null)
             {
                 TempData["Error"] = "Session expired or invalid token. Please login again.";
                 return RedirectToAction("Login", "Admin");
             }
 
-            string userId = currentUserId;
-
-            // Data ko descending order (Latest Date) me load kiya
             var data = _db.PersonalKhatas
-                .Where(x => x.KhataPerson.Name == userId)
+                .Where(x => x.KhataPerson.Name == currentUserId)
                 .OrderByDescending(x => x.EntryDate)
                 .ToList();
 
             return View(data);
         }
 
+        // =========================
+        // ADD OLD ENTRY (GET) — Cash Ledger ko touch nahi karta
+        // =========================
+        [HttpGet]
+        public IActionResult AddOldEntry()
+        {
+            ViewBag.Khatas = _db.KhataPersons.OrderBy(k => k.Name).ToList();
+            return View();
+        }
+
+        // =========================
+        // ADD OLD ENTRY (POST)
+        // FIX Issue 14: Purani/manual entries ka option — is se PersonalKhata me
+        // direct entry ho jati hai kisi bhi selected KhataPerson ke against,
+        // Cash Ledger ya Tanker Ledger ko affect kiye baghair.
+        // =========================
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddOldEntry([Bind("EntryDate,KhataPersonId,Description,AddAmount,MinusAmount")] PersonalKhata model)
+        {
+            if (model.KhataPersonId <= 0)
+            {
+                TempData["error"] = "Pehle customer select karain.";
+                ViewBag.Khatas = _db.KhataPersons.OrderBy(k => k.Name).ToList();
+                return View(model);
+            }
+
+            var person = _db.KhataPersons.Find(model.KhataPersonId);
+            if (person == null)
+            {
+                return NotFound();
+            }
+
+            var currentUserId = GetCurrentUserId() ?? User?.Identity?.Name ?? "Admin";
+            var pakTime = DateTimeHelper.GetPakistanTime();
+
+            model.CreatedAt = pakTime;
+            model.CreatedBy = currentUserId;
+            model.ModuleName = "Old Entry";
+            model.ReferenceId = null;
+            model.Balance = 0; // Will be set by RecalculatePersonalKhata below
+
+            _db.PersonalKhatas.Add(model);
+            _db.SaveChanges();
+
+            // Modified by AI
+            // Date: 2026-07-21
+            // Reason: H-05 — Using service instead of private method.
+            // Backdated entry may exist, so full chain recalculation (date-ordered) is needed.
+            _recalcService.RecalculatePersonalKhata(person.Id);
+
+            TempData["success"] = $"Purani entry '{person.Name}' ki ledger me add ho gai. Cash Ledger balance affect nahi hua.";
+            return RedirectToAction("Statement", "KhataPerson", new { id = person.Id });
+        }
     }
 }

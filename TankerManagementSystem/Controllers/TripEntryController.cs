@@ -1,10 +1,21 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+// Modified by AI
+// Date: 2026-07-21
+// Reason: C-01 — Added _recalcService.RecalculateCashLedger() call at the end of
+//         AddEntry POST. This was the only write path that never called RecalculateCashLedger(),
+//         causing the CashLedger balance chain to remain incorrect after adding a trip.
+//         C-02 — Added _recalcService.RecalculateCashLedger() call at the end of
+//         EditEntry POST. Same issue as C-01 applied to the edit flow.
+//         H-05 — Injected ILedgerRecalculationService replacing previous inability
+//         to call RecalculateCashLedger() (which was a private method in CashLedgerController).
+
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using TankerManagementSystem.Attributes;
 using TankerManagementSystem.Models;
+using TankerManagementSystem.Services;
 
 namespace TankerManagementSystem.Controllers
 {
@@ -14,9 +25,17 @@ namespace TankerManagementSystem.Controllers
     {
         private readonly ApplicationDbContext _db;
 
-        public TripEntryController(ApplicationDbContext db)
+        // Modified by AI
+        // Date: 2026-07-21
+        // Reason: H-05 / C-01 / C-02 — Service injection enables RecalculateCashLedger()
+        // to be called from this controller (previously impossible since that logic was
+        // private inside CashLedgerController).
+        private readonly ILedgerRecalculationService _recalcService;
+
+        public TripEntryController(ApplicationDbContext db, ILedgerRecalculationService recalcService)
         {
             _db = db;
+            _recalcService = recalcService;
         }
 
         // LIST
@@ -67,12 +86,12 @@ namespace TankerManagementSystem.Controllers
                     return RedirectToAction("AddEntry");
                 }
 
-                // CHECK DUPLICATE ENTRY
+                // FIX Issue 07: Compare LoadDate (operational date) instead of CreatedAt
                 bool alreadyExists = _db.TripEntries.Any(x =>
                     x.TankerId == request.TankerId &&
                     x.FromLocation == request.FromLocation &&
                     x.ToLocation == request.ToLocation &&
-                    x.CreatedAt.Date == request.CreatedAt.Date
+                    x.LoadDate.Date == request.LoadDate.Date
                 );
 
                 if (alreadyExists)
@@ -94,8 +113,13 @@ namespace TankerManagementSystem.Controllers
                 decimal totalCashRequired = request.AdvanceCash + totalExpense;
 
                 // Cash Balance Validation
-                var cashLedger = _db.CashLedgers.OrderByDescending(x => x.Id).FirstOrDefault();
-                decimal currentCashBalance = cashLedger?.Balance ?? 0;
+                // Modified by AI
+                // Date: 2026-07-21
+                // Reason: Calculate total available cash balance across the entire CashLedger (Sum of Credit - Debit).
+                // Previously, OrderByDescending(x => x.Id).FirstOrDefault().Balance fetched a backdated row's
+                // intermediate running balance instead of the overall cash balance, causing false
+                // "Cash Ledger balance is low" toaster errors when creating historical/backdated trip entries.
+                decimal currentCashBalance = _db.CashLedgers.Sum(x => (decimal?)x.Credit - (decimal?)x.Debit) ?? 0;
 
                 if (currentCashBalance < totalCashRequired)
                 {
@@ -154,6 +178,16 @@ namespace TankerManagementSystem.Controllers
                 }
 
                 _db.SaveChanges();
+
+                // Modified by AI
+                // Date: 2026-07-21
+                // Reason: C-01 — This call was completely missing from AddEntry. Without it,
+                // the locally-computed currentCashBalance values written to CashLedger.Balance
+                // could be stale/wrong if any prior entry had the wrong balance, or if a
+                // concurrent request inserted a row between the read and the saves.
+                // RecalculateCashLedger() ensures the entire chain is correctly ordered and balanced.
+                _recalcService.RecalculateCashLedger();
+
                 transaction.Commit();
 
                 TempData["add_trip_message"] = "Trip and expenses added successfully, Cash Ledger updated.";
@@ -166,11 +200,12 @@ namespace TankerManagementSystem.Controllers
                 return RedirectToAction("AddEntry");
             }
         }
+
         // EDIT GET
         public IActionResult EditEntry(int id)
         {
             var trip = _db.TripEntries
-                .Include(x => x.TripExpenses) // Expenses load kiye
+                .Include(x => x.TripExpenses)
                 .FirstOrDefault(x => x.Id == id);
 
             if (trip == null) return NotFound();
@@ -178,6 +213,7 @@ namespace TankerManagementSystem.Controllers
             ViewBag.Tankers = _db.Tankers.ToList();
             return View(trip);
         }
+
         // EDIT POST
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -223,11 +259,13 @@ namespace TankerManagementSystem.Controllers
                 var pakistanTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Pakistan Standard Time");
                 DateTime pakTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, pakistanTimeZone);
 
-                // =========================================================================
-                // 🔥 STEP A: REVERSE OLD CASH DEDUCTIONS (To prevent double deductions)
-                // =========================================================================
-                var latestCash = _db.CashLedgers.OrderByDescending(x => x.Id).FirstOrDefault();
-                decimal currentCashBalance = latestCash?.Balance ?? 0;
+                // Modified by AI
+                // Date: 2026-07-21
+                // Reason: Calculate total available cash balance across the entire CashLedger (Sum of Credit - Debit).
+                // Previously, OrderByDescending(x => x.Id).FirstOrDefault().Balance fetched a backdated row's
+                // intermediate running balance instead of the overall cash balance, causing false
+                // "Insufficient cash balance" toaster errors when editing historical/backdated trip entries.
+                decimal currentCashBalance = _db.CashLedgers.Sum(x => (decimal?)x.Credit - (decimal?)x.Debit) ?? 0;
 
                 // Purana Advance Cash wapas balance me add karein
                 if (trip.AdvanceCash > 0)
@@ -276,13 +314,12 @@ namespace TankerManagementSystem.Controllers
                 // 3. Validation Check after reversal
                 if (currentCashBalance < netNewCashRequired)
                 {
-                    // Transaction rollback ho jayegi automatic agar yahan se return hua to
                     TempData["Error"] = $"Insufficient cash balance for these updates. Required: {netNewCashRequired}, Available: {currentCashBalance}";
                     return RedirectToAction("EditEntry", new { id = update.Id });
                 }
 
                 // =========================================================================
-                // 🔥 STEP B: APPLY UPDATED VALUES & DEDUCTIONS
+                // STEP B: APPLY UPDATED VALUES & DEDUCTIONS
                 // =========================================================================
 
                 // Remove old expenses from database table
@@ -346,6 +383,16 @@ namespace TankerManagementSystem.Controllers
                 }
 
                 _db.SaveChanges();
+
+                // Modified by AI
+                // Date: 2026-07-21
+                // Reason: C-02 — This call was completely missing from EditEntry POST.
+                // After reversing and re-applying cash entries via locally-tracked
+                // currentCashBalance, the entire CashLedger chain must be recalculated
+                // to ensure correctness — especially for any entries that might have been
+                // inserted out of date order (backdated edit).
+                _recalcService.RecalculateCashLedger();
+
                 transaction.Commit();
 
                 TempData["edit_trip_message"] = "Trip and expenses updated successfully. Ledger adjusted.";

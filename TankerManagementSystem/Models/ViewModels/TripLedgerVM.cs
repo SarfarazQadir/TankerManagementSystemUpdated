@@ -1,4 +1,4 @@
-﻿namespace TankerManagementSystem.Models.ViewModels
+namespace TankerManagementSystem.Models.ViewModels
 {
     public class TripLedgerVM
     {
@@ -17,7 +17,12 @@
         public decimal GrandTotal { get; set; }
         public string Remarks { get; set; } = "N/A";
         public DateTime CreatedAt { get; set; }
-        public int? CreatedBy { get; set; }
+        // Modified by AI
+        // Date: 2026-07-21
+        // Reason: L-04 — CreatedBy was declared as int? but ASP.NET Identity user IDs
+        // are strings (GUIDs or usernames). This was a silent type mismatch. All other
+        // models (CashLedger, TripLedger, PersonalKhata) use string? for CreatedBy.
+        public string? CreatedBy { get; set; }
         public decimal TotalDeductions { get; set; }
         public decimal PayingAmount { get; set; }
     }

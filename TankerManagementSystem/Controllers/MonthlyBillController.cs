@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -130,7 +130,7 @@ namespace TankerManagementSystem.Controllers
                 {
                     Date = ats.EntryDate,
                     RowType = "ATS",
-                    Details = $"[ATS PSO] - {ats.Description}",
+                    Details = ats.Description,
                     Freight = 0,
                     Deduction = ats.Amount,
                     Net = 0 - ats.Amount,
@@ -151,16 +151,9 @@ namespace TankerManagementSystem.Controllers
             {
                 previousBalance = lastLedgerBeforeMonth.RunningBalance;
             }
-            else
-            {
-                var firstLedger = _db.TankerLedgers
-                    .Where(x => x.TankerId == tankerId)
-                    .OrderBy(x => x.TransactionDate)
-                    .ThenBy(x => x.Id)
-                    .FirstOrDefault();
-
-                previousBalance = firstLedger?.RunningBalance ?? 0;
-            }
+            // FIX Issue 06: If no ledger entry exists before the billing month - Done by AntiGravity on 2026-07-18 08:15 PST
+            // previousBalance stays 0. The old fallback to the first-ever entry
+            // caused double-counting when that entry fell within the billing month.
 
             ViewBag.OpeningBalance = previousBalance;
             ViewBag.TotalFreight = totalFreight;
@@ -175,6 +168,21 @@ namespace TankerManagementSystem.Controllers
             ViewBag.Tanker = tanker;
             ViewBag.Month = month;
             ViewBag.Year = year;
+
+            // Modified by AI
+            // Date: 2026-07-21
+            // Reason: C-04 — Added ClosingBalance calculation so the monthly bill view
+            // can display a reconcilable closing balance.
+            // Formula: ClosingBalance = previousBalance + sum of all row Net values
+            // This works because each StatementRowVM.Net stores exactly what was posted to
+            // TankerLedger for that entry (Trip: GrandTotal, ATS: -Amount, Cash: Credit-Debit).
+            // The ClosingBalance can be cross-checked against the actual TankerLedger.RunningBalance
+            // of the last entry in the billing month to verify financial consistency.
+            decimal netMovement = orderedRows.Sum(r => r.Net);
+            decimal closingBalance = previousBalance + netMovement;
+
+            ViewBag.NetMovement = netMovement;
+            ViewBag.ClosingBalance = closingBalance;
 
             return View(orderedRows);
         }

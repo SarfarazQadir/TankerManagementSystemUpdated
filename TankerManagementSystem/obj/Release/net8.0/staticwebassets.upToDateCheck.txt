@@ -626,7 +626,7 @@ wwwroot\css\app.min.css
 wwwroot\css\components.css
 wwwroot\css\custom.css
 wwwroot\css\MaterialIcons-Regular.html
-wwwroot\css\site.css
+wwwroot\js\site.js
 wwwroot\css\style.css
 wwwroot\css\userbooking.css
 wwwroot\css\userflight.css
@@ -1368,7 +1368,7 @@ wwwroot\js\page\vector-map.js
 wwwroot\js\page\widget-chart.js
 wwwroot\js\page\widget-data.js
 wwwroot\js\scripts.js
-wwwroot\js\site.js
+wwwroot\css\site.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.min.css
