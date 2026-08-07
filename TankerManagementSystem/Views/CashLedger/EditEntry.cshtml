@@ -100,6 +100,18 @@
                            class="form-control" />
                 </div>
 
+                <div class="form-group form-check">
+                    <input type="checkbox"
+                           id="IsGeneralExpense"
+                           name="IsGeneralExpense"
+                           class="form-check-input"
+                           value="true"
+                           checked="@(Model.IsGeneralExpense ? "checked" : null)" />
+                    <label class="form-check-label" for="IsGeneralExpense">
+                        This is a general company expense (Office rent, salaries, utilities, etc.)
+                    </label>
+                </div>
+
                 <button type="submit" class="btn btn-primary">Update Entry</button>
                 <a href="@Url.Action("Index")" class="btn btn-secondary">Back</a>
             </form>

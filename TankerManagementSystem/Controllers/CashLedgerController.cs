@@ -41,7 +41,7 @@ namespace TankerManagementSystem.Controllers
         {
             var data = (
                 from c in _db.CashLedgers
-                orderby c.EntryDate descending
+                orderby c.CreatedAt descending
                 select new CashLedgerVM
                 {
                     Id = c.Id,
@@ -67,7 +67,7 @@ namespace TankerManagementSystem.Controllers
 
         // POST: CashLedger/AddEntry
         [HttpPost]
-        public IActionResult AddEntry([Bind("EntryDate,TankerId,KhataPersonId,Description,Credit,Debit")] CashLedger model)
+        public IActionResult AddEntry([Bind("EntryDate,TankerId,KhataPersonId,Description,Credit,Debit,IsGeneralExpense")] CashLedger model)
         {
             try
             {
@@ -207,7 +207,7 @@ namespace TankerManagementSystem.Controllers
         }
 
         [HttpPost]
-        public IActionResult EditEntry([Bind("Id,EntryDate,TankerId,KhataPersonId,Description,Credit,Debit,PersonId")] CashLedger model)
+        public IActionResult EditEntry([Bind("Id,EntryDate,TankerId,KhataPersonId,Description,Credit,Debit,PersonId,IsGeneralExpense")] CashLedger model)
         {
             try
             {
@@ -485,7 +485,7 @@ namespace TankerManagementSystem.Controllers
                 query = query.Where(x => x.EntryDate <= endDate.Value.Date.AddDays(1).AddTicks(-1));
             }
 
-            var data = query.OrderByDescending(x => x.EntryDate)
+            var data = query.OrderByDescending(x => x.CreatedAt)
                             .Select(x => new CashLedgerVM
                             {
                                 Id = x.Id,

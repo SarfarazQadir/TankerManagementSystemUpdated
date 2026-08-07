@@ -21,7 +21,11 @@ using TankerManagementSystem.Services;
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
 
+<<<<<<< HEAD
 // 1. DB Context
+=======
+// 1. DB Context New old old
+>>>>>>> 712ef1ada1ecc6c0176e4d791717c2c5ffd99679
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(configuration.GetConnectionString("conn")));
 

@@ -18,6 +18,12 @@ namespace TankerManagementSystem.Models
         public string? CreatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public string? UpdatedBy { get; set; }
+        // NEW: Explicit flag — replaces fragile "Description contains 'Office'" text matching.
+        // True = this Debit is a genuine company-level expense (rent, salaries, utilities, etc.)
+        // that should count toward Dashboard "Total Expenses". Should normally be false/unused
+        // when TankerId or KhataPersonId is set, since those already have their own accounting.
+        public bool IsGeneralExpense { get; set; }
+
         // TankerId can be null if it's a general expense
         public int? TankerId { get; set; }
 
