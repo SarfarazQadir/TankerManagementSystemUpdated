@@ -1,4 +1,4 @@
-// Modified by AI
+// Modified by Sarfaraz
 // Date: 2026-07-21
 // Reason: Multiple fixes applied:
 //   H-05 — Registered ILedgerRecalculationService as Scoped DI service.
