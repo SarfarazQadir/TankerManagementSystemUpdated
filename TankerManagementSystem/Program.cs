@@ -8,6 +8,7 @@
 //   L-03 — RequireHttpsMetadata now conditionally true in Production (false only in Development).
 //   M-05 — UserManager injection fix moved to AdminController constructor instead.
 // New Old Check
+// using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
